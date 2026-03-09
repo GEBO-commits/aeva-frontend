@@ -331,7 +331,7 @@ export default function Landing() {
                     <h2 className="text-4xl font-display font-bold text-text-dark mb-12 text-center">Discover Event Ideas</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <IdeaCard title="Weddings" img="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=800" />
-                        <IdeaCard title="Birthdays" img="https://images.unsplash.com/photo-1530103862676-de8892cae1ef?auto=format&fit=crop&q=80&w=800" />
+                        <IdeaCard title="Birthdays" img="https://images.unsplash.com/photo-1533227260871-3323087a3cb1?auto=format&fit=crop&q=80&w=800" />
                         <IdeaCard title="Corporate" img="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=80&w=800" />
                     </div>
                 </div>
