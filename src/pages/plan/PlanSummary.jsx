@@ -1,0 +1,320 @@
+/**
+ * PlanSummary.jsx — Step 5 of the Manual Plan Builder
+ * 
+ * Displays a full overview of all selected items (Venue, Catering, Decorations, Vendors)
+ * and the total computed cost.
+ */
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { usePlanStore } from '../../store/plan.store';
+import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
+import { CheckCircle, Sparkles, Calendar, MapPin, Users, Utensils, Palette, Camera, Music, Video, ArrowRight, Mail, Loader2, AlertTriangle } from 'lucide-react';
+
+export default function PlanSummary() {
+    const navigate = useNavigate();
+    const {
+        selectedVenue,
+        selectedCatering,
+        selectedDecorations,
+        selectedVendors,
+        skippedSteps,
+        getTotalCost,
+        clearPlan
+    } = usePlanStore();
+
+    const hasAnySelection = Boolean(
+        selectedVenue ||
+        selectedCatering ||
+        selectedDecorations ||
+        Object.values(selectedVendors).some(Boolean)
+    );
+
+    const totalCost = getTotalCost();
+
+    const [isFinalized, setIsFinalized] = useState(false);
+    const [isSending, setIsSending] = useState(false);
+    const [emailResult, setEmailResult] = useState(null);
+
+    const handleConfirm = () => {
+        setIsFinalized(true);
+    };
+
+    const handleStartAI = () => {
+        // Navigate to dashboard and auto-open chat
+        navigate('/dashboard', { state: { openChat: true } });
+    };
+
+    const sendFakeEmails = async (vendors) => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({ success: true, sent: vendors.map(v => v.name) });
+            }, 2000);
+        });
+    };
+
+    const handleSendEmails = async () => {
+        setIsSending(true);
+        setEmailResult(null);
+
+        const allVendors = [
+            selectedVenue,
+            selectedCatering,
+            selectedDecorations,
+            selectedVendors.photographer,
+            selectedVendors.dj,
+            selectedVendors.videographer
+        ].filter(Boolean);
+
+        await sendFakeEmails(allVendors);
+
+        setIsSending(false);
+        setEmailResult({
+            success: true,
+            sentNames: allVendors.map(v => v.name)
+        });
+    };
+
+    return (
+        <div className="max-w-6xl mx-auto py-8 px-4">
+            <PlanProgressBar currentStep={4} />
+
+            <div className="mt-8 mb-10 text-center">
+                <h1 className="text-4xl font-display font-bold text-text-dark mb-2">✨ Your Event Plan is Ready!</h1>
+                <p className="text-text-muted">Review your selections and confirm your dream event.</p>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-8">
+                {/* Left: Selection Cards */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Venue */}
+                    <SummaryItem
+                        title="Venue"
+                        icon={<MapPin className="text-primary" size={20} />}
+                        item={selectedVenue}
+                        placeholder="No venue selected yet"
+                        details={selectedVenue ? `${selectedVenue.location} · ${selectedVenue.maxGuests} Guests` : ''}
+                        price={selectedVenue?.startingPrice}
+                        emailSent={emailResult?.sentNames?.includes(selectedVenue?.name)}
+                        noEmailWarning={emailResult?.warnings?.includes(selectedVenue?.name)}
+                        isSkipped={skippedSteps.includes(0)}
+                    />
+
+                    {/* Catering */}
+                    <SummaryItem
+                        title="Catering"
+                        icon={<Utensils className="text-orange-500" size={20} />}
+                        item={selectedCatering}
+                        placeholder="No catering selected yet"
+                        details={selectedCatering ? `${selectedCatering.style} · ${selectedCatering.pricePerPerson} EGP/person` : ''}
+                        price={selectedCatering ? selectedCatering.pricePerPerson * 100 : 0} // ~100 guests
+                        priceLabel="~For 100 guests"
+                        emailSent={emailResult?.sentNames?.includes(selectedCatering?.name)}
+                        noEmailWarning={emailResult?.warnings?.includes(selectedCatering?.name)}
+                        isSkipped={skippedSteps.includes(1)}
+                    />
+
+                    {/* Decorations */}
+                    <SummaryItem
+                        title="Decorations"
+                        icon={<Palette className="text-pink-500" size={20} />}
+                        item={selectedDecorations}
+                        placeholder="No decorations selected yet"
+                        details={selectedDecorations ? `${selectedDecorations.theme}` : ''}
+                        price={selectedDecorations?.totalPrice}
+                        emailSent={emailResult?.sentNames?.includes(selectedDecorations?.name)}
+                        noEmailWarning={emailResult?.warnings?.includes(selectedDecorations?.name)}
+                        isSkipped={skippedSteps.includes(2)}
+                    />
+
+                    {/* Vendors */}
+                    <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                                <Camera className="text-blue-500" size={20} />
+                            </div>
+                            <h3 className="text-xl font-bold text-text-dark">Vendors</h3>
+                            {skippedSteps.includes(3) && (
+                                <span className="ml-2 flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                                    Skipped
+                                </span>
+                            )}
+                        </div>
+                        <div className="grid sm:grid-cols-3 gap-4">
+                            <VendorSmall role="Photographer" vendor={selectedVendors.photographer} icon={<Camera size={16} />} color="blue" emailSent={emailResult?.sentNames?.includes(selectedVendors.photographer?.name)} noEmailWarning={emailResult?.warnings?.includes(selectedVendors.photographer?.name)} />
+                            <VendorSmall role="DJ" vendor={selectedVendors.dj} icon={<Music size={16} />} color="violet" emailSent={emailResult?.sentNames?.includes(selectedVendors.dj?.name)} noEmailWarning={emailResult?.warnings?.includes(selectedVendors.dj?.name)} />
+                            <VendorSmall role="Videographer" vendor={selectedVendors.videographer} icon={<Video size={16} />} color="indigo" emailSent={emailResult?.sentNames?.includes(selectedVendors.videographer?.name)} noEmailWarning={emailResult?.warnings?.includes(selectedVendors.videographer?.name)} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right: Cost Summary & Actions */}
+                <div className="lg:col-start-3">
+                    <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl sticky top-24">
+                        <h3 className="text-2xl font-bold text-text-dark mb-6">Cost Summary</h3>
+
+                        <div className="space-y-4 mb-8">
+                            <CostRow label="Venue" value={selectedVenue?.startingPrice} />
+                            <CostRow label="Catering (~100p)" value={selectedCatering ? selectedCatering.pricePerPerson * 100 : 0} />
+                            <CostRow label="Decorations" value={selectedDecorations?.totalPrice} />
+                            <CostRow label="Vendors" value={
+                                (selectedVendors.photographer?.startingPrice || 0) +
+                                (selectedVendors.dj?.startingPrice || 0) +
+                                (selectedVendors.videographer?.startingPrice || 0)
+                            } />
+                        </div>
+
+                        <div className="pt-6 border-t border-gray-100 mb-8 font-black">
+                            <div className="flex justify-between items-center text-2xl">
+                                <span className="text-text-dark">Total Est.</span>
+                                <span className="text-primary">{totalCost.toLocaleString()} EGP</span>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            {!isFinalized ? (
+                                <button
+                                    onClick={handleConfirm}
+                                    disabled={!hasAnySelection}
+                                    title={!hasAnySelection ? "Please make your selections to continue" : ""}
+                                    className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${!hasAnySelection
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-2 border-gray-300'
+                                        : 'bg-primary text-white hover:bg-secondary shadow-lg shadow-primary/20'
+                                        }`}
+                                >
+                                    <CheckCircle size={20} /> Finalize Plan
+                                </button>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-center text-sm font-bold animate-pulse">
+                                        Plan Finalized!
+                                    </div>
+                                    <button
+                                        onClick={handleSendEmails}
+                                        disabled={isSending || emailResult?.success}
+                                        className={`w-full py-4 rounded-2xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${emailResult?.success ? 'bg-green-500 text-white shadow-green-500/20' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-600/20'} disabled:opacity-70`}
+                                    >
+                                        {isSending ? (
+                                            <><Loader2 size={20} className="animate-spin" /> Sending Emails...</>
+                                        ) : emailResult?.success ? (
+                                            <><CheckCircle size={20} /> Emails Sent</>
+                                        ) : (
+                                            <><Mail size={20} /> Send Emails to Vendors</>
+                                        )}
+                                    </button>
+                                </div>
+                            )}
+
+                            {emailResult?.success && (
+                                <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                                    <p className="text-sm font-bold text-green-600 flex items-start gap-2 mb-2">
+                                        <CheckCircle size={16} className="mt-0.5" />
+                                        <span>Emails sent successfully to: {emailResult.sentNames.join(', ')}</span>
+                                    </p>
+                                </div>
+                            )}
+
+                            <button
+                                onClick={handleStartAI}
+                                className="w-full py-4 bg-white border-2 border-primary/20 text-primary rounded-2xl font-bold text-lg hover:border-primary transition-all flex items-center justify-center gap-2 group mt-4!"
+                            >
+                                <Sparkles size={20} className="group-hover:animate-pulse" /> Want a Better One With AI?
+                            </button>
+
+                            <button
+                                onClick={() => navigate('/invitations')}
+                                className="w-full py-3 bg-gray-100 text-text-dark rounded-xl font-bold hover:bg-gray-200 transition-all text-sm"
+                            >
+                                Skip to Invitations
+                            </button>
+
+                            <button
+                                onClick={clearPlan}
+                                className="w-full py-2 text-text-muted hover:text-red-500 transition-colors text-sm font-medium"
+                            >
+                                Reset Selections
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function SummaryItem({ title, icon, item, placeholder, details, price, priceLabel = null, emailSent, noEmailWarning, isSkipped }) {
+    return (
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-6">
+            <div className="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100">
+                {item?.image ? (
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                        {icon}
+                    </div>
+                )}
+            </div>
+            <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                    {icon}
+                    <h4 className="text-sm font-bold text-text-muted uppercase tracking-widest">{title}</h4>
+                    {isSkipped && (
+                        <span className="ml-2 flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                            Skipped
+                        </span>
+                    )}
+                    {emailSent && (
+                        <span className="ml-auto flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
+                            <CheckCircle size={10} /> Email Sent
+                        </span>
+                    )}
+                </div>
+                {item ? (
+                    <>
+                        <h3 className="text-xl font-bold text-text-dark">{item.name}</h3>
+                        <p className="text-text-muted text-sm">{details}</p>
+                    </>
+                ) : (
+                    <p className="text-gray-400 italic">{placeholder}</p>
+                )}
+            </div>
+            {price > 0 && (
+                <div className="text-right">
+                    <p className="text-lg font-bold text-text-dark">{price.toLocaleString()} EGP</p>
+                    {priceLabel && <p className="text-[10px] text-text-muted">{priceLabel}</p>}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function VendorSmall({ role, vendor, icon, color, emailSent, noEmailWarning }) {
+    return (
+        <div className={`p-4 rounded-2xl border ${vendor ? 'border-primary/20 bg-primary/5' : 'border-gray-100 bg-gray-50'}`}>
+            <p className="text-[10px] uppercase font-bold text-text-muted mb-2">{role}</p>
+            {vendor ? (
+                <div className="flex items-center gap-2 relative">
+                    <div className={`w-6 h-6 rounded-lg bg-white flex items-center justify-center text-${color}-500 shadow-sm`}>
+                        {icon}
+                    </div>
+                    <p className="text-xs font-bold text-text-dark truncate flex-1">{vendor.name}</p>
+                    {emailSent && (
+                        <CheckCircle size={14} className="text-green-500 flex-shrink-0" />
+                    )}
+                </div>
+            ) : (
+                <p className="text-[10px] text-gray-400 italic">Not selected</p>
+            )}
+        </div>
+    );
+}
+
+function CostRow({ label, value }) {
+    return (
+        <div className="flex justify-between items-center text-sm">
+            <span className="text-text-muted">{label}</span>
+            <span className="text-text-dark font-semibold">{value ? value.toLocaleString() : 0} EGP</span>
+        </div>
+    );
+}

@@ -1,0 +1,80 @@
+export const mockVenues = [
+    {
+        id: "v001",
+        name: "Kempinski Hotel",
+        type: "indoor",
+        minGuests: 50,
+        maxGuests: 500,
+        startingPrice: 90000,
+        rating: 4.8,
+        image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=600",
+        location: "Cairo",
+        amenities: ["Catering", "Parking", "AV Equipment", "Pool"],
+        description: "Luxury 5-star venue with a grand ballroom perfect for majestic weddings and large corporate events."
+    },
+    {
+        id: "v002",
+        name: "Nile Ritz-Carlton",
+        type: "indoor",
+        minGuests: 100,
+        maxGuests: 800,
+        startingPrice: 150000,
+        rating: 4.9,
+        image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=600",
+        location: "Cairo",
+        amenities: ["Catering", "Valet", "Nile View", "Dance Floor"],
+        description: "Iconic venue featuring unparalleled views of the Nile river and exceptional service."
+    },
+    {
+        id: "v003",
+        name: "Royal Maxim Palace",
+        type: "outdoor",
+        minGuests: 50,
+        maxGuests: 300,
+        startingPrice: 85000,
+        rating: 4.7,
+        image: "https://images.unsplash.com/photo-1530103862676-de8892cae1ef?auto=format&fit=crop&q=80&w=600",
+        location: "New Cairo",
+        amenities: ["Outdoors", "Catering", "Stage", "Decor"],
+        description: "Beautiful open-air palace gardens ideal for sunset ceremonies and summer events."
+    },
+    {
+        id: "v004",
+        name: "Mena House Gardens",
+        type: "outdoor",
+        minGuests: 200,
+        maxGuests: 1000,
+        startingPrice: 200000,
+        rating: 5.0,
+        image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=80&w=600",
+        location: "Giza",
+        amenities: ["Pyramid View", "Catering", "Valet"],
+        description: "Historic gardens offering an awe-inspiring backdrop of the Great Pyramids."
+    },
+    {
+        id: "v005",
+        name: "Dusit Thani Lakeview",
+        type: "indoor",
+        minGuests: 50,
+        maxGuests: 400,
+        startingPrice: 110000,
+        rating: 4.6,
+        image: "https://images.unsplash.com/photo-1549488344-c6e80b2a95c9?auto=format&fit=crop&q=80&w=600",
+        location: "New Cairo",
+        amenities: ["Catering", "Lake View", "Luxury Suites"],
+        description: "A piece of Thailand in Cairo with stunning lakes and unmatched Thai hospitality."
+    },
+    {
+        id: "v006",
+        name: "Sakkara Country Club",
+        type: "outdoor",
+        minGuests: 100,
+        maxGuests: 600,
+        startingPrice: 75000,
+        rating: 4.5,
+        image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=600",
+        location: "Giza",
+        amenities: ["Pool", "Open Areas", "BBQ"],
+        description: "Rustic outdoor charm perfect for casual daytime events and outdoor parties."
+    }
+];

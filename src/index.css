@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* ── Prevent flash of white before React mounts ──
+   html is set to the hero dark purple so the very first
+   paint on the Landing page already shows the dark background.
+   inner pages override via body/component backgrounds. */
+html {
+  background-color: #0d0a1f;
+}
+
+body,
+#root {
+  background-color: #F0F2FF;
+}
+
+@keyframes floatBlob {
+
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  25% {
+    transform: translate(20px, -30px) scale(1.05);
+  }
+
+  50% {
+    transform: translate(-15px, 15px) scale(0.95);
+  }
+
+  75% {
+    transform: translate(-25px, -10px) scale(1.02);
+  }
+}
+
+@theme {
+  --color-primary: #6B3FF3;
+  --color-secondary: #9B6CF7;
+  --color-accent: #FF6B6B;
+  --color-background: #F0F2FF;
+  --color-text-dark: #1A1A2E;
+  --color-text-muted: #6B7280;
+  --color-foreground: #FFFFFF;
+
+  --font-display: 'Syne', sans-serif;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-dark);
+    font-family: var(--font-sans);
+  }
+}
+
+@layer utilities {
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+
+    33% {
+      transform: translateY(-20px) rotate(120deg);
+    }
+
+    66% {
+      transform: translateY(10px) rotate(240deg);
+    }
+  }
+
+  .blob {
+    animation: float 8s ease-in-out infinite;
+  }
+}
