@@ -22,37 +22,41 @@ export default function SelectDecorations() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         const fetchDecorations = async () => {
             setIsLoading(true);
             const { data, error } = await getVendors('decorations');
-            if (error) {
-                console.error('[SelectDecorations] Failed to fetch decoration vendors:', error);
-                setDecorationsData([]);
-            } else {
-                // Map Supabase vendors to card shape
-                const mapped = (data || []).map(v => {
-                    let details = {};
-                    if (v.details) {
-                        details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
-                    }
-                    return {
-                        id: v.id,
-                        name: v.name,
-                        description: v.description,
-                        rating: v.rating,
-                        image: Array.isArray(v.image_urls)
-                            ? v.image_urls[0]
-                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800'),
-                        totalPrice: v.price_max || v.price_min,
-                        theme: (details.styles && details.styles[0]) || 'Custom',
-                        includes: details.services || []
-                    };
-                });
-                setDecorationsData(mapped);
+            if (!cancelled) {
+                if (error) {
+                    console.error('[SelectDecorations] Failed to fetch decoration vendors:', error);
+                    setDecorationsData([]);
+                } else {
+                    // Map Supabase vendors to card shape
+                    const mapped = (data || []).map(v => {
+                        let details = {};
+                        if (v.details) {
+                            details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
+                        }
+                        return {
+                            id: v.id,
+                            name: v.name,
+                            description: v.description,
+                            rating: v.rating,
+                            image: Array.isArray(v.image_urls)
+                                ? v.image_urls[0]
+                                : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800'),
+                            totalPrice: v.price_max || v.price_min,
+                            theme: (details.styles && details.styles[0]) || 'Custom',
+                            includes: details.services || []
+                        };
+                    });
+                    setDecorationsData(mapped);
+                }
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
         fetchDecorations();
+        return () => { cancelled = true; };
     }, []);
 
     const handleSelect = async (d) => {

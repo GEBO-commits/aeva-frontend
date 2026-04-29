@@ -20,36 +20,40 @@ export default function VenuePick() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         const fetchVenues = async () => {
             setIsLoading(true);
             const { data, error } = await getVenues();
-            if (error) {
-                console.error('[VenuePick] Failed to fetch venues:', error);
-                setVenues([]);
-            } else {
-                // Map Supabase venues to card shape
-                const mapped = (data || []).map(v => ({
-                    id: v.id,
-                    name: v.name,
-                    type: v.venue_type,
-                    minGuests: v.capacity_min,
-                    maxGuests: v.capacity_max,
-                    startingPrice: v.price_min,
-                    rating: v.rating,
-                    image: Array.isArray(v.image_urls)
-                        ? v.image_urls[0]
-                        : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800'),
-                    location: v.city,
-                    amenities: Array.isArray(v.features)
-                        ? v.features
-                        : (JSON.parse(v.features || '[]') || []),
-                    description: v.description
-                }));
-                setVenues(mapped);
+            if (!cancelled) {
+                if (error) {
+                    console.error('[VenuePick] Failed to fetch venues:', error);
+                    setVenues([]);
+                } else {
+                    // Map Supabase venues to card shape
+                    const mapped = (data || []).map(v => ({
+                        id: v.id,
+                        name: v.name,
+                        type: v.venue_type,
+                        minGuests: v.capacity_min,
+                        maxGuests: v.capacity_max,
+                        startingPrice: v.price_min,
+                        rating: v.rating,
+                        image: Array.isArray(v.image_urls)
+                            ? v.image_urls[0]
+                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800'),
+                        location: v.city,
+                        amenities: Array.isArray(v.features)
+                            ? v.features
+                            : (JSON.parse(v.features || '[]') || []),
+                        description: v.description
+                    }));
+                    setVenues(mapped);
+                }
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
         fetchVenues();
+        return () => { cancelled = true; };
     }, []);
 
     const handleVenueSelect = async (venue, isSelected) => {

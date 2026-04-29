@@ -4,18 +4,21 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, DollarSign, ArrowLeft, AlertCircle } from 'lucide-react';
 import { getEvent } from '../services/planningService';
 import { createBooking } from '../services/bookingService';
+import { usePlanStore } from '../store/plan.store';
 
 export default function BookingConfirmation() {
     const location = useLocation();
     const navigate = useNavigate();
     const eventId = location.state?.eventId;
+    const { getTotalCost } = usePlanStore();
 
     const [event, setEvent] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isConfirming, setIsConfirming] = useState(false);
     const [error, setError] = useState(null);
 
-    const estimatedTotal = 133000;
+    const planTotal = getTotalCost();
+    const estimatedTotal = planTotal > 0 ? planTotal : (event?.budget_max || 0);
 
     useEffect(() => {
         const fetchEvent = async () => {

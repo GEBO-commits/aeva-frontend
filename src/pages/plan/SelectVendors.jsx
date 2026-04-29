@@ -18,12 +18,10 @@ import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
 import { Star, CheckCircle, ArrowRight } from 'lucide-react';
 
 const CATEGORIES = [
-    { key: 'photographer', label: 'Photographers', icon: '📸', color: 'blue' },
-    { key: 'dj', label: 'DJs', icon: '🎵', color: 'violet' },
-    { key: 'videographer', label: 'Videographers', icon: '🎬', color: 'indigo' },
+    { key: 'photographer', dbCategory: 'photography', label: 'Photographers', icon: '📸', color: 'blue' },
+    { key: 'dj', dbCategory: 'dj', label: 'DJs', icon: '🎵', color: 'violet' },
+    { key: 'videographer', dbCategory: 'videography', label: 'Videographers', icon: '🎬', color: 'indigo' },
 ];
-
-const CATEGORY_MAP = { Photographer: 'photographer', DJ: 'dj', Videographer: 'videographer' };
 
 /** Category-specific color classes */
 const COLOR = {
@@ -41,35 +39,39 @@ export default function SelectVendors() {
     const anySelected = Object.values(selectedVendors).some(Boolean);
 
     useEffect(() => {
+        let cancelled = false;
         const fetchVendors = async () => {
             setIsLoading(true);
             const { data, error } = await getVendors();
-            if (error) {
-                console.error('[SelectVendors] Failed to fetch vendors:', error);
-                setVendorsData([]);
-            } else {
-                // Map Supabase vendors to card shape
-                const mapped = (data || []).map(v => {
-                    let details = {};
-                    if (v.details) {
-                        details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
-                    }
-                    return {
-                        id: v.id,
-                        name: v.name,
-                        category: v.category,
-                        rating: v.rating,
-                        image: Array.isArray(v.image_urls)
-                            ? v.image_urls[0]
-                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1514306688007-f2e490fb4e90?w=800'),
-                        startingPrice: v.price_min
-                    };
-                });
-                setVendorsData(mapped);
+            if (!cancelled) {
+                if (error) {
+                    console.error('[SelectVendors] Failed to fetch vendors:', error);
+                    setVendorsData([]);
+                } else {
+                    // Map Supabase vendors to card shape
+                    const mapped = (data || []).map(v => {
+                        let details = {};
+                        if (v.details) {
+                            details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
+                        }
+                        return {
+                            id: v.id,
+                            name: v.name,
+                            category: v.category,
+                            rating: v.rating,
+                            image: Array.isArray(v.image_urls)
+                                ? v.image_urls[0]
+                                : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1514306688007-f2e490fb4e90?w=800'),
+                            startingPrice: v.price_min
+                        };
+                    });
+                    setVendorsData(mapped);
+                }
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
         fetchVendors();
+        return () => { cancelled = true; };
     }, []);
 
     const handleVendorSelect = async (vendorType, isSelected, vendor) => {
@@ -120,7 +122,7 @@ export default function SelectVendors() {
             {isLoading ? (
                 <div>Loading vendors...</div>
             ) : CATEGORIES.map(cat => {
-                const vendors = vendorsData.filter(v => CATEGORY_MAP[v.category] === cat.key);
+                const vendors = vendorsData.filter(v => v.category === cat.dbCategory);
                 const c = COLOR[cat.color];
                 return (
                     <div key={cat.key} className="mb-10">

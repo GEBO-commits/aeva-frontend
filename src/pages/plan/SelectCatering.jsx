@@ -23,39 +23,43 @@ export default function SelectCatering() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        let cancelled = false;
         const fetchCatering = async () => {
             setIsLoading(true);
             const { data, error } = await getVendors('catering');
-            if (error) {
-                console.error('[SelectCatering] Failed to fetch catering vendors:', error);
-                setCateringData([]);
-            } else {
-                // Map Supabase vendors to card shape
-                const mapped = (data || []).map(v => {
-                    let details = {};
-                    if (v.details) {
-                        details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
-                    }
-                    return {
-                        id: v.id,
-                        name: v.name,
-                        description: v.description,
-                        rating: v.rating,
-                        image: Array.isArray(v.image_urls)
-                            ? v.image_urls[0]
-                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800'),
-                        style: 'Buffet',
-                        pricePerPerson: v.price_min,
-                        dietaryOptions: details.options || [],
-                        menuHighlights: details.specialties || [],
-                        type: 'Catering'
-                    };
-                });
-                setCateringData(mapped);
+            if (!cancelled) {
+                if (error) {
+                    console.error('[SelectCatering] Failed to fetch catering vendors:', error);
+                    setCateringData([]);
+                } else {
+                    // Map Supabase vendors to card shape
+                    const mapped = (data || []).map(v => {
+                        let details = {};
+                        if (v.details) {
+                            details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
+                        }
+                        return {
+                            id: v.id,
+                            name: v.name,
+                            description: v.description,
+                            rating: v.rating,
+                            image: Array.isArray(v.image_urls)
+                                ? v.image_urls[0]
+                                : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800'),
+                            style: 'Buffet',
+                            pricePerPerson: v.price_min,
+                            dietaryOptions: details.options || [],
+                            menuHighlights: details.specialties || [],
+                            type: 'Catering'
+                        };
+                    });
+                    setCateringData(mapped);
+                }
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
         fetchCatering();
+        return () => { cancelled = true; };
     }, []);
 
     const handleSelect = async (c) => {

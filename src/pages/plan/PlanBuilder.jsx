@@ -51,9 +51,6 @@ export default function PlanBuilder() {
                 return;
             }
 
-            // Clear any stale selections from previous session
-            usePlanStore.getState().clearPlan();
-
             setEventId(event.id);
             setIsLoading(false);
         };
