@@ -33,6 +33,8 @@ import Catering from './pages/Catering';
 import Decorations from './pages/Decorations';
 import Vendors from './pages/Vendors';
 import EventPlan from './pages/EventPlan';
+import BookingConfirmation from './pages/BookingConfirmation';
+import BookingSuccess from './pages/BookingSuccess';
 
 // Legal pages (public, no auth required)
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
@@ -121,6 +123,8 @@ export default function App() {
             <Route path="/vendors" element={<Vendors />} />
             <Route path="/vendors/:id" element={<VendorDetail />} />
             <Route path="/event-plan" element={<EventPlan />} />
+            <Route path="/booking/confirm" element={<BookingConfirmation />} />
+            <Route path="/booking/success" element={<BookingSuccess />} />
 
             {/* Manual Plan Builder — nested route flow */}
             <Route path="/plan/build" element={<PlanBuilder />}>
