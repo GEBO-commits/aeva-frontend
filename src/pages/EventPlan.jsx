@@ -131,10 +131,7 @@ export default function EventPlan() {
     const eventIdFromState = location.state?.eventId;
 
     const [plan, setPlan] = useState(mockPlan);
-    const [locked, setLocked] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [isSending, setIsSending] = useState(false);
-    const [emailSuccess, setEmailSuccess] = useState(false);
     const sections = buildSections(plan);
 
     useEffect(() => {
@@ -172,13 +169,6 @@ export default function EventPlan() {
         fetchEventData();
     }, [eventIdFromState]);
 
-    const sendFakeEmails = async () => {
-        setIsSending(true);
-        setTimeout(() => {
-            setIsSending(false);
-            setEmailSuccess(true);
-        }, 2000);
-    };
 
     return (
         <motion.div
@@ -247,61 +237,20 @@ export default function EventPlan() {
                 >
                     ← Browse Venues Instead
                 </Link>
-                {!locked ? (
-                    <button
-                        onClick={() => {
-                            if (!isAuthenticated) {
-                                navigate('/login', { state: { from: '/event-plan' } });
-                            } else {
-                                setLocked(true);
-                            }
-                        }}
-                        className="flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all bg-gradient-to-r from-[#6B3FF3] to-[#a855f7] hover:shadow-purple-300 hover:scale-105"
-                    >
-                        <Lock className="w-5 h-5" /> Lock In This Plan
-                    </button>
-                ) : (
-                    <button
-                        onClick={() => {
-                            if (!isAuthenticated) {
-                                navigate('/login', { state: { from: '/event-plan' } });
-                            } else {
-                                sendFakeEmails();
-                            }
-                        }}
-                        disabled={isSending || emailSuccess}
-                        className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all ${emailSuccess
-                            ? 'bg-green-500 cursor-default'
-                            : 'bg-blue-600 hover:bg-blue-700'
-                            }`}
-                    >
-                        {isSending ? (
-                            <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Sending...</>
-                        ) : emailSuccess ? (
-                            <><CheckCircle className="w-5 h-5" /> Emails Sent!</>
-                        ) : (
-                            <><Mail className="w-5 h-5" /> Send Emails to Reserve</>
-                        )}
-                    </button>
-                )}
+                <button
+                    onClick={() => {
+                        if (!isAuthenticated) {
+                            navigate('/login', { state: { from: '/event-plan' } });
+                        } else {
+                            navigate('/booking/confirm', { state: { eventId: eventIdFromState } });
+                        }
+                    }}
+                    className="flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all bg-gradient-to-r from-[#6B3FF3] to-[#a855f7] hover:shadow-purple-300 hover:scale-105"
+                >
+                    <Lock className="w-5 h-5" /> Lock In This Plan
+                </button>
             </motion.div>
 
-            {emailSuccess && (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                    className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 flex flex-col gap-2"
-                >
-                    <p className="font-bold flex items-center gap-2"><CheckCircle size={18} /> Emails successfully sent to vendors:</p>
-                    <ul className="text-sm list-disc list-inside ml-2">
-                        <li>{plan.venue.name}</li>
-                        <li>{plan.catering.name}</li>
-                        <li>{plan.decorations.name}</li>
-                        <li>{plan.vendors.photographer.name}</li>
-                        <li>{plan.vendors.dj.name}</li>
-                        <li>{plan.vendors.videographer.name}</li>
-                    </ul>
-                </motion.div>
-            )}
         </motion.div>
     );
 }
