@@ -57,7 +57,7 @@ export const useAuthStore = create(
                 // Only restore if user exists and is not anonymous
                 // Anonymous users have user.id but user.aud = 'authenticated_anonymous'
                 // Real auth users have user.aud = 'authenticated'
-                if (user && user.aud === 'authenticated') {
+                if (user && user.is_anonymous !== true && user.email) {
                     set({
                         user,
                         isAuthenticated: true,
@@ -68,6 +68,7 @@ export const useAuthStore = create(
         }),
         {
             name: 'aeva-auth-store',
+            partialize: (state) => ({})  // persist nothing — Supabase handles session
         }
     )
 );
