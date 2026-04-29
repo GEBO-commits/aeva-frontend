@@ -1,17 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { mockCatering } from '../api/mock/catering.mock';
+import { getVendors } from '../services/catalogService';
 import { Utensils, Star, Check } from 'lucide-react';
 import { CardSkeleton } from '../components/ui/Skeleton';
 
 export default function Catering() {
     const [isLoading, setIsLoading] = useState(true);
+    const [catering, setCatering] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 800);
-        return () => clearTimeout(timer);
+        const fetchCatering = async () => {
+            setIsLoading(true);
+            const { data, error } = await getVendors('catering');
+            if (error) {
+                console.error('[Catering] Failed to fetch catering vendors:', error);
+                setCatering([]);
+            } else {
+                // Map Supabase vendors table to card shape
+                const mapped = (data || []).map(v => {
+                    let details = {};
+                    if (v.details) {
+                        details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
+                    }
+                    return {
+                        id: v.id,
+                        name: v.name,
+                        description: v.description,
+                        rating: v.rating,
+                        image: Array.isArray(v.image_urls)
+                            ? v.image_urls[0]
+                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800'),
+                        startingPrice: v.price_min,
+                        pricePerPerson: v.price_min,
+                        dietaryOptions: details.options || [],
+                        menuHighlights: details.specialties || [],
+                        type: 'Catering'
+                    };
+                });
+                setCatering(mapped);
+            }
+            setIsLoading(false);
+        };
+        fetchCatering();
     }, []);
 
     return (
@@ -28,12 +60,20 @@ export default function Catering() {
                     <>
                         {[1, 2, 3].map(i => <CardSkeleton key={i} />)}
                     </>
-                ) : (
+                ) : catering.length > 0 ? (
                     <AnimatePresence>
-                        {mockCatering.map((caterer, index) => (
+                        {catering.map((caterer, index) => (
                             <CateringCard key={caterer.id} data={caterer} index={index} onView={() => navigate(`/catering/${caterer.id}`)} />
                         ))}
                     </AnimatePresence>
+                ) : (
+                    <div className="col-span-full bg-white p-12 rounded-3xl border border-gray-100 text-center flex flex-col items-center justify-center w-full min-h-[40vh]">
+                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                            <Utensils className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-text-dark mb-2">No catering options available</h3>
+                        <p className="text-text-muted">Please check back later.</p>
+                    </div>
                 )}
             </div>
         </div>

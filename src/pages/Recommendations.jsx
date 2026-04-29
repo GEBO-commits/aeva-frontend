@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { mockVenues } from '../api/mock/venues.mock';
+import { getVenues } from '../services/catalogService';
 import VenueCard from '../components/venue/VenueCard';
 import VenueFilter from '../components/venue/VenueFilter';
 import { Sparkles, SlidersHorizontal, Loader2 } from 'lucide-react';
@@ -17,14 +17,43 @@ export default function Recommendations() {
     const [sortBy, setSortBy] = useState('match');
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [venues, setVenues] = useState([]);
     const [visibleCount, setVisibleCount] = useState(6);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const navigate = useNavigate();
     const { setVenue } = usePlanStore();
 
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 800);
-        return () => clearTimeout(timer);
+        const fetchVenues = async () => {
+            setIsLoading(true);
+            const { data, error } = await getVenues();
+            if (error) {
+                console.error('[Recommendations] Failed to fetch venues:', error);
+                setVenues([]);
+            } else {
+                // Map Supabase venues table to card shape
+                const mapped = (data || []).map(v => ({
+                    id: v.id,
+                    name: v.name,
+                    type: v.venue_type,
+                    minGuests: v.capacity_min,
+                    maxGuests: v.capacity_max,
+                    startingPrice: v.price_min,
+                    rating: v.rating,
+                    image: Array.isArray(v.image_urls)
+                        ? v.image_urls[0]
+                        : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800'),
+                    location: v.city,
+                    amenities: Array.isArray(v.features)
+                        ? v.features
+                        : (JSON.parse(v.features || '[]') || []),
+                    description: v.description
+                }));
+                setVenues(mapped);
+            }
+            setIsLoading(false);
+        };
+        fetchVenues();
     }, []);
 
     const handleLoadMore = () => {
@@ -36,7 +65,7 @@ export default function Recommendations() {
     };
 
     const filteredVenues = useMemo(() => {
-        let result = [...mockVenues];
+        let result = [...venues];
 
         if (filters.type !== 'all') {
             result = result.filter(v => v.type === filters.type);
@@ -56,7 +85,7 @@ export default function Recommendations() {
         }
 
         return result;
-    }, [filters, sortBy]);
+    }, [venues, filters, sortBy]);
 
     const visibleVenues = filteredVenues.slice(0, visibleCount);
 

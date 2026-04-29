@@ -1,17 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { mockVendors } from '../api/mock/vendors.mock';
+import { getVendors } from '../services/catalogService';
 import { Camera, Star, Zap } from 'lucide-react';
 import { CardSkeleton } from '../components/ui/Skeleton';
 
 export default function Vendors() {
     const [isLoading, setIsLoading] = useState(true);
+    const [vendors, setVendors] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 800);
-        return () => clearTimeout(timer);
+        const fetchVendors = async () => {
+            setIsLoading(true);
+            const { data, error } = await getVendors();
+            if (error) {
+                console.error('[Vendors] Failed to fetch vendors:', error);
+                setVendors([]);
+            } else {
+                // Map Supabase vendors table to card shape
+                const mapped = (data || []).map(v => {
+                    let details = {};
+                    if (v.details) {
+                        details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
+                    }
+                    return {
+                        id: v.id,
+                        name: v.name,
+                        category: v.category,
+                        description: v.description,
+                        rating: v.rating,
+                        image: Array.isArray(v.image_urls)
+                            ? v.image_urls[0]
+                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800'),
+                        startingPrice: v.price_min,
+                        features: details.services || details.specialties || details.packages || []
+                    };
+                });
+                setVendors(mapped);
+            }
+            setIsLoading(false);
+        };
+        fetchVendors();
     }, []);
 
     return (
@@ -28,12 +58,20 @@ export default function Vendors() {
                     <>
                         {[1, 2, 3].map(i => <CardSkeleton key={i} />)}
                     </>
-                ) : (
+                ) : vendors.length > 0 ? (
                     <AnimatePresence>
-                        {mockVendors.map((vendor, index) => (
+                        {vendors.map((vendor, index) => (
                             <VendorCard key={vendor.id} data={vendor} index={index} onView={() => navigate(`/vendors/${vendor.id}`)} />
                         ))}
                     </AnimatePresence>
+                ) : (
+                    <div className="col-span-full bg-white p-12 rounded-3xl border border-gray-100 text-center flex flex-col items-center justify-center w-full min-h-[40vh]">
+                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                            <Camera className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-text-dark mb-2">No vendors available</h3>
+                        <p className="text-text-muted">Please check back later.</p>
+                    </div>
                 )}
             </div>
         </div>
