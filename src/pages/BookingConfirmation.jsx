@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, DollarSign, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, DollarSign, ArrowLeft, AlertCircle } from 'lucide-react';
 import { getEvent } from '../services/planningService';
 import { createBooking } from '../services/bookingService';
 
@@ -19,6 +19,8 @@ export default function BookingConfirmation() {
 
     useEffect(() => {
         const fetchEvent = async () => {
+            console.log('[BookingConfirmation] eventId:', eventId);
+
             if (!eventId) {
                 setError('No event ID provided');
                 setIsLoading(false);
@@ -82,7 +84,25 @@ export default function BookingConfirmation() {
                     <p className="text-white/80">Review your event details before confirming</p>
                 </div>
 
-                {event && (
+                {!eventId ? (
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
+                            <AlertCircle className="w-6 h-6 text-orange-600 flex-shrink-0" />
+                            <div>
+                                <p className="text-sm font-bold text-orange-900">No event found.</p>
+                                <p className="text-sm text-orange-800">Please go back and complete the survey first.</p>
+                            </div>
+                        </div>
+                        <div className="flex justify-center">
+                            <button
+                                onClick={() => navigate('/survey')}
+                                className="px-6 py-3 rounded-full font-bold text-white shadow-lg transition-all bg-gradient-to-r from-[#6B3FF3] to-[#a855f7] hover:shadow-purple-300 hover:scale-105"
+                            >
+                                Back to Survey
+                            </button>
+                        </div>
+                    </div>
+                ) : event ? (
                     <div className="space-y-6">
                         {/* Event Details */}
                         <div className="space-y-4">
@@ -151,7 +171,22 @@ export default function BookingConfirmation() {
                             </button>
                         </div>
                     </div>
-                )}
+                ) : !isLoading ? (
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl p-4">
+                            <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                            <p className="text-sm font-bold text-red-900">Could not load event details.</p>
+                        </div>
+                        <div className="flex justify-center">
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-white shadow-lg transition-all bg-gradient-to-r from-[#6B3FF3] to-[#a855f7] hover:shadow-purple-300 hover:scale-105"
+                            >
+                                <ArrowLeft className="w-4 h-4" /> Back to Plan
+                            </button>
+                        </div>
+                    </div>
+                ) : null}
             </div>
         </motion.div>
     );

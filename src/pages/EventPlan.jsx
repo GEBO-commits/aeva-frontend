@@ -142,11 +142,7 @@ export default function EventPlan() {
 
                     if (eventError) {
                         console.error('[EventPlan] Failed to fetch event:', eventError);
-                        setIsLoading(false);
-                        return;
-                    }
-
-                    if (event) {
+                    } else if (event) {
                         const { recommendations, error: recError } = await getEventRecommendations(event.id);
 
                         if (recError) {
@@ -157,12 +153,11 @@ export default function EventPlan() {
                         // In future, build plan from recommendations data here
                     }
                 }
-
-                const timer = setTimeout(() => setIsLoading(false), 600);
-                return () => clearTimeout(timer);
             } catch (err) {
                 console.error('[EventPlan] Unexpected error fetching event data:', err);
-                setIsLoading(false);
+            } finally {
+                const timer = setTimeout(() => setIsLoading(false), 600);
+                return () => clearTimeout(timer);
             }
         };
 
@@ -219,7 +214,6 @@ export default function EventPlan() {
                         key={section.key}
                         section={section}
                         index={i}
-                        locked={locked}
                     />
                 ))}
             </div>
@@ -240,9 +234,17 @@ export default function EventPlan() {
                 <button
                     onClick={() => {
                         if (!isAuthenticated) {
+                            // Save eventId before login redirect so it survives the auth flow
+                            if (eventIdFromState) {
+                                localStorage.setItem('aeva_pending_event_id', eventIdFromState);
+                            }
                             navigate('/login', { state: { from: '/event-plan' } });
                         } else {
-                            navigate('/booking/confirm', { state: { eventId: eventIdFromState } });
+                            // Use eventId from state, or fall back to localStorage if returning from login
+                            const resolvedEventId = eventIdFromState
+                                || localStorage.getItem('aeva_pending_event_id');
+                            localStorage.removeItem('aeva_pending_event_id');
+                            navigate('/booking/confirm', { state: { eventId: resolvedEventId } });
                         }
                     }}
                     className="flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all bg-gradient-to-r from-[#6B3FF3] to-[#a855f7] hover:shadow-purple-300 hover:scale-105"
@@ -256,7 +258,7 @@ export default function EventPlan() {
 }
 
 /** ─── Individual section card ─────────────────────────────────── */
-function PlanSectionCard({ section, index, locked }) {
+function PlanSectionCard({ section, index }) {
     // Alternating slide-in direction: even = left, odd = right
     const xDir = index % 2 === 0 ? -40 : 40;
 
