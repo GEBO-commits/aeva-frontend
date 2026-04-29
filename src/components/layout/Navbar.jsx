@@ -51,7 +51,7 @@ export default function Navbar() {
                             <div className="flex items-center gap-4">
                                 <Link to="/dashboard" className="text-primary font-bold hover:text-secondary transition-colors">Dashboard</Link>
                                 <div className="flex items-center gap-4 ml-2 border-l pl-4 border-gray-200">
-                                    <span className="text-sm font-bold text-text-dark">Hello, {user?.display_name || 'User'}</span>
+                                    <span className="text-sm font-bold text-text-dark">Hello, {user?.display_name}</span>
                                     <button onClick={handleLogout} className="text-gray-400 hover:text-accent p-2 rounded-full hover:bg-gray-50 transition-colors" aria-label="Logout">
                                         <LogOut size={18} />
                                     </button>

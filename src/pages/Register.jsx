@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../store/auth.store';
+import { Link } from 'react-router-dom';
+import { CheckCircle, Mail } from 'lucide-react';
 import * as authService from '../services/authService';
 
 const registerSchema = z.object({
@@ -20,11 +20,9 @@ const pageVariants = {
 };
 
 export default function Register() {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const from = location.state?.from || '/dashboard';
-    const login = useAuthStore(state => state.login);
     const [authError, setAuthError] = useState(null);
+    const [registered, setRegistered] = useState(false);
+    const [registeredEmail, setRegisteredEmail] = useState(null);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(registerSchema)
@@ -41,76 +39,113 @@ export default function Register() {
             return;
         }
 
-        login(user);
-        navigate(from, { replace: true });
+        setRegisteredEmail(data.email);
+        setRegistered(true);
     };
 
     return (
         <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" className="flex justify-center items-center min-h-[70vh]">
             <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h2 className="text-3xl font-display font-bold text-primary mb-2">Create Account</h2>
-                    <p className="text-text-muted">Join AEVA and start planning your perfect event today.</p>
-                </div>
-
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                    <div>
-                        <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="name">Full Name</label>
-                        <input
-                            {...register('name')}
-                            id="name"
-                            type="text"
-                            placeholder="Emma Johnson"
-                            onChange={(e) => { setAuthError(null); }}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
-                        />
-                        {errors.name && <p className="text-accent text-sm mt-1 ml-1">{errors.name.message}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="email">Email Address</label>
-                        <input
-                            {...register('email')}
-                            id="email"
-                            type="email"
-                            placeholder="you@example.com"
-                            onChange={(e) => { setAuthError(null); }}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
-                        />
-                        {errors.email && <p className="text-accent text-sm mt-1 ml-1">{errors.email.message}</p>}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="password">Password</label>
-                        <input
-                            {...register('password')}
-                            id="password"
-                            type="password"
-                            placeholder="••••••••"
-                            onChange={(e) => { setAuthError(null); }}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
-                        />
-                        {errors.password && <p className="text-accent text-sm mt-1 ml-1">{errors.password.message}</p>}
-                    </div>
-
-                    {authError && (
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">
-                            {authError}
+                {registered ? (
+                    <div className="text-center space-y-6">
+                        <div className="flex justify-center mb-4">
+                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                                <CheckCircle className="w-8 h-8 text-green-600" />
+                            </div>
                         </div>
-                    )}
+                        <div>
+                            <h2 className="text-3xl font-display font-bold text-primary mb-2">Check Your Email</h2>
+                            <p className="text-text-muted">We sent a confirmation email to <span className="font-semibold text-text-dark">{registeredEmail}</span></p>
+                        </div>
+                        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-2">
+                            <div className="flex items-start gap-3">
+                                <Mail className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                <div className="text-left">
+                                    <p className="text-sm font-semibold text-blue-900 mb-1">Please click the link in the email</p>
+                                    <p className="text-sm text-blue-800">to activate your account before logging in.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="pt-4 border-t border-gray-100">
+                            <p className="text-sm text-text-muted mb-4">Didn't receive the email? Check your spam folder or try again.</p>
+                            <button
+                                onClick={() => setRegistered(false)}
+                                className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-secondary transition-all shadow-md hover:shadow-lg"
+                            >
+                                Back to Register
+                            </button>
+                        </div>
+                        <div className="text-center text-text-muted text-sm">
+                            Already confirmed? <Link to="/login" className="text-primary font-bold hover:text-secondary transition-colors">Sign in</Link>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-display font-bold text-primary mb-2">Create Account</h2>
+                            <p className="text-text-muted">Join AEVA and start planning your perfect event today.</p>
+                        </div>
 
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full bg-primary text-white py-3.5 rounded-xl font-bold hover:bg-secondary transition-all shadow-md hover:shadow-lg disabled:opacity-70 flex justify-center items-center gap-2"
-                    >
-                        {isSubmitting ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : 'Create Account'}
-                    </button>
-                </form>
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                            <div>
+                                <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="name">Full Name</label>
+                                <input
+                                    {...register('name')}
+                                    id="name"
+                                    type="text"
+                                    placeholder="Emma Johnson"
+                                    onChange={(e) => { setAuthError(null); }}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
+                                />
+                                {errors.name && <p className="text-accent text-sm mt-1 ml-1">{errors.name.message}</p>}
+                            </div>
 
-                <div className="mt-8 text-center text-text-muted">
-                    Already have an account? <Link to="/login" className="text-primary font-bold hover:text-secondary transition-colors">Sign in</Link>
-                </div>
+                            <div>
+                                <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="email">Email Address</label>
+                                <input
+                                    {...register('email')}
+                                    id="email"
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    onChange={(e) => { setAuthError(null); }}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
+                                />
+                                {errors.email && <p className="text-accent text-sm mt-1 ml-1">{errors.email.message}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="password">Password</label>
+                                <input
+                                    {...register('password')}
+                                    id="password"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    onChange={(e) => { setAuthError(null); }}
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
+                                />
+                                {errors.password && <p className="text-accent text-sm mt-1 ml-1">{errors.password.message}</p>}
+                            </div>
+
+                            {authError && (
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">
+                                    {authError}
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full bg-primary text-white py-3.5 rounded-xl font-bold hover:bg-secondary transition-all shadow-md hover:shadow-lg disabled:opacity-70 flex justify-center items-center gap-2"
+                            >
+                                {isSubmitting ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : 'Create Account'}
+                            </button>
+                        </form>
+
+                        <div className="mt-8 text-center text-text-muted">
+                            Already have an account? <Link to="/login" className="text-primary font-bold hover:text-secondary transition-colors">Sign in</Link>
+                        </div>
+                    </>
+                )}
             </div>
         </motion.div>
     );

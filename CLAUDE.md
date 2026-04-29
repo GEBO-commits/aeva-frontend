@@ -22,7 +22,9 @@
 **Decision rules for this phase:**
 - Do not optimize for the current phase only.
 - Always consider how implementations extend in later phases.
-- Do not invent schema, routes, or logic not listed here or in `aeva-backend-claude-dossier.md`.
+- Do not invent schema, routes, or logic not listed here or in 
+- Do not paste complete files. Show changed lines only with file name and line numbers. Confirm what was changed in one short paragraph.
+`aeva-backend-claude-dossier.md`.
 
 ---
 
