@@ -156,6 +156,22 @@ Recommended branch naming:
 * `feature/auth-session-merge`
 * `feature/catalog-integration`
 
+## Schema notes — survey and selections
+
+Missing survey fields to collect (add to survey or chatbot flow):
+- `venue_type`: indoor/outdoor/garden/beach/hotel ballroom (dropdown in survey step 1 or 2)
+- `theme`: modern/classic/rustic/bohemian/glamour (multi-select or dropdown)
+- `vibe_summary`: free text "describe your dream event in one sentence"
+- `vision_summary`: populated by AI from chatbot, or from vibe_summary as a copy for now
+
+`event_selections` table will be populated when:
+- Plan builder (usePlanStore) is migrated to backend in Phase 5
+- Each venue/catering/decoration/vendor selection in the builder writes to event_selections
+
+`event_recommendations` table will be populated when:
+- Catalog is seeded (Prompt G)
+- Recommendation logic writes scored results to event_recommendations instead of filtering mockVenues
+
 ## Recommended first task
 
 Read `aeva-backend-claude-dossier.md` and perform the repository audit only. Do not edit files until the audit and rollout plan are complete.

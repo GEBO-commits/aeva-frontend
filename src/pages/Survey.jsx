@@ -15,7 +15,10 @@ const surveySchema = z.object({
     guestCount: z.string().min(1, "Select guest range"),
     location: z.string().min(2, "Location is required"),
     eventDate: z.string().min(1, "Event date is required").refine(date => new Date(date) > new Date(), "Event date must be in the future"),
-    budget: z.number().min(1000, "Budget must be at least 1000 EGP")
+    budget: z.number().min(1000, "Budget must be at least 1000 EGP"),
+    venue_type: z.string().optional(),
+    theme: z.string().optional(),
+    vibe_summary: z.string().max(150).optional()
 });
 
 export default function Survey() {
@@ -172,6 +175,37 @@ export default function Survey() {
                                             <input type="range" {...register('budget', { valueAsNumber: true })} min="5000" max="500000" step="1000" className="w-full accent-primary h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2" />
                                             {errors.budget && <p className="text-accent text-sm mt-1">{errors.budget.message}</p>}
                                         </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1 ml-1">Venue Type Preference</label>
+                                            <select {...register('venue_type')} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none">
+                                                <option value="">Select (optional)</option>
+                                                <option value="hotel-ballroom">Hotel Ballroom</option>
+                                                <option value="outdoor-garden">Outdoor Garden</option>
+                                                <option value="beach">Beach</option>
+                                                <option value="rooftop">Rooftop</option>
+                                                <option value="villa">Villa</option>
+                                                <option value="event-hall">Event Hall</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1 ml-1">Event Theme</label>
+                                            <select {...register('theme')} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none">
+                                                <option value="">Select (optional)</option>
+                                                <option value="modern">Modern</option>
+                                                <option value="classic">Classic</option>
+                                                <option value="rustic">Rustic</option>
+                                                <option value="bohemian">Bohemian</option>
+                                                <option value="glamour">Glamour</option>
+                                                <option value="minimal">Minimal</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1 ml-1 flex justify-between">
+                                                <span>Event Vibe</span>
+                                                <span className="text-xs text-text-muted">{(formData.vibe_summary?.length || 0)}/150</span>
+                                            </label>
+                                            <input {...register('vibe_summary')} maxLength="150" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Describe your dream event in one sentence..." />
+                                        </div>
                                     </>
                                 )}
 
@@ -185,7 +219,10 @@ export default function Survey() {
                                             <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Guests</span><span className="font-medium text-text-dark">{formData.guestCount}</span></div>
                                             <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Location</span><span className="font-medium text-text-dark">{formData.location}</span></div>
                                             <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Event Date</span><span className="font-medium text-text-dark">{formData.eventDate ? new Date(formData.eventDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</span></div>
-                                            <div className="flex justify-between"><span className="text-text-muted">Budget</span><span className="font-medium text-text-dark">{formData.budget?.toLocaleString()} EGP</span></div>
+                                            <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Budget</span><span className="font-medium text-text-dark">{formData.budget?.toLocaleString()} EGP</span></div>
+                                            {formData.venue_type && <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Venue Type</span><span className="font-medium text-text-dark capitalize">{formData.venue_type.replace('-', ' ')}</span></div>}
+                                            {formData.theme && <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Theme</span><span className="font-medium text-text-dark capitalize">{formData.theme}</span></div>}
+                                            {formData.vibe_summary && <div className="flex justify-between"><span className="text-text-muted">Event Vibe</span><span className="font-medium text-text-dark">{formData.vibe_summary}</span></div>}
                                         </div>
                                     </>
                                 )}

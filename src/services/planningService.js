@@ -105,7 +105,7 @@ export async function getOrCreatePlanningSession() {
 
 /**
  * Create an event draft from survey data.
- * @param {Object} surveyData - { fullName, eventType, guestCount, location, budget, gender }
+ * @param {Object} surveyData - { fullName, eventType, guestCount, location, eventDate, budget, gender, venue_type, theme, vibe_summary }
  * @returns {Promise<{event, error}>}
  */
 export async function createEventFromSurvey(surveyData) {
@@ -156,6 +156,10 @@ export async function createEventFromSurvey(surveyData) {
           budget_max: budgetMax,
           city: surveyData.location || null,
           event_date: surveyData.eventDate || null,
+          venue_type: surveyData.venue_type || null,
+          theme: surveyData.theme || null,
+          vibe_summary: surveyData.vibe_summary || null,
+          vision_summary: surveyData.vibe_summary || null,
           source_flow: 'survey'
         }
       ])
