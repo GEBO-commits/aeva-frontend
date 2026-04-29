@@ -1,37 +1,65 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import * as authService from '../services/authService';
 
 /**
  * Global authentication state
+ * user: Supabase Auth user object or null
+ * isAuthenticated: true if logged in with email/password (not anonymous)
+ * isAdmin: true if user has admin role (deferred to later phase)
  */
 export const useAuthStore = create(
     persist(
         (set) => ({
-            user: null,          // null means not logged in
+            user: null,
             isAuthenticated: false,
             isAdmin: false,
 
-            // Actions
+            // Login: called after successful Supabase auth
             login: (userData) => set({
                 user: userData,
                 isAuthenticated: true,
-                isAdmin: userData?.role === 'admin'
+                isAdmin: false, // Admin role determination deferred to Prompt M
             }),
-            logout: () => {
+
+            // Logout: call authService.signOut(), then clear state
+            logout: async () => {
+                const { error } = await authService.signOut();
+                if (error) {
+                    console.error('[auth.store] Logout failed:', error);
+                }
                 set({
                     user: null,
                     isAuthenticated: false,
-                    isAdmin: false
+                    isAdmin: false,
                 });
-                // Note: intentional logout may clear other stores if necessary.
-                // localStorage.clear() can be too aggressive if we want to keep some preferences,
-                // but if we want to clear everything on logout:
                 localStorage.removeItem('aeva-auth-store');
                 localStorage.removeItem('aeva-plan-store');
             },
+
+            // Restore session: check for valid non-anonymous Supabase session
+            restoreSession: async () => {
+                const { user, error } = await authService.getCurrentAuthUser();
+
+                if (error) {
+                    console.error('[auth.store] Failed to restore session:', error);
+                    return;
+                }
+
+                // Only restore if user exists and is not anonymous
+                // Anonymous users have user.id but user.aud = 'authenticated_anonymous'
+                // Real auth users have user.aud = 'authenticated'
+                if (user && user.aud === 'authenticated') {
+                    set({
+                        user,
+                        isAuthenticated: true,
+                        isAdmin: false,
+                    });
+                }
+            },
         }),
         {
-            name: 'aeva-auth-store', // namespace in localStorage
+            name: 'aeva-auth-store',
         }
     )
 );

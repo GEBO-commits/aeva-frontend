@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
+import * as authService from '../services/authService';
 
 const registerSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -23,22 +24,24 @@ export default function Register() {
     const location = useLocation();
     const from = location.state?.from || '/dashboard';
     const login = useAuthStore(state => state.login);
+    const [authError, setAuthError] = useState(null);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(registerSchema)
     });
 
     const onSubmit = async (data) => {
-        await new Promise(r => setTimeout(r, 800));
+        setAuthError(null);
 
-        // Auto-login after register
-        login({
-            id: 'u002',
-            name: data.name,
-            email: data.email,
-            role: 'user'
-        });
+        const { user, error } = await authService.signUpWithEmail(data.email, data.password, data.name);
 
+        if (error) {
+            console.error('[Register] Auth error:', error);
+            setAuthError(error.message || 'Failed to create account');
+            return;
+        }
+
+        login(user);
         navigate(from, { replace: true });
     };
 
@@ -58,6 +61,7 @@ export default function Register() {
                             id="name"
                             type="text"
                             placeholder="Emma Johnson"
+                            onChange={(e) => { setAuthError(null); }}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
                         />
                         {errors.name && <p className="text-accent text-sm mt-1 ml-1">{errors.name.message}</p>}
@@ -70,6 +74,7 @@ export default function Register() {
                             id="email"
                             type="email"
                             placeholder="you@example.com"
+                            onChange={(e) => { setAuthError(null); }}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
                         />
                         {errors.email && <p className="text-accent text-sm mt-1 ml-1">{errors.email.message}</p>}
@@ -82,10 +87,17 @@ export default function Register() {
                             id="password"
                             type="password"
                             placeholder="••••••••"
+                            onChange={(e) => { setAuthError(null); }}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
                         />
                         {errors.password && <p className="text-accent text-sm mt-1 ml-1">{errors.password.message}</p>}
                     </div>
+
+                    {authError && (
+                        <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">
+                            {authError}
+                        </div>
+                    )}
 
                     <button
                         type="submit"

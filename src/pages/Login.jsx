@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
+import * as authService from '../services/authService';
 
 const loginSchema = z.object({
     email: z.string().email('Please enter a valid email'),
@@ -22,23 +23,24 @@ export default function Login() {
     const location = useLocation();
     const from = location.state?.from || '/dashboard';
     const login = useAuthStore(state => state.login);
+    const [authError, setAuthError] = useState(null);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(loginSchema)
     });
 
     const onSubmit = async (data) => {
-        // Mock login delay
-        await new Promise(r => setTimeout(r, 800));
+        setAuthError(null);
 
-        // Mock auth success
-        login({
-            id: 'u001',
-            name: 'Emma',
-            email: data.email,
-            role: data.email.includes('admin') ? 'admin' : 'user'
-        });
+        const { user, error } = await authService.signInWithEmail(data.email, data.password);
 
+        if (error) {
+            console.error('[Login] Auth error:', error);
+            setAuthError(error.message || 'Invalid email or password');
+            return;
+        }
+
+        login(user);
         navigate(from, { replace: true });
     };
 
@@ -58,6 +60,7 @@ export default function Login() {
                             id="email"
                             type="email"
                             placeholder="you@example.com"
+                            onChange={(e) => { setAuthError(null); }}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
                         />
                         {errors.email && <p className="text-accent text-sm mt-1 ml-1">{errors.email.message}</p>}
@@ -70,10 +73,17 @@ export default function Login() {
                             id="password"
                             type="password"
                             placeholder="••••••••"
+                            onChange={(e) => { setAuthError(null); }}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
                         />
                         {errors.password && <p className="text-accent text-sm mt-1 ml-1">{errors.password.message}</p>}
                     </div>
+
+                    {authError && (
+                        <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">
+                            {authError}
+                        </div>
+                    )}
 
                     <button
                         type="submit"

@@ -7,11 +7,13 @@
  * Admin routes: Admin dashboard, Venue management, Analytics
  */
 
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from './store/auth.store';
 import PageLayout from './components/layout/PageLayout';
 import { AnimatePresence } from 'framer-motion';
 import ChatBot from './components/chat/ChatBot';
+import { initializeAnonymousAuth } from './services/planningService';
 
 // Public pages
 import Landing from './pages/Landing';
@@ -73,6 +75,30 @@ const AdminRoute = () => {
 };
 
 export default function App() {
+  const [authInitialized, setAuthInitialized] = useState(false);
+  const restoreSession = useAuthStore(state => state.restoreSession);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const { error } = await initializeAnonymousAuth();
+      if (error) {
+        console.error('[App] Failed to initialize anonymous auth:', error);
+      }
+      await restoreSession();
+      setAuthInitialized(true);
+    };
+
+    initAuth();
+  }, []);
+
+  if (!authInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <Router>
       <PageLayout>
