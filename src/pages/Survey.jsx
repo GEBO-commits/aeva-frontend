@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { createEventFromSurvey, saveSurveyResponse } from '../services/planningService';
 
 const steps = ['Basic Info', 'Event Details', 'Preferences', 'Review'];
 
@@ -13,6 +14,7 @@ const surveySchema = z.object({
     eventType: z.string().min(1, "Select event type"),
     guestCount: z.string().min(1, "Select guest range"),
     location: z.string().min(2, "Location is required"),
+    eventDate: z.string().min(1, "Event date is required").refine(date => new Date(date) > new Date(), "Event date must be in the future"),
     budget: z.number().min(1000, "Budget must be at least 1000 EGP")
 });
 
@@ -32,7 +34,7 @@ export default function Survey() {
         let fieldsToValidate = [];
         if (currentStep === 0) fieldsToValidate = ['fullName', 'gender'];
         if (currentStep === 1) fieldsToValidate = ['eventType', 'guestCount'];
-        if (currentStep === 2) fieldsToValidate = ['location', 'budget'];
+        if (currentStep === 2) fieldsToValidate = ['location', 'eventDate', 'budget'];
 
         const isStepValid = await trigger(fieldsToValidate);
         if (isStepValid) setCurrentStep(prev => prev + 1);
@@ -42,10 +44,30 @@ export default function Survey() {
         setCurrentStep(prev => prev - 1);
     };
 
-    const onSubmit = (data) => {
-        console.log("Survey data submitted", data);
-        // Navigate to the full event plan result page
-        navigate('/event-plan');
+    const onSubmit = async (data) => {
+        try {
+            // Create event from survey data
+            const { event, error: eventError } = await createEventFromSurvey(data);
+
+            if (eventError) {
+                console.error('[Survey] Failed to create event:', eventError);
+                alert('Failed to create event. Please try again.');
+                return;
+            }
+
+            // Save survey response (non-blocking; log warn if it fails)
+            const { error: responseError } = await saveSurveyResponse(event.id, 'survey_complete', data);
+
+            if (responseError) {
+                console.warn('[Survey] Failed to save survey response (continuing anyway):', responseError);
+            }
+
+            // Navigate to event plan with eventId in state
+            navigate('/event-plan', { state: { eventId: event.id } });
+        } catch (err) {
+            console.error('[Survey] Unexpected error in onSubmit:', err);
+            alert('An unexpected error occurred. Please try again.');
+        }
     };
 
     return (
@@ -138,6 +160,11 @@ export default function Survey() {
                                             {errors.location && <p className="text-accent text-sm mt-1">{errors.location.message}</p>}
                                         </div>
                                         <div>
+                                            <label className="block text-sm font-medium mb-1 ml-1">Event Date</label>
+                                            <input type="date" {...register('eventDate')} min={new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none" />
+                                            {errors.eventDate && <p className="text-accent text-sm mt-1">{errors.eventDate.message}</p>}
+                                        </div>
+                                        <div>
                                             <label className="block text-sm font-medium mb-1 ml-1 flex justify-between">
                                                 <span>Budget (EGP)</span>
                                                 <span className="text-primary font-bold">{formData.budget?.toLocaleString() || 50000}</span>
@@ -157,6 +184,7 @@ export default function Survey() {
                                             <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Event</span><span className="font-medium text-text-dark capitalize">{formData.eventType}</span></div>
                                             <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Guests</span><span className="font-medium text-text-dark">{formData.guestCount}</span></div>
                                             <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Location</span><span className="font-medium text-text-dark">{formData.location}</span></div>
+                                            <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Event Date</span><span className="font-medium text-text-dark">{formData.eventDate ? new Date(formData.eventDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</span></div>
                                             <div className="flex justify-between"><span className="text-text-muted">Budget</span><span className="font-medium text-text-dark">{formData.budget?.toLocaleString()} EGP</span></div>
                                         </div>
                                     </>
