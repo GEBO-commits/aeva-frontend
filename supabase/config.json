@@ -1,0 +1,22 @@
+{
+  "project_id": "your-project-id",
+  "supabase_url": "https://your-project.supabase.co",
+  "api": {
+    "port": 54321,
+    "schemas": ["public", "graphql_public"],
+    "default_schema": "public",
+    "max_rows": 1000
+  },
+  "db": {
+    "port": 54322,
+    "major_version": 15
+  },
+  "auth": {
+    "enable_signup": true,
+    "enable_anonymous_signups": false,
+    "jwt_expiry": 3600
+  },
+  "studio": {
+    "port": 54323
+  }
+}
