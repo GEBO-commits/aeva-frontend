@@ -68,26 +68,26 @@ export default function PlanBuilder() {
 
     return (
         <PlanBuilderProvider initialEventId={eventId}>
-        <div className="max-w-5xl mx-auto py-6">
-            {/* Page title */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-display font-bold text-text-dark">Build Your Own Plan</h1>
-                <p className="text-text-muted mt-1">Select your preferred options step by step.</p>
+            <div className="max-w-5xl mx-auto py-6">
+                {/* Page title */}
+                <div className="mb-8">
+                    <h1 className="text-3xl font-display font-bold text-text-dark">Build Your Own Plan</h1>
+                    <p className="text-text-muted mt-1">Select your preferred options step by step.</p>
+                </div>
+
+
+
+                {/* ─── Step content rendered here ─── */}
+                <motion.div
+                    key={location.pathname}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <Outlet />
+                </motion.div>
             </div>
-
-
-
-            {/* ─── Step content rendered here ─── */}
-            <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-            >
-                <Outlet />
-            </motion.div>
         </PlanBuilderProvider>
-        </div>
     );
 }

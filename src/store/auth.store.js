@@ -44,9 +44,6 @@ export const useAuthStore = create(
 
             // Restore session: check for valid non-anonymous Supabase session
             restoreSession: async () => {
-                // Reset store first to clear any stale mock data from localStorage
-                set({ user: null, isAuthenticated: false, isAdmin: false });
-
                 const { user, error } = await authService.getCurrentAuthUser();
 
                 if (error) {
@@ -55,14 +52,21 @@ export const useAuthStore = create(
                 }
 
                 // Only restore if user exists and is not anonymous
-                // Anonymous users have user.id but user.aud = 'authenticated_anonymous'
-                // Real auth users have user.aud = 'authenticated'
+                // Anonymous users have user.id but user.is_anonymous = true
+                // Real auth users have user.is_anonymous !== true and user.email
                 if (user && user.is_anonymous !== true && user.email) {
                     set({
-                        user,
+                        user: {
+                            ...user,
+                            display_name: user.user_metadata?.full_name
+                                || user.email?.split('@')[0]
+                                || 'User'
+                        },
                         isAuthenticated: true,
                         isAdmin: false,
                     });
+                } else {
+                    set({ user: null, isAuthenticated: false, isAdmin: false });
                 }
             },
         }),
