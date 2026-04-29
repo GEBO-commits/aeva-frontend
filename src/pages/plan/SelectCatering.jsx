@@ -5,10 +5,10 @@
  * On selection: saves to plan store → navigates to /plan/build/decorations
  */
 
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { mockCatering } from '../../api/mock/catering.mock';
+import { getVendors } from '../../services/catalogService';
 import { usePlanStore } from '../../store/plan.store';
 import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
 import { saveEventSelection } from '../../services/planningService';
@@ -19,6 +19,44 @@ export default function SelectCatering() {
     const navigate = useNavigate();
     const { setCatering, selectedCatering, skipStep } = usePlanStore();
     const { eventId } = useContext(PlanBuilderContext);
+    const [catering, setCateringData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchCatering = async () => {
+            setIsLoading(true);
+            const { data, error } = await getVendors('catering');
+            if (error) {
+                console.error('[SelectCatering] Failed to fetch catering vendors:', error);
+                setCateringData([]);
+            } else {
+                // Map Supabase vendors to card shape
+                const mapped = (data || []).map(v => {
+                    let details = {};
+                    if (v.details) {
+                        details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
+                    }
+                    return {
+                        id: v.id,
+                        name: v.name,
+                        description: v.description,
+                        rating: v.rating,
+                        image: Array.isArray(v.image_urls)
+                            ? v.image_urls[0]
+                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800'),
+                        style: 'Buffet',
+                        pricePerPerson: v.price_min,
+                        dietaryOptions: details.options || [],
+                        menuHighlights: details.specialties || [],
+                        type: 'Catering'
+                    };
+                });
+                setCateringData(mapped);
+            }
+            setIsLoading(false);
+        };
+        fetchCatering();
+    }, []);
 
     const handleSelect = async (c) => {
         const isSelected = selectedCatering?.id === c.id;
@@ -44,6 +82,12 @@ export default function SelectCatering() {
                 </div>
                 <div className="flex items-center gap-3">
                     <button
+                        onClick={() => navigate(-1)}
+                        className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
+                    >
+                        ← Back
+                    </button>
+                    <button
                         onClick={() => { skipStep(1); navigate('/plan/build/decorations'); }}
                         className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
                     >
@@ -61,7 +105,10 @@ export default function SelectCatering() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockCatering.map((c, i) => {
+                {isLoading ? (
+                    <div>Loading catering options...</div>
+                ) : catering.length > 0 ? (
+                    catering.map((c, i) => {
                     const isSelected = selectedCatering?.id === c.id;
                     return (
                         <motion.div
@@ -116,7 +163,10 @@ export default function SelectCatering() {
                             </div>
                         </motion.div>
                     );
-                })}
+                    })
+                ) : (
+                    <div className="col-span-full text-center text-text-muted">No catering options available</div>
+                )}
             </div>
         </div>
     );

@@ -4,10 +4,10 @@
  * On selection: saves to plan store → navigates to /plan/build/vendors
  */
 
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { mockDecorations } from '../../api/mock/decorations.mock';
+import { getVendors } from '../../services/catalogService';
 import { usePlanStore } from '../../store/plan.store';
 import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
 import { saveEventSelection } from '../../services/planningService';
@@ -18,6 +18,42 @@ export default function SelectDecorations() {
     const navigate = useNavigate();
     const { setDecorations, selectedDecorations, skipStep } = usePlanStore();
     const { eventId } = useContext(PlanBuilderContext);
+    const [decorations, setDecorationsData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDecorations = async () => {
+            setIsLoading(true);
+            const { data, error } = await getVendors('decorations');
+            if (error) {
+                console.error('[SelectDecorations] Failed to fetch decoration vendors:', error);
+                setDecorationsData([]);
+            } else {
+                // Map Supabase vendors to card shape
+                const mapped = (data || []).map(v => {
+                    let details = {};
+                    if (v.details) {
+                        details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
+                    }
+                    return {
+                        id: v.id,
+                        name: v.name,
+                        description: v.description,
+                        rating: v.rating,
+                        image: Array.isArray(v.image_urls)
+                            ? v.image_urls[0]
+                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800'),
+                        totalPrice: v.price_max || v.price_min,
+                        theme: (details.styles && details.styles[0]) || 'Custom',
+                        includes: details.services || []
+                    };
+                });
+                setDecorationsData(mapped);
+            }
+            setIsLoading(false);
+        };
+        fetchDecorations();
+    }, []);
 
     const handleSelect = async (d) => {
         const isSelected = selectedDecorations?.id === d.id;
@@ -43,6 +79,12 @@ export default function SelectDecorations() {
                 </div>
                 <div className="flex items-center gap-3">
                     <button
+                        onClick={() => navigate(-1)}
+                        className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
+                    >
+                        ← Back
+                    </button>
+                    <button
                         onClick={() => { skipStep(2); navigate('/plan/build/vendors'); }}
                         className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
                     >
@@ -60,7 +102,10 @@ export default function SelectDecorations() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockDecorations.map((d, i) => {
+                {isLoading ? (
+                    <div>Loading decoration packages...</div>
+                ) : decorations.length > 0 ? (
+                    decorations.map((d, i) => {
                     const isSelected = selectedDecorations?.id === d.id;
                     return (
                         <motion.div
@@ -118,7 +163,10 @@ export default function SelectDecorations() {
                             </div>
                         </motion.div>
                     );
-                })}
+                    })
+                ) : (
+                    <div className="col-span-full text-center text-text-muted">No decoration packages available</div>
+                )}
             </div>
         </div>
     );

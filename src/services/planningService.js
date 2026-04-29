@@ -362,7 +362,7 @@ export async function createEventFromPlanBuilder() {
 
 /**
  * Save or update an event selection (venue, catering, decorations, vendor).
- * Uses upsert with unique constraint on (event_id, selection_type) to prevent duplicates.
+ * Uses a two-step approach: check if exists, then INSERT or UPDATE.
  * @param {string} eventId - UUID of the event
  * @param {string} selectionType - 'venue' | 'catering' | 'decorations' | 'photographer' | 'dj' | 'videographer'
  * @param {string} entityId - UUID of the selected entity
@@ -371,22 +371,59 @@ export async function createEventFromPlanBuilder() {
  */
 export async function saveEventSelection(eventId, selectionType, entityId, notes = null) {
   try {
-    const { data: selection, error } = await supabase
+    console.log('[planningService] saveEventSelection called:', eventId, selectionType, entityId);
+
+    // Step 1: Check if selection already exists
+    const { data: existingSelection, error: selectError } = await supabase
       .from('event_selections')
-      .upsert(
-        {
-          event_id: eventId,
-          selection_type: selectionType,
+      .select('id')
+      .eq('event_id', eventId)
+      .eq('selection_type', selectionType)
+      .single();
+
+    if (selectError && selectError.code !== 'PGRST116') {
+      // PGRST116 = no rows returned (expected if no existing selection)
+      console.error('[planningService] Failed to check existing selection:', selectError);
+      return { selection: null, error: selectError };
+    }
+
+    let selection;
+    let error;
+
+    if (existingSelection && existingSelection.id) {
+      // Step 2a: UPDATE existing selection
+      const { data, error: updateError } = await supabase
+        .from('event_selections')
+        .update({
           entity_id: entityId,
           notes: notes,
           status: 'selected'
-        },
-        {
-          onConflict: 'event_id,selection_type'
-        }
-      )
-      .select()
-      .single();
+        })
+        .eq('id', existingSelection.id)
+        .select()
+        .single();
+
+      selection = data;
+      error = updateError;
+    } else {
+      // Step 2b: INSERT new selection
+      const { data, error: insertError } = await supabase
+        .from('event_selections')
+        .insert([
+          {
+            event_id: eventId,
+            selection_type: selectionType,
+            entity_id: entityId,
+            notes: notes,
+            status: 'selected'
+          }
+        ])
+        .select()
+        .single();
+
+      selection = data;
+      error = insertError;
+    }
 
     if (error) {
       console.error('[planningService] Failed to save event selection:', error);

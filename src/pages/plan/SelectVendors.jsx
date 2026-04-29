@@ -7,10 +7,10 @@
  * On continue: navigates to /plan/build/summary
  */
 
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { mockVendors } from '../../api/mock/vendors.mock';
+import { getVendors } from '../../services/catalogService';
 import { usePlanStore } from '../../store/plan.store';
 import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
 import { saveEventSelection } from '../../services/planningService';
@@ -36,7 +36,41 @@ export default function SelectVendors() {
     const navigate = useNavigate();
     const { setVendor, selectedVendors, skipStep } = usePlanStore();
     const { eventId } = useContext(PlanBuilderContext);
+    const [vendorsData, setVendorsData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const anySelected = Object.values(selectedVendors).some(Boolean);
+
+    useEffect(() => {
+        const fetchVendors = async () => {
+            setIsLoading(true);
+            const { data, error } = await getVendors();
+            if (error) {
+                console.error('[SelectVendors] Failed to fetch vendors:', error);
+                setVendorsData([]);
+            } else {
+                // Map Supabase vendors to card shape
+                const mapped = (data || []).map(v => {
+                    let details = {};
+                    if (v.details) {
+                        details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
+                    }
+                    return {
+                        id: v.id,
+                        name: v.name,
+                        category: v.category,
+                        rating: v.rating,
+                        image: Array.isArray(v.image_urls)
+                            ? v.image_urls[0]
+                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1514306688007-f2e490fb4e90?w=800'),
+                        startingPrice: v.price_min
+                    };
+                });
+                setVendorsData(mapped);
+            }
+            setIsLoading(false);
+        };
+        fetchVendors();
+    }, []);
 
     const handleVendorSelect = async (vendorType, isSelected, vendor) => {
         setVendor(vendorType, isSelected ? null : vendor);
@@ -61,6 +95,12 @@ export default function SelectVendors() {
                 </div>
                 <div className="flex items-center gap-3">
                     <button
+                        onClick={() => navigate(-1)}
+                        className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
+                    >
+                        ← Back
+                    </button>
+                    <button
                         onClick={() => navigate('/plan/build/summary')}
                         className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
                     >
@@ -77,8 +117,10 @@ export default function SelectVendors() {
                 </div>
             </div>
 
-            {CATEGORIES.map(cat => {
-                const vendors = mockVendors.filter(v => CATEGORY_MAP[v.category] === cat.key);
+            {isLoading ? (
+                <div>Loading vendors...</div>
+            ) : CATEGORIES.map(cat => {
+                const vendors = vendorsData.filter(v => CATEGORY_MAP[v.category] === cat.key);
                 const c = COLOR[cat.color];
                 return (
                     <div key={cat.key} className="mb-10">
@@ -139,6 +181,7 @@ export default function SelectVendors() {
                     </div>
                 );
             })}
+
 
             {anySelected && (
                 <div className="flex justify-end mt-4 pb-8">
