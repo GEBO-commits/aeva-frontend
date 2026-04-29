@@ -74,12 +74,6 @@ export default function VenuePick() {
                     <p className="text-text-muted mt-1">Select the perfect space for your event.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
-                    >
-                        ← Back
-                    </button>
                     {selectedVenue ? (
                         <button
                             onClick={() => navigate('/plan/build/catering')}

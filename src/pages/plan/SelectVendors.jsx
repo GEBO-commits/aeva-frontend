@@ -95,7 +95,7 @@ export default function SelectVendors() {
                 </div>
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate('/plan/build/decorations')}
                         className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
                     >
                         ← Back

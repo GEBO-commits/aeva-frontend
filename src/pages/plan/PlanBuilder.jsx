@@ -14,6 +14,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
+import { usePlanStore } from '../../store/plan.store';
 import { createEventFromPlanBuilder } from '../../services/planningService';
 import { PlanBuilderProvider } from '../../contexts/PlanBuilderContext';
 
@@ -50,6 +51,9 @@ export default function PlanBuilder() {
                 return;
             }
 
+            // Clear any stale selections from previous session
+            usePlanStore.getState().clearPlan();
+
             setEventId(event.id);
             setIsLoading(false);
         };
@@ -70,9 +74,20 @@ export default function PlanBuilder() {
         <PlanBuilderProvider initialEventId={eventId}>
             <div className="max-w-5xl mx-auto py-6">
                 {/* Page title */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-display font-bold text-text-dark">Build Your Own Plan</h1>
-                    <p className="text-text-muted mt-1">Select your preferred options step by step.</p>
+                <div className="mb-8 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-display font-bold text-text-dark">Build Your Own Plan</h1>
+                        <p className="text-text-muted mt-1">Select your preferred options step by step.</p>
+                    </div>
+                    <button
+                        onClick={() => {
+                            usePlanStore.getState().clearPlan();
+                            navigate('/');
+                        }}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium transition-colors"
+                    >
+                        Cancel Plan
+                    </button>
                 </div>
 
 

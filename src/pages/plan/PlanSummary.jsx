@@ -48,9 +48,17 @@ export default function PlanSummary() {
         <div className="max-w-6xl mx-auto py-8 px-4">
             <PlanProgressBar currentStep={4} />
 
-            <div className="mt-8 mb-10 text-center">
-                <h1 className="text-4xl font-display font-bold text-text-dark mb-2">✨ Your Event Plan is Ready!</h1>
-                <p className="text-text-muted">Review your selections and confirm your dream event.</p>
+            <div className="mt-8 mb-10 flex items-center justify-between">
+                <div className="flex-1">
+                    <h1 className="text-4xl font-display font-bold text-text-dark mb-2">✨ Your Event Plan is Ready!</h1>
+                    <p className="text-text-muted">Review your selections and confirm your dream event.</p>
+                </div>
+                <button
+                    onClick={() => navigate('/plan/build/vendors')}
+                    className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white ml-4"
+                >
+                    ← Back
+                </button>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">

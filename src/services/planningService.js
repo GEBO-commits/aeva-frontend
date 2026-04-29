@@ -379,10 +379,9 @@ export async function saveEventSelection(eventId, selectionType, entityId, notes
       .select('id')
       .eq('event_id', eventId)
       .eq('selection_type', selectionType)
-      .single();
+      .maybeSingle();
 
-    if (selectError && selectError.code !== 'PGRST116') {
-      // PGRST116 = no rows returned (expected if no existing selection)
+    if (selectError) {
       console.error('[planningService] Failed to check existing selection:', selectError);
       return { selection: null, error: selectError };
     }
