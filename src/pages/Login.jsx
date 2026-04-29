@@ -32,12 +32,25 @@ export default function Login() {
     const onSubmit = async (data) => {
         setAuthError(null);
 
+        // Capture current user before login (may be anonymous)
+        const { user: currentUser } = await authService.getCurrentAuthUser();
+        const anonymousUserId = currentUser?.id;
+
         const { user, error } = await authService.signInWithEmail(data.email, data.password);
 
         if (error) {
             console.error('[Login] Auth error:', error);
             setAuthError(error.message || 'Invalid email or password');
             return;
+        }
+
+        // Claim anonymous session if it exists and is different from authenticated user
+        if (anonymousUserId && user.id !== anonymousUserId) {
+            try {
+                await authService.claimAnonymousSession(anonymousUserId, user.id);
+            } catch (mergeError) {
+                console.warn('[Login] Session merge failed, proceeding anyway:', mergeError);
+            }
         }
 
         login(user);

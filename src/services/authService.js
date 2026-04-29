@@ -101,14 +101,38 @@ export async function getCurrentAuthUser() {
 }
 
 /**
- * Claim an anonymous planning session after user signs up.
- * Transfers planning_session and events from anonymous user_id to authenticated user_id.
- * TODO: Implement in Prompt C (session merge).
- * @param {string} authenticatedUserId
- * @returns {Promise<{sessionClaimed, error}>}
+ * Claim an anonymous planning session after user logs in.
+ * Transfers planning_sessions and events from anonymous user_id to authenticated user_id.
+ * Idempotent: safe to call multiple times with same IDs.
+ * @param {string} anonymousUserId - UUID of the anonymous session user
+ * @param {string} authenticatedUserId - UUID of the newly authenticated user
+ * @returns {Promise<void>} - Throws on error (caller handles with try/catch)
  */
-export async function claimAnonymousSession(authenticatedUserId) {
-  // Placeholder for session merge logic
-  console.warn('[authService] claimAnonymousSession not yet implemented');
-  return { sessionClaimed: false, error: null };
+export async function claimAnonymousSession(anonymousUserId, authenticatedUserId) {
+  try {
+    // Update planning_sessions: transfer ownership from anonymous to authenticated user
+    const { error: sessionError } = await supabase
+      .from('planning_sessions')
+      .update({ user_id: authenticatedUserId })
+      .eq('user_id', anonymousUserId);
+
+    if (sessionError) {
+      throw new Error(`Failed to transfer planning_sessions: ${sessionError.message}`);
+    }
+
+    // Update events: transfer ownership from anonymous to authenticated user
+    const { error: eventError } = await supabase
+      .from('events')
+      .update({ user_id: authenticatedUserId })
+      .eq('user_id', anonymousUserId);
+
+    if (eventError) {
+      throw new Error(`Failed to transfer events: ${eventError.message}`);
+    }
+
+    console.log(`[authService] Session merge complete: ${anonymousUserId} → ${authenticatedUserId}`);
+  } catch (err) {
+    console.error('[authService] Session merge failed:', err);
+    throw err;
+  }
 }
