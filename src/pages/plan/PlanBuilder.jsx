@@ -6,12 +6,16 @@
  *   Venue → Catering → Decorations → Vendors → Summary
  *
  * Uses React Router nested routes for each step.
+ * Requires authentication; creates a draft event on mount.
  */
 
-import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
+import { useAuthStore } from '../../store/auth.store';
+import { createEventFromPlanBuilder } from '../../services/planningService';
+import { PlanBuilderProvider } from '../../contexts/PlanBuilderContext';
 
 /** Step definitions for the progress bar */
 const STEPS = [
@@ -24,9 +28,46 @@ const STEPS = [
 
 export default function PlanBuilder() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuthStore();
+    const [eventId, setEventId] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const currentIndex = STEPS.findIndex(s => location.pathname.startsWith(s.path));
 
+    useEffect(() => {
+        const initializePlanBuilder = async () => {
+            // Redirect to login if not authenticated
+            if (!isAuthenticated) {
+                navigate('/login', { state: { from: '/plan/build' } });
+                return;
+            }
+
+            // Create a draft event for this plan builder session
+            const { event, error } = await createEventFromPlanBuilder();
+            if (error) {
+                console.error('[PlanBuilder] Failed to create event:', error);
+                setIsLoading(false);
+                return;
+            }
+
+            setEventId(event.id);
+            setIsLoading(false);
+        };
+
+        initializePlanBuilder();
+    }, [isAuthenticated, navigate]);
+
+    // Show loading spinner while creating event
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-[70vh]">
+                <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
+
     return (
+        <PlanBuilderProvider initialEventId={eventId}>
         <div className="max-w-5xl mx-auto py-6">
             {/* Page title */}
             <div className="mb-8">
@@ -46,6 +87,7 @@ export default function PlanBuilder() {
             >
                 <Outlet />
             </motion.div>
+        </PlanBuilderProvider>
         </div>
     );
 }

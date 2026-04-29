@@ -2,17 +2,32 @@
  * VenuePick.jsx — Step 1 of the Plan Builder
  * User browses and selects a venue.
  */
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { mockVenues } from '../../api/mock/venues.mock';
 import { usePlanStore } from '../../store/plan.store';
+import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
+import { saveEventSelection } from '../../services/planningService';
 import { MapPin, Users, Star, CheckCircle } from 'lucide-react';
 import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
 
 export default function VenuePick() {
     const { selectedVenue, setVenue, skipStep } = usePlanStore();
     const navigate = useNavigate();
+    const { eventId } = useContext(PlanBuilderContext);
+
+    const handleVenueSelect = async (venue, isSelected) => {
+        setVenue(isSelected ? null : venue);
+
+        // Save to Supabase if selecting (not deselecting)
+        if (!isSelected && venue && eventId) {
+            const { error } = await saveEventSelection(eventId, 'venue', venue.id);
+            if (error) {
+                console.error('[VenuePick] Failed to save venue selection:', error);
+            }
+        }
+    };
 
     return (
         <div className="max-w-6xl mx-auto py-2">
@@ -49,7 +64,7 @@ export default function VenuePick() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.08 }}
-                            onClick={() => setVenue(isSelected ? null : venue)}
+                            onClick={() => handleVenueSelect(venue, isSelected)}
                             className={`relative bg-white rounded-3xl overflow-hidden shadow-sm border-2 cursor-pointer transition-all duration-200 hover:shadow-xl hover:-translate-y-1 ${isSelected ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-gray-100'
                                 }`}
                         >

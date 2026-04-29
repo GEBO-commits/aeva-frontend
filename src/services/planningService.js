@@ -307,3 +307,95 @@ export async function getCurrentUser() {
     return { user: null, error: err };
   }
 }
+
+/**
+ * Create a draft event for the plan builder flow.
+ * Calls getOrCreatePlanningSession() to ensure ownership consistency.
+ * @returns {Promise<{event, error}>}
+ */
+export async function createEventFromPlanBuilder() {
+  try {
+    // Get current user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      const error = authError || new Error('No authenticated user');
+      console.error('[planningService] Failed to get current user:', error);
+      return { event: null, error };
+    }
+
+    // Get or create planning session
+    const { planningSession, error: sessionError } = await getOrCreatePlanningSession();
+
+    if (sessionError) {
+      console.error('[planningService] Failed to get/create planning session:', sessionError);
+      return { event: null, error: sessionError };
+    }
+
+    // Create event draft
+    const { data: event, error: insertError } = await supabase
+      .from('events')
+      .insert([
+        {
+          user_id: user.id,
+          planning_session_id: planningSession.id,
+          title: 'My Event',
+          event_type: 'wedding',
+          status: 'draft',
+          source_flow: 'plan_builder'
+        }
+      ])
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('[planningService] Failed to create event from plan builder:', insertError);
+      return { event: null, error: insertError };
+    }
+
+    return { event, error: null };
+  } catch (err) {
+    console.error('[planningService] Unexpected error in createEventFromPlanBuilder:', err);
+    return { event: null, error: err };
+  }
+}
+
+/**
+ * Save or update an event selection (venue, catering, decorations, vendor).
+ * Uses upsert with unique constraint on (event_id, selection_type) to prevent duplicates.
+ * @param {string} eventId - UUID of the event
+ * @param {string} selectionType - 'venue' | 'catering' | 'decorations' | 'photographer' | 'dj' | 'videographer'
+ * @param {string} entityId - UUID of the selected entity
+ * @param {string} notes - Optional notes
+ * @returns {Promise<{selection, error}>}
+ */
+export async function saveEventSelection(eventId, selectionType, entityId, notes = null) {
+  try {
+    const { data: selection, error } = await supabase
+      .from('event_selections')
+      .upsert(
+        {
+          event_id: eventId,
+          selection_type: selectionType,
+          entity_id: entityId,
+          notes: notes,
+          status: 'selected'
+        },
+        {
+          onConflict: 'event_id,selection_type'
+        }
+      )
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[planningService] Failed to save event selection:', error);
+      return { selection: null, error };
+    }
+
+    return { selection, error: null };
+  } catch (err) {
+    console.error('[planningService] Unexpected error in saveEventSelection:', err);
+    return { selection: null, error: err };
+  }
+}

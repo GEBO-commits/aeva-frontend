@@ -7,11 +7,13 @@
  * On continue: navigates to /plan/build/summary
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { mockVendors } from '../../api/mock/vendors.mock';
 import { usePlanStore } from '../../store/plan.store';
+import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
+import { saveEventSelection } from '../../services/planningService';
 import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
 import { Star, CheckCircle, ArrowRight } from 'lucide-react';
 
@@ -33,7 +35,20 @@ const COLOR = {
 export default function SelectVendors() {
     const navigate = useNavigate();
     const { setVendor, selectedVendors, skipStep } = usePlanStore();
+    const { eventId } = useContext(PlanBuilderContext);
     const anySelected = Object.values(selectedVendors).some(Boolean);
+
+    const handleVendorSelect = async (vendorType, isSelected, vendor) => {
+        setVendor(vendorType, isSelected ? null : vendor);
+
+        // Save to Supabase if selecting (not deselecting)
+        if (!isSelected && vendor && eventId) {
+            const { error } = await saveEventSelection(eventId, vendorType, vendor.id);
+            if (error) {
+                console.error('[SelectVendors] Failed to save vendor selection:', error);
+            }
+        }
+    };
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
@@ -77,7 +92,7 @@ export default function SelectVendors() {
                                         initial={{ opacity: 0, y: 15 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.07 }}
-                                        onClick={() => setVendor(cat.key, isSelected ? null : vendor)}
+                                        onClick={() => handleVendorSelect(cat.key, isSelected, vendor)}
                                         className={`bg-white rounded-2xl overflow-hidden shadow-sm border-2 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer ${isSelected ? `${c.ring} ${c.bg} ring-2` : 'border-gray-100'
                                             }`}
                                     >
@@ -109,7 +124,7 @@ export default function SelectVendors() {
                                                     View Details
                                                 </button>
                                                 <button
-                                                    onClick={(e) => { e.stopPropagation(); setVendor(cat.key, isSelected ? null : vendor); }}
+                                                    onClick={(e) => { e.stopPropagation(); handleVendorSelect(cat.key, isSelected, vendor); }}
                                                     className={`w-full py-2 rounded-xl text-sm font-bold transition-all border ${isSelected ? c.sel : c.btn
                                                         } hover:text-white`}
                                                 >

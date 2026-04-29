@@ -4,20 +4,32 @@
  * On selection: saves to plan store → navigates to /plan/build/vendors
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { mockDecorations } from '../../api/mock/decorations.mock';
 import { usePlanStore } from '../../store/plan.store';
+import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
+import { saveEventSelection } from '../../services/planningService';
 import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
 import { Star, CheckCircle } from 'lucide-react';
 
 export default function SelectDecorations() {
     const navigate = useNavigate();
     const { setDecorations, selectedDecorations, skipStep } = usePlanStore();
+    const { eventId } = useContext(PlanBuilderContext);
 
-    const handleSelect = (d) => {
-        setDecorations(selectedDecorations?.id === d.id ? null : d);
+    const handleSelect = async (d) => {
+        const isSelected = selectedDecorations?.id === d.id;
+        setDecorations(isSelected ? null : d);
+
+        // Save to Supabase if selecting (not deselecting)
+        if (!isSelected && d && eventId) {
+            const { error } = await saveEventSelection(eventId, 'decorations', d.id);
+            if (error) {
+                console.error('[SelectDecorations] Failed to save decorations selection:', error);
+            }
+        }
     };
 
     return (

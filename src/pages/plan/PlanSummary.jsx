@@ -1,19 +1,21 @@
 /**
  * PlanSummary.jsx — Step 5 of the Manual Plan Builder
- * 
+ *
  * Displays a full overview of all selected items (Venue, Catering, Decorations, Vendors)
  * and the total computed cost.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { usePlanStore } from '../../store/plan.store';
+import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
 import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
-import { CheckCircle, Sparkles, Calendar, MapPin, Users, Utensils, Palette, Camera, Music, Video, ArrowRight, Mail, Loader2, AlertTriangle } from 'lucide-react';
+import { CheckCircle, Sparkles, Calendar, MapPin, Users, Utensils, Palette, Camera, Music, Video, ArrowRight, AlertTriangle } from 'lucide-react';
 
 export default function PlanSummary() {
     const navigate = useNavigate();
+    const { eventId } = useContext(PlanBuilderContext);
     const {
         selectedVenue,
         selectedCatering,
@@ -33,47 +35,13 @@ export default function PlanSummary() {
 
     const totalCost = getTotalCost();
 
-    const [isFinalized, setIsFinalized] = useState(false);
-    const [isSending, setIsSending] = useState(false);
-    const [emailResult, setEmailResult] = useState(null);
-
     const handleConfirm = () => {
-        setIsFinalized(true);
+        navigate('/booking/confirm', { state: { eventId } });
     };
 
     const handleStartAI = () => {
         // Navigate to dashboard and auto-open chat
         navigate('/dashboard', { state: { openChat: true } });
-    };
-
-    const sendFakeEmails = async (vendors) => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({ success: true, sent: vendors.map(v => v.name) });
-            }, 2000);
-        });
-    };
-
-    const handleSendEmails = async () => {
-        setIsSending(true);
-        setEmailResult(null);
-
-        const allVendors = [
-            selectedVenue,
-            selectedCatering,
-            selectedDecorations,
-            selectedVendors.photographer,
-            selectedVendors.dj,
-            selectedVendors.videographer
-        ].filter(Boolean);
-
-        await sendFakeEmails(allVendors);
-
-        setIsSending(false);
-        setEmailResult({
-            success: true,
-            sentNames: allVendors.map(v => v.name)
-        });
     };
 
     return (
@@ -96,8 +64,6 @@ export default function PlanSummary() {
                         placeholder="No venue selected yet"
                         details={selectedVenue ? `${selectedVenue.location} · ${selectedVenue.maxGuests} Guests` : ''}
                         price={selectedVenue?.startingPrice}
-                        emailSent={emailResult?.sentNames?.includes(selectedVenue?.name)}
-                        noEmailWarning={emailResult?.warnings?.includes(selectedVenue?.name)}
                         isSkipped={skippedSteps.includes(0)}
                     />
 
@@ -110,8 +76,6 @@ export default function PlanSummary() {
                         details={selectedCatering ? `${selectedCatering.style} · ${selectedCatering.pricePerPerson} EGP/person` : ''}
                         price={selectedCatering ? selectedCatering.pricePerPerson * 100 : 0} // ~100 guests
                         priceLabel="~For 100 guests"
-                        emailSent={emailResult?.sentNames?.includes(selectedCatering?.name)}
-                        noEmailWarning={emailResult?.warnings?.includes(selectedCatering?.name)}
                         isSkipped={skippedSteps.includes(1)}
                     />
 
@@ -123,8 +87,6 @@ export default function PlanSummary() {
                         placeholder="No decorations selected yet"
                         details={selectedDecorations ? `${selectedDecorations.theme}` : ''}
                         price={selectedDecorations?.totalPrice}
-                        emailSent={emailResult?.sentNames?.includes(selectedDecorations?.name)}
-                        noEmailWarning={emailResult?.warnings?.includes(selectedDecorations?.name)}
                         isSkipped={skippedSteps.includes(2)}
                     />
 
@@ -142,9 +104,9 @@ export default function PlanSummary() {
                             )}
                         </div>
                         <div className="grid sm:grid-cols-3 gap-4">
-                            <VendorSmall role="Photographer" vendor={selectedVendors.photographer} icon={<Camera size={16} />} color="blue" emailSent={emailResult?.sentNames?.includes(selectedVendors.photographer?.name)} noEmailWarning={emailResult?.warnings?.includes(selectedVendors.photographer?.name)} />
-                            <VendorSmall role="DJ" vendor={selectedVendors.dj} icon={<Music size={16} />} color="violet" emailSent={emailResult?.sentNames?.includes(selectedVendors.dj?.name)} noEmailWarning={emailResult?.warnings?.includes(selectedVendors.dj?.name)} />
-                            <VendorSmall role="Videographer" vendor={selectedVendors.videographer} icon={<Video size={16} />} color="indigo" emailSent={emailResult?.sentNames?.includes(selectedVendors.videographer?.name)} noEmailWarning={emailResult?.warnings?.includes(selectedVendors.videographer?.name)} />
+                            <VendorSmall role="Photographer" vendor={selectedVendors.photographer} icon={<Camera size={16} />} color="blue" />
+                            <VendorSmall role="DJ" vendor={selectedVendors.dj} icon={<Music size={16} />} color="violet" />
+                            <VendorSmall role="Videographer" vendor={selectedVendors.videographer} icon={<Video size={16} />} color="indigo" />
                         </div>
                     </div>
                 </div>
@@ -173,47 +135,17 @@ export default function PlanSummary() {
                         </div>
 
                         <div className="space-y-3">
-                            {!isFinalized ? (
-                                <button
-                                    onClick={handleConfirm}
-                                    disabled={!hasAnySelection}
-                                    title={!hasAnySelection ? "Please make your selections to continue" : ""}
-                                    className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${!hasAnySelection
-                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-2 border-gray-300'
-                                        : 'bg-primary text-white hover:bg-secondary shadow-lg shadow-primary/20'
-                                        }`}
-                                >
-                                    <CheckCircle size={20} /> Finalize Plan
-                                </button>
-                            ) : (
-                                <div className="space-y-3">
-                                    <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-center text-sm font-bold animate-pulse">
-                                        Plan Finalized!
-                                    </div>
-                                    <button
-                                        onClick={handleSendEmails}
-                                        disabled={isSending || emailResult?.success}
-                                        className={`w-full py-4 rounded-2xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${emailResult?.success ? 'bg-green-500 text-white shadow-green-500/20' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-600/20'} disabled:opacity-70`}
-                                    >
-                                        {isSending ? (
-                                            <><Loader2 size={20} className="animate-spin" /> Sending Emails...</>
-                                        ) : emailResult?.success ? (
-                                            <><CheckCircle size={20} /> Emails Sent</>
-                                        ) : (
-                                            <><Mail size={20} /> Send Emails to Vendors</>
-                                        )}
-                                    </button>
-                                </div>
-                            )}
-
-                            {emailResult?.success && (
-                                <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-xl">
-                                    <p className="text-sm font-bold text-green-600 flex items-start gap-2 mb-2">
-                                        <CheckCircle size={16} className="mt-0.5" />
-                                        <span>Emails sent successfully to: {emailResult.sentNames.join(', ')}</span>
-                                    </p>
-                                </div>
-                            )}
+                            <button
+                                onClick={handleConfirm}
+                                disabled={!hasAnySelection}
+                                title={!hasAnySelection ? "Please make your selections to continue" : ""}
+                                className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${!hasAnySelection
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-2 border-gray-300'
+                                    : 'bg-primary text-white hover:bg-secondary shadow-lg shadow-primary/20'
+                                    }`}
+                            >
+                                <CheckCircle size={20} /> Lock In This Plan
+                            </button>
 
                             <button
                                 onClick={handleStartAI}
@@ -243,7 +175,7 @@ export default function PlanSummary() {
     );
 }
 
-function SummaryItem({ title, icon, item, placeholder, details, price, priceLabel = null, emailSent, noEmailWarning, isSkipped }) {
+function SummaryItem({ title, icon, item, placeholder, details, price, priceLabel = null, isSkipped }) {
     return (
         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-6">
             <div className="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100">
@@ -262,11 +194,6 @@ function SummaryItem({ title, icon, item, placeholder, details, price, priceLabe
                     {isSkipped && (
                         <span className="ml-2 flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
                             Skipped
-                        </span>
-                    )}
-                    {emailSent && (
-                        <span className="ml-auto flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
-                            <CheckCircle size={10} /> Email Sent
                         </span>
                     )}
                 </div>
@@ -289,7 +216,7 @@ function SummaryItem({ title, icon, item, placeholder, details, price, priceLabe
     );
 }
 
-function VendorSmall({ role, vendor, icon, color, emailSent, noEmailWarning }) {
+function VendorSmall({ role, vendor, icon, color }) {
     return (
         <div className={`p-4 rounded-2xl border ${vendor ? 'border-primary/20 bg-primary/5' : 'border-gray-100 bg-gray-50'}`}>
             <p className="text-[10px] uppercase font-bold text-text-muted mb-2">{role}</p>
@@ -299,9 +226,6 @@ function VendorSmall({ role, vendor, icon, color, emailSent, noEmailWarning }) {
                         {icon}
                     </div>
                     <p className="text-xs font-bold text-text-dark truncate flex-1">{vendor.name}</p>
-                    {emailSent && (
-                        <CheckCircle size={14} className="text-green-500 flex-shrink-0" />
-                    )}
                 </div>
             ) : (
                 <p className="text-[10px] text-gray-400 italic">Not selected</p>

@@ -5,20 +5,32 @@
  * On selection: saves to plan store → navigates to /plan/build/decorations
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { mockCatering } from '../../api/mock/catering.mock';
 import { usePlanStore } from '../../store/plan.store';
+import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
+import { saveEventSelection } from '../../services/planningService';
 import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
 import { Star, CheckCircle } from 'lucide-react';
 
 export default function SelectCatering() {
     const navigate = useNavigate();
     const { setCatering, selectedCatering, skipStep } = usePlanStore();
+    const { eventId } = useContext(PlanBuilderContext);
 
-    const handleSelect = (c) => {
-        setCatering(selectedCatering?.id === c.id ? null : c);
+    const handleSelect = async (c) => {
+        const isSelected = selectedCatering?.id === c.id;
+        setCatering(isSelected ? null : c);
+
+        // Save to Supabase if selecting (not deselecting)
+        if (!isSelected && c && eventId) {
+            const { error } = await saveEventSelection(eventId, 'catering', c.id);
+            if (error) {
+                console.error('[SelectCatering] Failed to save catering selection:', error);
+            }
+        }
     };
 
     return (
