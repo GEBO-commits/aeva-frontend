@@ -17,7 +17,12 @@ export const useAuthStore = create(
 
             // Login: called after successful Supabase auth
             login: (userData) => set({
-                user: userData,
+                user: {
+                    ...userData,
+                    display_name: userData.user_metadata?.full_name
+                      || userData.email?.split('@')[0]
+                      || 'User'
+                },
                 isAuthenticated: true,
                 isAdmin: false, // Admin role determination deferred to Prompt M
             }),
@@ -39,6 +44,9 @@ export const useAuthStore = create(
 
             // Restore session: check for valid non-anonymous Supabase session
             restoreSession: async () => {
+                // Reset store first to clear any stale mock data from localStorage
+                set({ user: null, isAuthenticated: false, isAdmin: false });
+
                 const { user, error } = await authService.getCurrentAuthUser();
 
                 if (error) {

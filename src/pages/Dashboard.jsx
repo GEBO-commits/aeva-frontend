@@ -28,7 +28,7 @@ export default function Dashboard() {
             <div className="bg-gradient-to-r from-primary to-secondary rounded-3xl p-8 text-white shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
                 <div className="relative z-10">
-                    <h1 className="text-4xl font-display font-bold mb-2">Welcome back, {user?.name || 'User'}! 👋</h1>
+                    <h1 className="text-4xl font-display font-bold mb-2">Welcome back, {user?.display_name || 'User'}! 👋</h1>
                     <p className="text-primary-foreground/80 max-w-xl">
                         You have 1 active event coming up. Ready to continue planning?
                     </p>
