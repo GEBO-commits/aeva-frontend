@@ -9,12 +9,21 @@
  */
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import { usePlanStore } from '../../store/plan.store';
 
 const STEPS = ['Venue', 'Catering', 'Decorations', 'Vendors', 'Summary'];
+const STEP_ROUTES = [
+    '/plan/build/venue',
+    '/plan/build/catering',
+    '/plan/build/decorations',
+    '/plan/build/vendors',
+    '/plan/build/summary'
+];
 
 export function PlanProgressBar({ currentStep }) {
+    const navigate = useNavigate();
     const { selectedVenue, selectedCatering, selectedDecorations, selectedVendors, skippedSteps } = usePlanStore();
 
     const checkStepCompleted = (index) => {
@@ -49,6 +58,7 @@ export function PlanProgressBar({ currentStep }) {
                     const isCompleted = checkStepCompleted(i);
                     const isActive = i === currentStep;
                     const isSkipped = skippedSteps.includes(i);
+                    const isClickable = i <= currentStep;
 
                     return (
                         <div key={step} className="relative z-10 flex flex-col items-center flex-1">
@@ -58,10 +68,10 @@ export function PlanProgressBar({ currentStep }) {
                                 </span>
                             )}
                             {/* Circle */}
-                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all ${isCompleted ? 'bg-primary text-white shadow-md shadow-primary/30'
+                            <div onClick={() => isClickable && navigate(STEP_ROUTES[i])} className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all ${isCompleted ? 'bg-primary text-white shadow-md shadow-primary/30'
                                 : isActive ? 'bg-primary text-white ring-4 ring-primary/20 shadow-md shadow-primary/30'
                                     : 'bg-gray-100 text-gray-400'
-                                }`}>
+                                } ${isClickable ? 'cursor-pointer' : ''}`}>
                                 {isCompleted && !isSkipped ? <CheckCircle className="w-5 h-5" /> : i + 1}
                             </div>
                             {/* Label */}

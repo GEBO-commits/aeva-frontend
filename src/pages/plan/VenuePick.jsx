@@ -78,6 +78,15 @@ export default function VenuePick() {
                     <p className="text-text-muted mt-1">Select the perfect space for your event.</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => {
+                            usePlanStore.getState().clearPlan();
+                            navigate('/');
+                        }}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium transition-colors"
+                    >
+                        Cancel Plan
+                    </button>
                     {selectedVenue ? (
                         <button
                             onClick={() => navigate('/plan/build/catering')}
