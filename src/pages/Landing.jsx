@@ -1,341 +1,412 @@
-/**
- * Landing.jsx
- *
- * Redesigned Landing page for AEVA with a premium hero section.
- * Includes: permanent purple gradient, floating blobs, stars,
- * glassmorphism buttons, and a smooth bottom transition wave.
- */
-
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { Sparkles, CalendarHeart, MessageSquare, MapPin, ArrowRight } from 'lucide-react';
-
-// ─── Animation variants ────────────────────────────────────────────────────────
-const pageVariants = {
-    initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: 0.5 } },
-    exit: { opacity: 0 }
-};
-const containerVariants = { animate: { transition: { staggerChildren: 0.1 } } };
-const cardVariants = { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 } };
-
-/** Floating category pills for hero */
-const floatingBubbles = [
-    { emoji: '💍', label: 'Wedding', x: '5%', y: '10px', driftX: 8, duration: 5, delay: 0 },
-    { emoji: '🎂', label: 'Birthday', x: '24%', y: '55px', driftX: -6, duration: 6.5, delay: 0.8 },
-    { emoji: '🏢', label: 'Corporate', x: '46%', y: '5px', driftX: 10, duration: 4.8, delay: 1.4 },
-    { emoji: '🎊', label: 'Gala Night', x: '65%', y: '60px', driftX: -8, duration: 5.6, delay: 0.4 },
-    { emoji: '🌸', label: 'Decorations', x: '80%', y: '15px', driftX: 6, duration: 7, delay: 1.2 },
-    { emoji: '📸', label: 'Photography', x: '14%', y: '70px', driftX: -7, duration: 5.2, delay: 2.1 },
-    { emoji: '🍽️', label: 'Catering', x: '55%', y: '68px', driftX: 5, duration: 6, delay: 0.6 },
-];
-
-const categories = [
-    { icon: '🏛️', label: 'Venues', href: '/recommendations' },
-    { icon: '🍽️', label: 'Catering', href: '/catering' },
-    { icon: '🌸', label: 'Decorations', href: '/decorations' },
-    { icon: '🎵', label: 'Vendors', href: '/vendors' },
-    { icon: '✉️', label: 'Survey', href: '/survey' },
-];
-
-function FeatureCard({ title, desc, icon }) {
-    return (
-        <motion.div variants={cardVariants} className="bg-white border border-gray-100 p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                {icon}
-            </div>
-            <h3 className="text-xl font-bold mb-3 text-text-dark">{title}</h3>
-            <p className="text-text-muted">{desc}</p>
-        </motion.div>
-    );
-}
-
-function Step({ number, title, desc }) {
-    return (
-        <div className="flex flex-col items-center text-center">
-            <div className="w-24 h-24 bg-white shadow-lg border-4 border-primary rounded-full flex items-center justify-center text-3xl font-display font-bold text-primary mb-6 relative hover:scale-110 transition-transform cursor-default">
-                {number}
-            </div>
-            <h3 className="text-xl font-bold mb-2">{title}</h3>
-            <p className="text-text-muted">{desc}</p>
-        </div>
-    );
-}
-
-function IdeaCard({ title, img }) {
-    return (
-        <motion.div variants={cardVariants} whileHover={{ y: -8 }} className="relative h-80 rounded-3xl overflow-hidden group cursor-pointer shadow-lg">
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors z-10" />
-            <img src={img} alt={title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-            <div className="absolute bottom-0 left-0 p-8 z-20 w-full bg-gradient-to-t from-black/80 to-transparent">
-                <h3 className="text-3xl font-display font-bold text-white">{title}</h3>
-            </div>
-        </motion.div>
-    );
-}
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Sparkles, CheckCircle, ArrowRight } from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Tag } from '../components/ui/Tag';
 
 export default function Landing() {
-    const [currentWord, setCurrentWord] = useState(0);
-    const words = ['Wedding', 'Birthday', 'Corporate Event', 'Gala'];
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentWord((prev) => (prev + 1) % words.length);
-        }, 3000);
-        return () => clearInterval(interval);
-    }, []);
+  const threeWays = [
+    {
+      kind: 'Conversation',
+      title: 'Just talk it through',
+      desc: 'Describe what you want in plain English. AEVA asks the right questions, drafts a plan, and lets you nudge it.',
+      icon: 'sparkles',
+      cta: 'Plan with AI',
+      screen: 'chat',
+    },
+    {
+      kind: 'Survey',
+      title: 'Answer 8 quick questions',
+      desc: 'Date, vibe, headcount, budget. Two minutes, then we hand you a curated brief.',
+      icon: 'wand',
+      cta: 'Take the survey',
+      screen: 'survey',
+    },
+    {
+      kind: 'Manual',
+      title: 'Build it yourself',
+      desc: 'You know what you want. Pick a venue, add catering, drop in vendors. We just stay out of your way.',
+      icon: 'layers',
+      cta: 'Open builder',
+      screen: 'builder',
+    },
+  ];
 
-    return (
-        <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+  const howItWorks = [
+    ['01', 'Tell us about it', 'Share the rough idea — date, vibe, headcount.'],
+    ['02', 'Get a draft plan', 'AEVA suggests venue, catering, vendors, a timeline.'],
+    ['03', 'Refine it', 'Swap, tweak, approve. Changes are saved live.'],
+    ['04', 'Invite + run it', 'RSVPs, vendor confirms, day-of timeline — done.'],
+  ];
 
-            {/* ─── PREMIUM HERO SECTION ────────────────────────────────────────────── */}
-            <section
-                style={{
-                    background: 'linear-gradient(135deg, #6B3FF3 0%, #A855F7 50%, #7C3AED 100%)',
-                    minHeight: '100vh',
-                    paddingTop: '64px',
-                    position: 'relative',
-                    overflow: 'hidden',
-                }}
-                className="flex flex-col items-center justify-center text-center px-4"
+  const stats = [
+    ['540+', 'events planned'],
+    ['96%', 'rated 5 stars'],
+    ['12 min', 'average plan time'],
+  ];
+
+  const handleNavigation = (screen) => {
+    if (screen === 'chat') navigate('/chat');
+    else if (screen === 'survey') navigate('/survey');
+    else if (screen === 'builder') navigate('/plan/build');
+  };
+
+  return (
+    <div style={{ background: 'var(--aeva-paper)' }}>
+      {/* ─── HERO ─── */}
+      <section style={{ padding: '64px 32px 32px', maxWidth: '1280px', margin: '0 auto' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1.1fr 0.9fr',
+            gap: '56px',
+            alignItems: 'center',
+            minHeight: '560px',
+          }}
+        >
+          {/* Left: copy + CTAs */}
+          <div>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 12px',
+                borderRadius: '999px',
+                background: 'var(--aeva-paper-warm)',
+                border: '1px solid var(--aeva-line)',
+                fontSize: '12px',
+                color: 'var(--aeva-ink-soft)',
+                marginBottom: '32px',
+              }}
             >
-                {/* Background decorative blobs */}
-                <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-                    {/* Large soft blob top-left */}
-                    <div style={{
-                        position: 'absolute',
-                        width: '600px',
-                        height: '600px',
-                        borderRadius: '50%',
-                        background: 'radial-gradient(circle, rgba(167,139,250,0.4) 0%, transparent 70%)',
-                        top: '-200px',
-                        left: '-200px',
-                        animation: 'floatBlob 12s ease-in-out infinite',
-                    }} />
-
-                    {/* Medium blob top-right */}
-                    <div style={{
-                        position: 'absolute',
-                        width: '400px',
-                        height: '400px',
-                        borderRadius: '50%',
-                        background: 'radial-gradient(circle, rgba(99,102,241,0.5) 0%, transparent 70%)',
-                        top: '-100px',
-                        right: '-100px',
-                        animation: 'floatBlob 15s ease-in-out infinite reverse',
-                    }} />
-
-                    {/* Small blob bottom-left */}
-                    <div style={{
-                        position: 'absolute',
-                        width: '300px',
-                        height: '300px',
-                        borderRadius: '50%',
-                        background: 'radial-gradient(circle, rgba(236,72,153,0.3) 0%, transparent 70%)',
-                        bottom: '-100px',
-                        left: '20%',
-                        animation: 'floatBlob 18s ease-in-out infinite 3s',
-                    }} />
-
-                    {/* Small blob bottom-right */}
-                    <div style={{
-                        position: 'absolute',
-                        width: '250px',
-                        height: '250px',
-                        borderRadius: '50%',
-                        background: 'radial-gradient(circle, rgba(139,92,246,0.4) 0%, transparent 70%)',
-                        bottom: '50px',
-                        right: '10%',
-                        animation: 'floatBlob 10s ease-in-out infinite 1s',
-                    }} />
-
-                    {/* Scattered small star dots */}
-                    {[...Array(25)].map((_, i) => (
-                        <div
-                            key={i}
-                            style={{
-                                position: 'absolute',
-                                width: i % 3 === 0 ? '3px' : '2px',
-                                height: i % 3 === 0 ? '3px' : '2px',
-                                borderRadius: '50%',
-                                background: 'rgba(255,255,255,0.5)',
-                                left: `${5 + (i * 37) % 90}%`,
-                                top: `${10 + (i * 23) % 80}%`,
-                                animation: `floatBlob ${6 + (i % 5) * 2}s ease-in-out infinite`,
-                                animationDelay: `${(i % 4) * 1.5}s`,
-                            }}
-                        />
-                    ))}
-                </div>
-
-                {/* Hero Content */}
-                <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <h1 className="font-display text-5xl md:text-7xl font-bold text-white mb-6">
-                            Plan Your Perfect <br className="hidden md:block" />
-                            <span className="text-yellow-300">
-                                <AnimatePresence mode="wait">
-                                    <motion.span
-                                        key={currentWord}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -20 }}
-                                        className="inline-block min-w-[300px]"
-                                    >
-                                        {words[currentWord]}
-                                    </motion.span>
-                                </AnimatePresence>
-                            </span>
-                        </h1>
-                        <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-10">
-                            AEVA uses AI to recommend venues, track RSVPs, and turn your vision into an unforgettable reality.
-                        </p>
-                    </motion.div>
-
-                    {/* CTAs */}
-                    <motion.div variants={containerVariants} initial="initial" animate="animate" className="flex justify-center gap-4 flex-wrap mb-16">
-                        <Link to="/survey" className="bg-white text-primary font-semibold px-8 py-4 rounded-full hover:bg-yellow-50 transition-all shadow-lg flex items-center gap-2 transform hover:-translate-y-1">
-                            <Sparkles size={20} /> Start with AI
-                        </Link>
-                        <Link to="/survey" className="bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-full border border-white/40 hover:bg-white/30 transition-all flex items-center gap-2 transform hover:-translate-y-1">
-                            <CalendarHeart size={20} /> Fill Survey
-                        </Link>
-                        <Link to="/plan/build" className="bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 rounded-full border border-white/40 hover:bg-white/30 transition-all flex items-center gap-2 transform hover:-translate-y-1">
-                            <ArrowRight size={20} /> Build My Plan
-                        </Link>
-                    </motion.div>
-
-                    {/* Stats */}
-                    <div className="flex justify-center items-center gap-8 md:gap-16 flex-wrap">
-                        <div className="text-center">
-                            <p className="text-white font-bold text-2xl lg:text-3xl">500+</p>
-                            <p className="text-white/60 text-sm uppercase tracking-wider">Events Planned</p>
-                        </div>
-                        <div className="w-px h-10 bg-white/20" />
-                        <div className="text-center">
-                            <p className="text-white font-bold text-2xl lg:text-3xl">2400+</p>
-                            <p className="text-white/60 text-sm uppercase tracking-wider">Happy Guests</p>
-                        </div>
-                        <div className="w-px h-10 bg-white/20" />
-                        <div className="text-center">
-                            <p className="text-white font-bold text-2xl lg:text-3xl">98%</p>
-                            <p className="text-white/60 text-sm uppercase tracking-wider">Success Rate</p>
-                        </div>
-                    </div>
-
-                    {/* Floating category pills */}
-                    <div className="relative w-full max-w-3xl h-32 mt-12 select-none pointer-events-none hidden md:block">
-                        {floatingBubbles.map((bubble, i) => (
-                            <motion.div
-                                key={i}
-                                className="absolute"
-                                style={{ left: bubble.x, top: bubble.y }}
-                                animate={{
-                                    y: [0, -12, 0, 10, 0],
-                                    x: [0, bubble.driftX, 0, -bubble.driftX / 2, 0],
-                                    opacity: [0.7, 1, 0.7, 0.9, 0.7]
-                                }}
-                                transition={{ duration: bubble.duration, delay: bubble.delay, repeat: Infinity, ease: "easeInOut" }}
-                            >
-                                <span className="bg-white/20 backdrop-blur-md text-white border border-white/30 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 whitespace-nowrap shadow-xl">
-                                    {bubble.emoji} {bubble.label}
-                                </span>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Bottom wave transition */}
-                <div
-                    aria-hidden="true"
-                    style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10 }}
-                >
-                    <svg
-                        viewBox="0 0 1440 80"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        style={{ display: 'block' }}
-                    >
-                        <path
-                            d="M0 80L1440 80L1440 40C1320 0 1080 80 720 40C360 0 120 80 0 40L0 80Z"
-                            fill="#F0F2FF"
-                        />
-                    </svg>
-                </div>
-            </section>
-
-            {/* ─── Browse by Category bar ─────────────────────────────────── */}
-            <div className="relative z-20 bg-white py-12 px-4 shadow-sm">
-                <div className="max-w-7xl mx-auto">
-                    <p className="text-text-muted text-xs font-bold uppercase tracking-widest text-center mb-8 italic">Or Browse by Category</p>
-                    <div className="flex justify-center flex-wrap gap-6">
-                        {categories.map((cat, i) => (
-                            <motion.div
-                                key={cat.label}
-                                initial={{ opacity: 0, y: 15 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.1 * i }}
-                            >
-                                <Link
-                                    to={cat.href}
-                                    className="group flex flex-col items-center gap-3 bg-gray-50 hover:bg-primary/5 border border-gray-100 hover:border-primary/20 p-6 rounded-[2.5rem] transition-all hover:-translate-y-2 min-w-[120px] shadow-sm hover:shadow-xl"
-                                >
-                                    <span className="text-4xl group-hover:scale-125 transition-transform duration-500">{cat.icon}</span>
-                                    <span className="text-text-dark text-xs font-bold tracking-tight uppercase">{cat.label}</span>
-                                </Link>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: 'var(--aeva-ember)',
+                  animation: 'aeva-pulse 2s infinite',
+                }}
+              />
+              <span style={{ fontWeight: 500 }}>AI-assisted planning · in private beta</span>
             </div>
 
-            {/* ─── Rest of Content (Why Choose AEVA / How It Works / Event Ideas) ──────────────── */}
-            <section className="bg-background pt-24 pb-16 px-4">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl font-display font-bold text-text-dark mb-4">Why Choose AEVA?</h2>
-                        <p className="text-text-muted text-lg max-w-2xl mx-auto">Our intelligent platform handles the logistics, so you can focus on the celebration.</p>
-                    </div>
-                    <motion.div variants={containerVariants} initial="initial" whileInView="animate" viewport={{ once: true }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <FeatureCard title="AI Assistant" desc="Chat with our conversational AI to brainstorm and plan your entire event seamlessly." icon={<MessageSquare className="w-8 h-8 text-primary" />} />
-                        <FeatureCard title="Smart Venues" desc="Get tailored venue recommendations matching your budget, location, and guest list." icon={<MapPin className="w-8 h-8 text-secondary" />} />
-                        <FeatureCard title="Guided Survey" desc="Quickly outline your needs with an easy 4-step interactive survey process." icon={<CalendarHeart className="w-8 h-8 text-accent" />} />
-                        <FeatureCard title="Digital Invites" desc="Create stunning invitations and track real-time RSVP responses visually." icon={<Sparkles className="w-8 h-8 text-primary" />} />
-                    </motion.div>
-                </div>
-            </section>
+            <h1 className="t-display-lg" style={{ marginBottom: '28px' }}>
+              Events,<br />
+              <span
+                style={{
+                  fontStyle: 'italic',
+                  fontWeight: 320,
+                  color: 'var(--aeva-ink-soft)',
+                }}
+              >
+                thoughtfully
+              </span>
+              <br />
+              planned.
+            </h1>
 
-            <section className="bg-white py-24 px-4">
-                <div className="max-w-7xl mx-auto text-center mb-16">
-                    <h2 className="text-4xl font-display font-bold text-text-dark mb-4">How It Works</h2>
-                </div>
-                <div className="max-w-4xl mx-auto relative">
-                    <div className="hidden md:block absolute top-12 left-0 w-full h-1 bg-gradient-to-r from-primary/30 to-accent/30 -z-0" />
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
-                        <Step number="1" title="Share Vision" desc="Tell us what you want via survey or AI chat." />
-                        <Step number="2" title="Find Venue" desc="Review perfectly matched venue recommendations." />
-                        <Step number="3" title="Invite Friends" desc="Send custom digital RSVPs to your guest list." />
-                        <Step number="4" title="Celebrate" desc="Enjoy your flawlessly managed event day." />
-                    </div>
-                </div>
-            </section>
+            <p className="t-body-lg" style={{ color: 'var(--aeva-ink-soft)', maxWidth: '480px', marginBottom: '36px' }}>
+              From a backyard birthday to a 200-person conference — AEVA turns a few sentences into a complete plan, with curated
+              venues, vendors, and a day-of timeline.
+            </p>
 
-            <section className="bg-background py-24 px-4">
-                <div className="max-w-7xl mx-auto">
-                    <h2 className="text-4xl font-display font-bold text-text-dark mb-12 text-center">Discover Event Ideas</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <IdeaCard title="Weddings" img="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=800" />
-                        <IdeaCard title="Birthdays" img="https://images.unsplash.com/photo-1533227260871-3323087a3cb1?auto=format&fit=crop&q=80&w=800" />
-                        <IdeaCard title="Corporate" img="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=80&w=800" />
-                    </div>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '56px', flexWrap: 'wrap' }}>
+              <Button variant="ember" size="lg" onClick={() => handleNavigation('chat')}>
+                <Sparkles size={16} /> Plan with AEVA
+              </Button>
+              <Button
+                variant="ghost"
+                size="lg"
+                onClick={() => handleNavigation('survey')}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+              >
+                Start with a survey <ArrowRight size={15} />
+              </Button>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display: 'flex', gap: '32px', paddingTop: '28px', borderTop: '1px solid var(--aeva-line)' }}>
+              {stats.map(([num, label]) => (
+                <div key={label}>
+                  <div className="t-display-xs" style={{ marginBottom: '2px' }}>
+                    {num}
+                  </div>
+                  <div className="t-caption">{label}</div>
                 </div>
-            </section>
-        </motion.div>
-    );
+              ))}
+            </div>
+          </div>
+
+          {/* Right: hero images (rotated stack) */}
+          <div style={{ position: 'relative', height: '580px' }}>
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 30,
+                width: 280,
+                height: 360,
+                borderRadius: 'var(--r-lg)',
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-lg)',
+                transform: 'rotate(-3deg)',
+                background: 'linear-gradient(135deg, var(--aeva-ember-soft) 0%, var(--aeva-sage-soft) 100%)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: 80,
+                right: 0,
+                width: 240,
+                height: 300,
+                borderRadius: 'var(--r-lg)',
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-lg)',
+                transform: 'rotate(4deg)',
+                background: 'linear-gradient(135deg, var(--aeva-sage-soft) 0%, var(--aeva-paper-warm) 100%)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 80,
+                width: 220,
+                height: 200,
+                borderRadius: 'var(--r-lg)',
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-lg)',
+                transform: 'rotate(-1deg)',
+                background: 'linear-gradient(135deg, var(--aeva-paper-warm) 0%, var(--aeva-ember-soft) 100%)',
+              }}
+            />
+
+            {/* Floating event card */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 30,
+                right: 20,
+                width: 240,
+                padding: '16px',
+                background: 'var(--aeva-canvas)',
+                border: '1px solid var(--aeva-line)',
+                borderRadius: 'var(--r-md)',
+                boxShadow: 'var(--shadow-xl)',
+                transform: 'rotate(2deg)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <span
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'var(--aeva-ember)',
+                  }}
+                />
+                <span className="t-eyebrow">Plan generated</span>
+              </div>
+              <div className="t-display-xs" style={{ marginBottom: '6px' }}>
+                Maya's 30th
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--aeva-ink-mute)', marginBottom: '12px' }}>Sat, Jun 14 · 6 PM · Brooklyn</div>
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                <Tag tone="ember" size="sm">
+                  Rooftop
+                </Tag>
+                <Tag size="sm">Italian</Tag>
+                <Tag size="sm">DJ</Tag>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── THREE WAYS ─── */}
+      <section style={{ padding: '80px 32px', maxWidth: '1280px', margin: '0 auto' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            marginBottom: '48px',
+            gap: '40px',
+          }}
+        >
+          <div>
+            <p className="t-eyebrow" style={{ marginBottom: '12px' }}>
+              Three ways to start
+            </p>
+            <h2 className="t-display-md" style={{ maxWidth: '600px' }}>
+              However you think about your event, AEVA meets you there.
+            </h2>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+          {threeWays.map((card, i) => (
+            <button
+              key={card.kind}
+              onClick={() => handleNavigation(card.screen)}
+              style={{
+                textAlign: 'left',
+                padding: '32px',
+                background: i === 0 ? 'var(--aeva-ink)' : 'var(--aeva-canvas)',
+                color: i === 0 ? 'var(--aeva-paper)' : 'var(--aeva-ink)',
+                border: i === 0 ? 'none' : '1px solid var(--aeva-line)',
+                borderRadius: 'var(--r-lg)',
+                minHeight: '280px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                transition: 'all 200ms',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = '';
+                e.currentTarget.style.boxShadow = '';
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
+                    background: i === 0 ? 'rgba(250,248,245,0.1)' : 'var(--aeva-paper-warm)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '24px',
+                    color: i === 0 ? 'var(--aeva-ember)' : 'var(--aeva-ink)',
+                  }}
+                >
+                  <Sparkles size={20} />
+                </div>
+                <p
+                  style={{
+                    fontSize: '11px',
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    color: i === 0 ? 'rgba(250,248,245,0.5)' : 'var(--aeva-ink-mute)',
+                    marginBottom: '12px',
+                    fontWeight: 600,
+                  }}
+                >
+                  {card.kind}
+                </p>
+                <h3 className="t-display-sm" style={{ color: 'inherit', marginBottom: '12px' }}>
+                  {card.title}
+                </h3>
+                <p
+                  style={{
+                    fontSize: '14px',
+                    color: i === 0 ? 'rgba(250,248,245,0.7)' : 'var(--aeva-ink-soft)',
+                    lineHeight: 1.55,
+                  }}
+                >
+                  {card.desc}
+                </p>
+              </div>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  marginTop: '24px',
+                  color: i === 0 ? 'var(--aeva-ember)' : 'var(--aeva-ink)',
+                }}
+              >
+                {card.cta} <ArrowRight size={14} />
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── HOW IT WORKS ─── */}
+      <section
+        style={{
+          background: 'var(--aeva-paper-deep)',
+          padding: '96px 32px',
+          borderTop: '1px solid var(--aeva-line)',
+          borderBottom: '1px solid var(--aeva-line)',
+        }}
+      >
+        <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
+          <p className="t-eyebrow" style={{ marginBottom: '12px' }}>
+            How it works
+          </p>
+          <h2 className="t-display-md" style={{ maxWidth: '720px', marginBottom: '64px' }}>
+            From idea to invitations in four unhurried steps.
+          </h2>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '24px',
+              position: 'relative',
+            }}
+          >
+            <div style={{ position: 'absolute', top: 22, left: 24, right: 24, height: 1, background: 'var(--aeva-line-strong)', zIndex: 0 }} />
+
+            {howItWorks.map(([num, title, desc]) => (
+              <div key={num} style={{ position: 'relative', zIndex: 1 }}>
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '50%',
+                    background: 'var(--aeva-canvas)',
+                    border: '1px solid var(--aeva-line-strong)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '12px',
+                    color: 'var(--aeva-ink-soft)',
+                    marginBottom: '20px',
+                  }}
+                >
+                  {num}
+                </div>
+                <h3 className="t-display-xs" style={{ marginBottom: '8px' }}>
+                  {title}
+                </h3>
+                <p style={{ fontSize: '13.5px', color: 'var(--aeva-ink-soft)', lineHeight: 1.55 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── BIG CTA ─── */}
+      <section style={{ padding: '96px 32px', maxWidth: '1080px', margin: '0 auto', textAlign: 'center' }}>
+        <h2 className="t-display-lg" style={{ marginBottom: '20px' }}>
+          Your next event,
+          <br />
+          <em style={{ fontWeight: 320, color: 'var(--aeva-ink-soft)' }}>fewer tabs.</em>
+        </h2>
+        <p className="t-body-lg" style={{ color: 'var(--aeva-ink-soft)', marginBottom: '32px', maxWidth: '540px', margin: '0 auto 32px' }}>
+          Tell AEVA what you're celebrating. We'll handle the spreadsheet.
+        </p>
+        <Button variant="ember" size="lg" onClick={() => handleNavigation('chat')}>
+          <Sparkles size={16} /> Start planning
+        </Button>
+      </section>
+    </div>
+  );
 }

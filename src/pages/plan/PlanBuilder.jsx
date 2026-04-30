@@ -59,27 +59,45 @@ function PlanBuilderInner() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto py-6">
-            {/* Page title */}
-            <div className="mb-8 flex items-center justify-between">
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 32px' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
                 <div>
-                    <h1 className="text-3xl font-display font-bold text-text-dark">Build Your Own Plan</h1>
-                    <p className="text-text-muted mt-1">Select your preferred options step by step.</p>
+                    <h1 className="t-display-lg" style={{ marginBottom: '8px' }}>
+                        Build Your Own Plan
+                    </h1>
+                    <p style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)', marginTop: '1px' }}>
+                        Select your preferred options step by step.
+                    </p>
                 </div>
                 <button
                     onClick={() => {
                         usePlanStore.getState().clearPlan();
                         navigate('/');
                     }}
-                    className="text-red-500 hover:text-red-700 text-sm font-medium transition-colors"
+                    style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--aeva-danger)',
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        transition: 'all 200ms',
+                    }}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.color = '#8b3a3a';
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.color = 'var(--aeva-danger)';
+                    }}
                 >
                     Cancel Plan
                 </button>
             </div>
 
             {/* Date input */}
-            <div className="mb-6 bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5">
-                <label className="block text-sm font-bold text-text-dark mb-2">
+            <div style={{ marginBottom: '24px', background: 'var(--aeva-canvas)', borderRadius: 'var(--r-lg)', border: '1px solid var(--aeva-line)', padding: '20px' }}>
+                <label className="t-eyebrow" style={{ display: 'block', marginBottom: '8px' }}>
                     When is your event?
                 </label>
                 <input
@@ -88,20 +106,22 @@ function PlanBuilderInner() {
                     onChange={handleDateChange}
                     min={getTomorrowDate()}
                     required
-                    className="w-full max-w-xs px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="field"
+                    style={{ maxWidth: '280px' }}
                 />
                 {dateError && (
-                    <p className="text-sm text-red-500 font-medium mt-2">{dateError}</p>
+                    <p style={{ fontSize: '14px', color: 'var(--aeva-danger)', fontWeight: 500, marginTop: '8px' }}>{dateError}</p>
                 )}
             </div>
 
-            {/* ─── Step content rendered here ─── */}
+            {/* ─── Step content ─── */}
             <motion.div
                 key={location.pathname}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
+                className="aeva-rise"
             >
                 <Outlet context={{ onNavigatePastStep0: handleNavigatePastStep0 }} />
             </motion.div>

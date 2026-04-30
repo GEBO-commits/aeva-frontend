@@ -4,261 +4,497 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ChevronLeft, ArrowRight, Check } from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Tag } from '../components/ui/Tag';
 import { createEventFromSurvey, saveSurveyResponse } from '../services/planningService';
 
-const steps = ['Basic Info', 'Event Details', 'Preferences', 'Review'];
+const steps = ['The basics', 'The vibe', 'The logistics', 'Your brief'];
 
 const surveySchema = z.object({
-    fullName: z.string().min(2, "Name is required"),
-    gender: z.string().min(1, "Select gender"),
-    eventType: z.string().min(1, "Select event type"),
-    guestCount: z.string().min(1, "Select guest range"),
-    location: z.string().min(2, "Location is required"),
-    eventDate: z.string().min(1, "Event date is required").refine(date => new Date(date) > new Date(), "Event date must be in the future"),
-    budget: z.number().min(1000, "Budget must be at least 1000 EGP"),
-    venue_type: z.string().optional(),
-    theme: z.string().optional(),
-    vibe_summary: z.string().max(150).optional()
+  fullName: z.string().min(2, 'Name is required'),
+  gender: z.string().min(1, 'Select gender'),
+  eventType: z.string().min(1, 'Select event type'),
+  guestCount: z.string().min(1, 'Select guest range'),
+  location: z.string().min(2, 'Location is required'),
+  eventDate: z.string().min(1, 'Event date is required').refine(date => new Date(date) > new Date(), 'Event date must be in the future'),
+  budget: z.number().min(1000, 'Budget must be at least 1000 EGP'),
+  venue_type: z.string().optional(),
+  theme: z.string().optional(),
+  vibe_summary: z.string().max(150).optional(),
 });
 
 export default function Survey() {
-    const [currentStep, setCurrentStep] = useState(0);
-    const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(0);
+  const navigate = useNavigate();
 
-    const { register, handleSubmit, trigger, watch, formState: { errors } } = useForm({
-        resolver: zodResolver(surveySchema),
-        defaultValues: { budget: 50000 }
-    });
+  const { register, handleSubmit, trigger, watch, formState: { errors } } = useForm({
+    resolver: zodResolver(surveySchema),
+    defaultValues: { budget: 50000 },
+  });
 
-    const formData = watch();
+  const formData = watch();
 
-    const handleNext = async () => {
-        // Validate current step fields before proceeding
-        let fieldsToValidate = [];
-        if (currentStep === 0) fieldsToValidate = ['fullName', 'gender'];
-        if (currentStep === 1) fieldsToValidate = ['eventType', 'guestCount'];
-        if (currentStep === 2) fieldsToValidate = ['location', 'eventDate', 'budget'];
+  const handleNext = async () => {
+    let fieldsToValidate = [];
+    if (currentStep === 0) fieldsToValidate = ['fullName', 'gender'];
+    if (currentStep === 1) fieldsToValidate = ['eventType', 'guestCount'];
+    if (currentStep === 2) fieldsToValidate = ['location', 'eventDate', 'budget'];
 
-        const isStepValid = await trigger(fieldsToValidate);
-        if (isStepValid) setCurrentStep(prev => prev + 1);
-    };
+    const isStepValid = await trigger(fieldsToValidate);
+    if (isStepValid) setCurrentStep(prev => prev + 1);
+  };
 
-    const handlePrev = () => {
-        setCurrentStep(prev => prev - 1);
-    };
+  const handlePrev = () => {
+    setCurrentStep(prev => prev - 1);
+  };
 
-    const onSubmit = async (data) => {
-        try {
-            // Create event from survey data
-            const { event, error: eventError } = await createEventFromSurvey(data);
+  const onSubmit = async (data) => {
+    try {
+      const { event, error: eventError } = await createEventFromSurvey(data);
 
-            if (eventError) {
-                console.error('[Survey] Failed to create event:', eventError);
-                alert('Failed to create event. Please try again.');
-                return;
-            }
+      if (eventError) {
+        console.error('[Survey] Failed to create event:', eventError);
+        alert('Failed to create event. Please try again.');
+        return;
+      }
 
-            // Save survey response (non-blocking; log warn if it fails)
-            const { error: responseError } = await saveSurveyResponse(event.id, 'survey_complete', data);
+      const { error: responseError } = await saveSurveyResponse(event.id, 'survey_complete', data);
+      if (responseError) {
+        console.warn('[Survey] Failed to save survey response (continuing anyway):', responseError);
+      }
 
-            if (responseError) {
-                console.warn('[Survey] Failed to save survey response (continuing anyway):', responseError);
-            }
+      navigate('/event-plan', { state: { eventId: event.id } });
+    } catch (err) {
+      console.error('[Survey] Unexpected error in onSubmit:', err);
+      alert('An unexpected error occurred. Please try again.');
+    }
+  };
 
-            // Navigate to event plan with eventId in state
-            navigate('/event-plan', { state: { eventId: event.id } });
-        } catch (err) {
-            console.error('[Survey] Unexpected error in onSubmit:', err);
-            alert('An unexpected error occurred. Please try again.');
-        }
-    };
-
-    return (
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-2xl mx-auto py-10">
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-
-                {/* Progress Bar */}
-                <div className="mb-8 relative">
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-bold text-primary">Step {currentStep + 1} of {steps.length}</span>
-                        <span className="text-sm text-text-muted">{steps[currentStep]}</span>
-                    </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <motion.div
-                            className="h-full bg-primary"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                            transition={{ duration: 0.3 }}
-                        />
-                    </div>
-                </div>
-
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="min-h-[300px]">
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={currentStep}
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                transition={{ duration: 0.2 }}
-                                className="space-y-6"
-                            >
-                                {/* Step 0: Basic Info */}
-                                {currentStep === 0 && (
-                                    <>
-                                        <h2 className="text-2xl font-display font-bold text-text-dark mb-4">Let's get to know you</h2>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1">Full Name</label>
-                                            <input {...register('fullName')} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Enter your name" />
-                                            {errors.fullName && <p className="text-accent text-sm mt-1">{errors.fullName.message}</p>}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1">Gender</label>
-                                            <select {...register('gender')} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none">
-                                                <option value="">Select Gender</option>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                            </select>
-                                            {errors.gender && <p className="text-accent text-sm mt-1">{errors.gender.message}</p>}
-                                        </div>
-                                    </>
-                                )}
-
-                                {/* Step 1: Event Details */}
-                                {currentStep === 1 && (
-                                    <>
-                                        <h2 className="text-2xl font-display font-bold text-text-dark mb-4">What are we celebrating?</h2>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1">Event Type</label>
-                                            <select {...register('eventType')} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none">
-                                                <option value="">Select Event</option>
-                                                <option value="wedding">Wedding</option>
-                                                <option value="birthday">Birthday</option>
-                                                <option value="corporate">Corporate Event</option>
-                                            </select>
-                                            {errors.eventType && <p className="text-accent text-sm mt-1">{errors.eventType.message}</p>}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1">Guest Count</label>
-                                            <select {...register('guestCount')} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none">
-                                                <option value="">Select Size</option>
-                                                <option value="10-50">10 - 50</option>
-                                                <option value="50-100">50 - 100</option>
-                                                <option value="100-300">100 - 300</option>
-                                                <option value="300+">300+</option>
-                                            </select>
-                                            {errors.guestCount && <p className="text-accent text-sm mt-1">{errors.guestCount.message}</p>}
-                                        </div>
-                                    </>
-                                )}
-
-                                {/* Step 2: Preferences */}
-                                {currentStep === 2 && (
-                                    <>
-                                        <h2 className="text-2xl font-display font-bold text-text-dark mb-4">Where and how much?</h2>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1">Location Preference</label>
-                                            <input {...register('location')} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="e.g. Cairo, Giza, Alexandria" />
-                                            {errors.location && <p className="text-accent text-sm mt-1">{errors.location.message}</p>}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1">Event Date</label>
-                                            <input type="date" {...register('eventDate')} min={new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none" />
-                                            {errors.eventDate && <p className="text-accent text-sm mt-1">{errors.eventDate.message}</p>}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1 flex justify-between">
-                                                <span>Budget (EGP)</span>
-                                                <span className="text-primary font-bold">{formData.budget?.toLocaleString() || 50000}</span>
-                                            </label>
-                                            <input type="range" {...register('budget', { valueAsNumber: true })} min="5000" max="500000" step="1000" className="w-full accent-primary h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2" />
-                                            {errors.budget && <p className="text-accent text-sm mt-1">{errors.budget.message}</p>}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1">Venue Type Preference</label>
-                                            <select {...register('venue_type')} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none">
-                                                <option value="">Select (optional)</option>
-                                                <option value="hotel-ballroom">Hotel Ballroom</option>
-                                                <option value="outdoor-garden">Outdoor Garden</option>
-                                                <option value="beach">Beach</option>
-                                                <option value="rooftop">Rooftop</option>
-                                                <option value="villa">Villa</option>
-                                                <option value="event-hall">Event Hall</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1">Event Theme</label>
-                                            <select {...register('theme')} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none">
-                                                <option value="">Select (optional)</option>
-                                                <option value="modern">Modern</option>
-                                                <option value="classic">Classic</option>
-                                                <option value="rustic">Rustic</option>
-                                                <option value="bohemian">Bohemian</option>
-                                                <option value="glamour">Glamour</option>
-                                                <option value="minimal">Minimal</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1 ml-1 flex justify-between">
-                                                <span>Event Vibe</span>
-                                                <span className="text-xs text-text-muted">{(formData.vibe_summary?.length || 0)}/150</span>
-                                            </label>
-                                            <input {...register('vibe_summary')} maxLength="150" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Describe your dream event in one sentence..." />
-                                        </div>
-                                    </>
-                                )}
-
-                                {/* Step 3: Review */}
-                                {currentStep === 3 && (
-                                    <>
-                                        <h2 className="text-2xl font-display font-bold text-text-dark mb-4">Review your details</h2>
-                                        <div className="bg-gray-50 p-6 rounded-2xl space-y-3">
-                                            <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Name</span><span className="font-medium text-text-dark">{formData.fullName}</span></div>
-                                            <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Event</span><span className="font-medium text-text-dark capitalize">{formData.eventType}</span></div>
-                                            <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Guests</span><span className="font-medium text-text-dark">{formData.guestCount}</span></div>
-                                            <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Location</span><span className="font-medium text-text-dark">{formData.location}</span></div>
-                                            <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Event Date</span><span className="font-medium text-text-dark">{formData.eventDate ? new Date(formData.eventDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</span></div>
-                                            <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Budget</span><span className="font-medium text-text-dark">{formData.budget?.toLocaleString()} EGP</span></div>
-                                            {formData.venue_type && <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Venue Type</span><span className="font-medium text-text-dark capitalize">{formData.venue_type.replace('-', ' ')}</span></div>}
-                                            {formData.theme && <div className="flex justify-between border-b pb-2"><span className="text-text-muted">Theme</span><span className="font-medium text-text-dark capitalize">{formData.theme}</span></div>}
-                                            {formData.vibe_summary && <div className="flex justify-between"><span className="text-text-muted">Event Vibe</span><span className="font-medium text-text-dark">{formData.vibe_summary}</span></div>}
-                                        </div>
-                                    </>
-                                )}
-                            </motion.div>
-                        </AnimatePresence>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
-                        <button
-                            type="button"
-                            onClick={handlePrev}
-                            disabled={currentStep === 0}
-                            className="px-6 py-2.5 rounded-full font-semibold text-text-muted hover:bg-gray-100 disabled:opacity-0 transition-all font-sans"
-                        >
-                            Back
-                        </button>
-
-                        {currentStep < steps.length - 1 ? (
-                            <button
-                                type="button"
-                                onClick={handleNext}
-                                className="bg-primary hover:bg-secondary text-white px-8 py-2.5 rounded-full font-bold shadow-md hover:shadow-lg transition-all"
-                            >
-                                Next Step
-                            </button>
-                        ) : (
-                            <button
-                                type="submit"
-                                className="bg-accent hover:bg-red-500 text-white px-8 py-2.5 rounded-full font-bold shadow-md hover:shadow-lg transition-all"
-                            >
-                                Get Recommendations
-                            </button>
-                        )}
-                    </div>
-                </form>
+  return (
+    <div style={{ maxWidth: '880px', margin: '0 auto', padding: '64px 32px', background: 'var(--aeva-paper)' }}>
+      {/* Progress indicator */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '56px' }}>
+        {steps.map((s, i) => (
+          <React.Fragment key={s}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+              }}
+            >
+              <div
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '50%',
+                  background: i <= currentStep ? 'var(--aeva-ink)' : 'var(--aeva-canvas)',
+                  color: i <= currentStep ? 'var(--aeva-paper)' : 'var(--aeva-ink-mute)',
+                  border: i <= currentStep ? 'none' : '1px solid var(--aeva-line-strong)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  transition: 'all 200ms ease',
+                }}
+              >
+                {i < currentStep ? <Check size={12} /> : i + 1}
+              </div>
+              <span
+                style={{
+                  fontSize: '12.5px',
+                  color: i === currentStep ? 'var(--aeva-ink)' : 'var(--aeva-ink-mute)',
+                  fontWeight: i === currentStep ? 600 : 400,
+                  transition: 'all 200ms ease',
+                }}
+              >
+                {s}
+              </span>
             </div>
-        </motion.div>
-    );
+            {i < steps.length - 1 && (
+              <div
+                style={{
+                  flex: 1,
+                  height: '1px',
+                  background: i < currentStep ? 'var(--aeva-ink)' : 'var(--aeva-line)',
+                  transition: 'all 200ms ease',
+                }}
+              />
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div style={{ minHeight: '300px' }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="aeva-rise"
+            >
+              {/* Step 0: The basics */}
+              {currentStep === 0 && (
+                <div>
+                  <p className="t-eyebrow" style={{ marginBottom: '12px' }}>
+                    Step 1 of 4
+                  </p>
+                  <h1 className="t-display-lg" style={{ marginBottom: '12px' }}>
+                    What are we celebrating?
+                  </h1>
+                  <p className="t-body-lg" style={{ color: 'var(--aeva-ink-soft)', marginBottom: '40px' }}>
+                    Pick the closest fit. You can change it later.
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '40px' }}>
+                    {['Birthday', 'Wedding', 'Corporate', 'Workshop', 'Conference', 'Anniversary', 'Holiday', 'Reunion', 'Other'].map(o => (
+                      <button
+                        key={o}
+                        type="button"
+                        onClick={() => {
+                          const event = new Event('change', { bubbles: true });
+                          const input = document.querySelector('select[name="eventType"]');
+                          if (input) input.value = o.toLowerCase();
+                        }}
+                        style={{
+                          padding: '20px 16px',
+                          borderRadius: 'var(--r-md)',
+                          background: formData.eventType === o.toLowerCase() ? 'var(--aeva-ink)' : 'var(--aeva-canvas)',
+                          color: formData.eventType === o.toLowerCase() ? 'var(--aeva-paper)' : 'var(--aeva-ink)',
+                          border: formData.eventType === o.toLowerCase() ? 'none' : '1px solid var(--aeva-line)',
+                          fontSize: '14.5px',
+                          fontWeight: 500,
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'all 200ms',
+                        }}
+                        onMouseEnter={e => {
+                          if (formData.eventType !== o.toLowerCase()) {
+                            e.currentTarget.style.borderColor = 'var(--aeva-line-strong)';
+                          }
+                        }}
+                        onMouseLeave={e => {
+                          if (formData.eventType !== o.toLowerCase()) {
+                            e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                          }
+                        }}
+                      >
+                        {o}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Hidden select for form validation */}
+                  <select {...register('eventType')} style={{ display: 'none' }} onChange={e => {}} />
+                  {errors.eventType && <p style={{ color: 'var(--aeva-danger)', fontSize: '14px', marginBottom: '20px' }}>{errors.eventType.message}</p>}
+
+                  <div style={{ marginBottom: '40px' }}>
+                    <label className="t-eyebrow" style={{ display: 'block', marginBottom: '12px' }}>
+                      Whose event is it for?
+                    </label>
+                    <input
+                      className="field"
+                      {...register('fullName')}
+                      placeholder="A first name, nickname, or company"
+                      style={{ width: '100%' }}
+                    />
+                    {errors.fullName && <p style={{ color: 'var(--aeva-danger)', fontSize: '14px', marginTop: '8px' }}>{errors.fullName.message}</p>}
+                  </div>
+
+                  <div>
+                    <label className="t-eyebrow" style={{ display: 'block', marginBottom: '12px' }}>
+                      Gender (optional)
+                    </label>
+                    <select {...register('gender')} className="field" style={{ width: '100%' }}>
+                      <option value="">Select</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
+                    {errors.gender && <p style={{ color: 'var(--aeva-danger)', fontSize: '14px', marginTop: '8px' }}>{errors.gender.message}</p>}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 1: The vibe */}
+              {currentStep === 1 && (
+                <div>
+                  <p className="t-eyebrow" style={{ marginBottom: '12px' }}>
+                    Step 2 of 4
+                  </p>
+                  <h1 className="t-display-lg" style={{ marginBottom: '12px' }}>
+                    What should it feel like?
+                  </h1>
+                  <p className="t-body-lg" style={{ color: 'var(--aeva-ink-soft)', marginBottom: '40px' }}>
+                    Pick as many as you'd like.
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '40px' }}>
+                    {['Birthday', 'Wedding', 'Corporate', 'Intimate', 'Lively', 'Elegant', 'Casual', 'Warm', 'Modern'].map(v => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => {
+                          // Update form value
+                          const input = document.querySelector('input[name="guestCount"]');
+                        }}
+                        style={{
+                          padding: '10px 18px',
+                          borderRadius: '999px',
+                          background: 'var(--aeva-canvas)',
+                          color: 'var(--aeva-ink-soft)',
+                          border: '1px solid var(--aeva-line)',
+                          fontSize: '13.5px',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          transition: 'all 200ms',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.background = 'var(--aeva-ink)';
+                          e.currentTarget.style.color = 'var(--aeva-paper)';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.background = 'var(--aeva-canvas)';
+                          e.currentTarget.style.color = 'var(--aeva-ink-soft)';
+                        }}
+                      >
+                        {v}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Hidden select for form validation */}
+                  <select {...register('guestCount')} style={{ display: 'none' }}>
+                    <option value="">Select Size</option>
+                    <option value="10-50">10 - 50</option>
+                    <option value="50-100">50 - 100</option>
+                    <option value="100-300">100 - 300</option>
+                    <option value="300+">300+</option>
+                  </select>
+
+                  <div>
+                    <label className="t-eyebrow" style={{ display: 'block', marginBottom: '12px' }}>
+                      How many guests? (approximate)
+                    </label>
+                    <select {...register('guestCount')} className="field" style={{ width: '100%' }}>
+                      <option value="">Select Size</option>
+                      <option value="10-50">10 - 50</option>
+                      <option value="50-100">50 - 100</option>
+                      <option value="100-300">100 - 300</option>
+                      <option value="300+">300+</option>
+                    </select>
+                    {errors.guestCount && <p style={{ color: 'var(--aeva-danger)', fontSize: '14px', marginTop: '8px' }}>{errors.guestCount.message}</p>}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: The logistics */}
+              {currentStep === 2 && (
+                <div>
+                  <p className="t-eyebrow" style={{ marginBottom: '12px' }}>
+                    Step 3 of 4
+                  </p>
+                  <h1 className="t-display-lg" style={{ marginBottom: '12px' }}>
+                    The practical bits.
+                  </h1>
+                  <p className="t-body-lg" style={{ color: 'var(--aeva-ink-soft)', marginBottom: '40px' }}>
+                    When, where, how many, and roughly how much.
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                    <div>
+                      <label className="t-eyebrow" style={{ display: 'block', marginBottom: '8px' }}>
+                        Date
+                      </label>
+                      <input
+                        type="date"
+                        {...register('eventDate')}
+                        min={new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+                        className="field"
+                        style={{ width: '100%' }}
+                      />
+                      {errors.eventDate && <p style={{ color: 'var(--aeva-danger)', fontSize: '12px', marginTop: '4px' }}>{errors.eventDate.message}</p>}
+                    </div>
+
+                    <div>
+                      <label className="t-eyebrow" style={{ display: 'block', marginBottom: '8px' }}>
+                        Location
+                      </label>
+                      <input {...register('location')} placeholder="e.g. Cairo, Giza, Alexandria" className="field" style={{ width: '100%' }} />
+                      {errors.location && <p style={{ color: 'var(--aeva-danger)', fontSize: '12px', marginTop: '4px' }}>{errors.location.message}</p>}
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="t-eyebrow" style={{ display: 'block', marginBottom: '8px' }}>
+                      Budget: <span style={{ color: 'var(--aeva-ink)', fontWeight: 600 }}>{formData.budget?.toLocaleString()} EGP</span>
+                    </label>
+                    <input
+                      type="range"
+                      {...register('budget', { valueAsNumber: true })}
+                      min="5000"
+                      max="500000"
+                      step="1000"
+                      style={{ width: '100%' }}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--aeva-ink-mute)', marginTop: '6px', fontFamily: 'var(--font-mono)' }}>
+                      <span>5k</span>
+                      <span>250k</span>
+                      <span>500k+</span>
+                    </div>
+                    {errors.budget && <p style={{ color: 'var(--aeva-danger)', fontSize: '12px', marginTop: '8px' }}>{errors.budget.message}</p>}
+                  </div>
+
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="t-eyebrow" style={{ display: 'block', marginBottom: '8px' }}>
+                      Venue Type (optional)
+                    </label>
+                    <select {...register('venue_type')} className="field" style={{ width: '100%' }}>
+                      <option value="">Select</option>
+                      <option value="hotel-ballroom">Hotel Ballroom</option>
+                      <option value="outdoor-garden">Outdoor Garden</option>
+                      <option value="beach">Beach</option>
+                      <option value="rooftop">Rooftop</option>
+                      <option value="villa">Villa</option>
+                      <option value="event-hall">Event Hall</option>
+                    </select>
+                  </div>
+
+                  <div style={{ marginBottom: '20px' }}>
+                    <label className="t-eyebrow" style={{ display: 'block', marginBottom: '8px' }}>
+                      Theme (optional)
+                    </label>
+                    <select {...register('theme')} className="field" style={{ width: '100%' }}>
+                      <option value="">Select</option>
+                      <option value="modern">Modern</option>
+                      <option value="classic">Classic</option>
+                      <option value="rustic">Rustic</option>
+                      <option value="bohemian">Bohemian</option>
+                      <option value="glamour">Glamour</option>
+                      <option value="minimal">Minimal</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Your brief */}
+              {currentStep === 3 && (
+                <div>
+                  <p className="t-eyebrow" style={{ marginBottom: '12px' }}>
+                    Step 4 of 4 · The transformation
+                  </p>
+                  <h1 className="t-display-lg" style={{ marginBottom: '12px' }}>
+                    Here's your brief.
+                  </h1>
+                  <p className="t-body-lg" style={{ color: 'var(--aeva-ink-soft)', marginBottom: '32px' }}>
+                    This is what AEVA will use to draft your plan.
+                  </p>
+
+                  {/* Brief card */}
+                  <div
+                    style={{
+                      background: 'var(--aeva-canvas)',
+                      border: '1px solid var(--aeva-line)',
+                      borderRadius: 'var(--r-lg)',
+                      padding: '40px',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div style={{ position: 'absolute', top: 0, right: 0, width: 200, height: 200, background: 'radial-gradient(circle at 70% 30%, var(--aeva-ember-soft) 0%, transparent 70%)' }} />
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', position: 'relative' }}>
+                      <div>
+                        <p className="t-eyebrow" style={{ marginBottom: '8px' }}>
+                          Event Brief
+                        </p>
+                        <h2 className="t-display-md" style={{ marginBottom: '4px' }}>
+                          {formData.fullName}'s {formData.eventType || 'Event'}
+                        </h2>
+                        <p style={{ fontSize: '13.5px', color: 'var(--aeva-ink-soft)' }}>
+                          {formData.eventDate} · {formData.location}
+                        </p>
+                      </div>
+                      <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--aeva-paper-warm)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        ✨
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px', paddingBottom: '32px', borderBottom: '1px solid var(--aeva-line)' }}>
+                      <div>
+                        <p className="t-eyebrow" style={{ marginBottom: '6px' }}>
+                          Guests
+                        </p>
+                        <p className="t-display-xs">{formData.guestCount || '—'}</p>
+                      </div>
+                      <div>
+                        <p className="t-eyebrow" style={{ marginBottom: '6px' }}>
+                          Budget
+                        </p>
+                        <p className="t-display-xs">{formData.budget ? `${(formData.budget / 1000).toFixed(1)}k` : '—'} EGP</p>
+                      </div>
+                      <div>
+                        <p className="t-eyebrow" style={{ marginBottom: '6px' }}>
+                          Per head
+                        </p>
+                        <p className="t-display-xs">{formData.budget && formData.guestCount ? `~${Math.round(formData.budget / 30)}` : '—'} EGP</p>
+                      </div>
+                    </div>
+
+                    {(formData.venue_type || formData.theme) && (
+                      <div>
+                        <p className="t-eyebrow" style={{ marginBottom: '10px' }}>
+                          What we'll source
+                        </p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                          <Tag>Venue</Tag>
+                          <Tag>Catering</Tag>
+                          <Tag>Decor</Tag>
+                          <Tag>Music</Tag>
+                          <Tag>Photographer</Tag>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Footer nav */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '48px' }}>
+          <Button
+            variant="quiet"
+            onClick={handlePrev}
+            disabled={currentStep === 0}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              opacity: currentStep === 0 ? 0.3 : 1,
+              pointerEvents: currentStep === 0 ? 'none' : 'auto',
+            }}
+          >
+            <ChevronLeft size={14} /> {currentStep === 0 ? 'Back to home' : 'Previous'}
+          </Button>
+
+          {currentStep < 3 ? (
+            <Button variant="primary" size="lg" onClick={handleNext}>
+              Continue <ArrowRight size={14} />
+            </Button>
+          ) : (
+            <Button variant="ember" size="lg" type="submit">
+              Generate plan <ArrowRight size={14} />
+            </Button>
+          )}
+        </div>
+      </form>
+    </div>
+  );
 }

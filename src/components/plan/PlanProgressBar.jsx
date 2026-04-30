@@ -38,49 +38,124 @@ export function PlanProgressBar({ currentStep }) {
         }
     };
     return (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5">
-            <p className="text-xs font-bold text-text-muted uppercase tracking-widest mb-4">Plan Progress</p>
-            <div className="flex items-center relative">
+        <div style={{ background: 'var(--aeva-canvas)', borderRadius: 'var(--r-lg)', border: '1px solid var(--aeva-line)', padding: '20px' }}>
+            <p className="t-eyebrow" style={{ marginBottom: '16px' }}>Plan Progress</p>
+            <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
                 {/* Background connector line */}
-                <div className="absolute left-0 right-0 top-[18px] h-0.5 bg-gray-100 z-0" style={{ marginLeft: '18px', marginRight: '18px' }} />
-                {/* Filled connector line to visually indicate progress. We'll find the highest completed step logic or just use currentStep for layout */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    top: '18px',
+                    height: '1px',
+                    background: 'var(--aeva-line)',
+                    zIndex: 0,
+                    marginLeft: '18px',
+                    marginRight: '18px',
+                  }}
+                />
+                {/* Filled connector line */}
                 {currentStep > 0 && (
                     <div
-                        className="absolute top-[18px] h-0.5 bg-primary z-0 transition-all duration-500"
                         style={{
-                            left: '18px',
-                            width: `calc(${(currentStep / (STEPS.length - 1)) * 100}% - 36px)`,
+                          position: 'absolute',
+                          top: '18px',
+                          height: '1px',
+                          background: 'var(--aeva-ink)',
+                          zIndex: 0,
+                          left: '18px',
+                          width: `calc(${(currentStep / (STEPS.length - 1)) * 100}% - 36px)`,
+                          transition: 'width 500ms cubic-bezier(0.2, 0.8, 0.2, 1)',
                         }}
                     />
                 )}
 
                 {STEPS.map((step, i) => {
-                    const isCompleted = checkStepCompleted(i);
-                    const isActive = i === currentStep;
-                    const isSkipped = skippedSteps.includes(i);
-                    const isClickable = i <= currentStep;
+                  const isCompleted = checkStepCompleted(i);
+                  const isActive = i === currentStep;
+                  const isSkipped = skippedSteps.includes(i);
+                  const isClickable = i <= currentStep;
 
-                    return (
-                        <div key={step} className="relative z-10 flex flex-col items-center flex-1">
-                            {isSkipped && (
-                                <span className="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full absolute -top-5 whitespace-nowrap hidden sm:block border border-gray-200 shadow-sm font-bold">
-                                    Skipped
-                                </span>
-                            )}
-                            {/* Circle */}
-                            <div onClick={() => isClickable && navigate(STEP_ROUTES[i])} className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all ${isCompleted ? 'bg-primary text-white shadow-md shadow-primary/30'
-                                : isActive ? 'bg-primary text-white ring-4 ring-primary/20 shadow-md shadow-primary/30'
-                                    : 'bg-gray-100 text-gray-400'
-                                } ${isClickable ? 'cursor-pointer' : ''}`}>
-                                {isCompleted && !isSkipped ? <CheckCircle className="w-5 h-5" /> : i + 1}
-                            </div>
-                            {/* Label */}
-                            <span className={`text-[10px] font-semibold mt-1.5 hidden sm:block ${isActive ? 'text-primary' : isCompleted ? 'text-gray-500' : 'text-gray-400'
-                                }`}>
-                                {step}
-                            </span>
-                        </div>
-                    );
+                  return (
+                    <div
+                      key={step}
+                      style={{
+                        position: 'relative',
+                        zIndex: 10,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        flex: 1,
+                      }}
+                    >
+                      {isSkipped && (
+                        <span
+                          style={{
+                            fontSize: '9px',
+                            background: 'var(--aeva-paper-warm)',
+                            color: 'var(--aeva-ink-mute)',
+                            padding: '2px 8px',
+                            borderRadius: '999px',
+                            position: 'absolute',
+                            top: '-20px',
+                            whiteSpace: 'nowrap',
+                            border: '1px solid var(--aeva-line)',
+                            boxShadow: 'var(--shadow-sm)',
+                            fontWeight: 600,
+                            display: 'none',
+                          }}
+                          className="sm:block"
+                        >
+                          Skipped
+                        </span>
+                      )}
+
+                      {/* Circle */}
+                      <div
+                        onClick={() => isClickable && navigate(STEP_ROUTES[i])}
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          fontWeight: 600,
+                          transition: 'all 200ms',
+                          cursor: isClickable ? 'pointer' : 'default',
+                          background: isCompleted ? 'var(--aeva-ink)' : isActive ? 'var(--aeva-ink)' : 'var(--aeva-paper-warm)',
+                          color: isCompleted || isActive ? 'var(--aeva-paper)' : 'var(--aeva-ink-mute)',
+                          boxShadow: isActive ? '0 0 0 4px rgba(26,24,20,0.1)' : 'none',
+                        }}
+                        onMouseEnter={e => {
+                          if (isClickable) {
+                            e.currentTarget.style.transform = 'scale(1.08)';
+                          }
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = '';
+                        }}
+                      >
+                        {isCompleted && !isSkipped ? <CheckCircle size={18} /> : i + 1}
+                      </div>
+
+                      {/* Label */}
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          marginTop: '8px',
+                          display: 'none',
+                          color: isActive ? 'var(--aeva-ink)' : isCompleted ? 'var(--aeva-ink-mute)' : 'var(--aeva-ink-soft)',
+                        }}
+                        className="sm:block"
+                      >
+                        {step}
+                      </span>
+                    </div>
+                  );
                 })}
             </div>
         </div>

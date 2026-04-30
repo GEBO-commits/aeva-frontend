@@ -78,6 +78,7 @@ export default function BookingConfirmation() {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            style={{ maxWidth: '1080px', margin: '0 auto', padding: '40px 32px 80px' }}
             className="max-w-2xl mx-auto py-10"
         >
             <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">

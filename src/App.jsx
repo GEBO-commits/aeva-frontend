@@ -21,6 +21,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Survey from './pages/Survey';
+import Chat from './pages/Chat';
 import MyEvents from './pages/MyEvents';
 import EventDetail from './pages/EventDetail';
 import Recommendations from './pages/Recommendations';
@@ -114,6 +115,7 @@ export default function App() {
 
             {/* Planning discovery routes */}
             <Route path="/survey" element={<Survey />} />
+            <Route path="/chat" element={<Chat />} />
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/venues/:id" element={<VenueDetail />} />
             <Route path="/catering" element={<Catering />} />

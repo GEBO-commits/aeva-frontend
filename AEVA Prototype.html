@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AEVA — Interactive Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..600,30..100&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="tokens.css"/>
+<style>
+  .proto-shell { min-height: 100vh; background: var(--aeva-paper); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="screens/shell.jsx"></script>
+<script type="text/babel" src="screens/landing.jsx"></script>
+<script type="text/babel" src="screens/survey.jsx"></script>
+<script type="text/babel" src="screens/chat.jsx"></script>
+<script type="text/babel" src="screens/recommendations.jsx"></script>
+<script type="text/babel" src="screens/builder.jsx"></script>
+<script type="text/babel" src="screens/summary.jsx"></script>
+<script type="text/babel" src="screens/event.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "density": "comfortable",
+  "accent": "ember",
+  "radius": "soft"
+}/*EDITMODE-END*/;
+
+const ACCENT_MAP = {
+  ember: 'oklch(0.58 0.16 38)',
+  ink: '#1A1814',
+  sage: 'oklch(0.55 0.08 150)',
+};
+
+function App() {
+  const [screen, setScreen] = useState('landing');
+  const [tweaksOn, setTweaksOn] = useState(false);
+  const [tweaks, setTweaksState] = useState(TWEAK_DEFAULTS);
+
+  const setTweak = (k, v) => {
+    setTweaksState(prev => {
+      const next = { ...prev, [k]: v };
+      window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: v } }, '*');
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    const onMsg = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweaksOn(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweaksOn(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  // apply accent + radius globally via CSS var override
+  useEffect(() => {
+    document.documentElement.style.setProperty('--aeva-ember', ACCENT_MAP[tweaks.accent] || ACCENT_MAP.ember);
+    const radiusMap = { sharp: 4, soft: 14, round: 22 };
+    document.documentElement.style.setProperty('--r-md', (radiusMap[tweaks.radius] || 14) + 'px');
+  }, [tweaks.accent, tweaks.radius]);
+
+  const navigate = (s) => {
+    setScreen(s);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const screenLabels = {
+    landing: '01 Landing',
+    survey: '02 Survey',
+    chat: '03 AI Chat',
+    recommendations: 'Available',
+    builder: '05 Plan Builder',
+    summary: '06 Plan Summary',
+    dashboard: '07 Dashboard',
+    event: '08 Event Detail',
+    guests: '09 Guests',
+  };
+
+  const navHighlight = {
+    landing: 'home', venues: 'venues', recommendations: 'venues',
+    chat: 'home', builder: 'home', summary: 'home',
+    dashboard: 'home', event: 'home', guests: 'home',
+  };
+
+  return (
+    <div className="proto-shell" data-screen-label={screenLabels[screen]}>
+      <TopNav active={navHighlight[screen]} onNavigate={navigate} authenticated={screen !== 'landing'}/>
+
+      <div style={{ accentColor: 'var(--aeva-ember)' }}>
+        {screen === 'landing' && <Landing onNavigate={navigate} tweaks={tweaks}/>}
+        {screen === 'survey' && <Survey onNavigate={navigate} tweaks={tweaks}/>}
+        {screen === 'chat' && <AIChat onNavigate={navigate} tweaks={tweaks}/>}
+        {screen === 'recommendations' && <Recommendations onNavigate={navigate} tweaks={tweaks}/>}
+        {screen === 'builder' && <PlanBuilder onNavigate={navigate} tweaks={tweaks}/>}
+        {screen === 'summary' && <PlanSummary onNavigate={navigate} tweaks={tweaks}/>}
+        {screen === 'dashboard' && <Dashboard onNavigate={navigate} tweaks={tweaks}/>}
+        {screen === 'event' && <EventDetail onNavigate={navigate} tweaks={tweaks}/>}
+        {screen === 'guests' && <Guests onNavigate={navigate} tweaks={tweaks}/>}
+      </div>
+
+      {screen === 'landing' && <Footer/>}
+
+      <div style={{ position: 'fixed', bottom: 20, left: 20, zIndex: 60, display: 'flex', flexDirection: 'column', gap: 4, padding: 8, background: 'var(--aeva-canvas)', border: '1px solid var(--aeva-line)', borderRadius: 'var(--r-md)', boxShadow: 'var(--shadow-md)', maxWidth: 200 }}>
+        <div style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--aeva-ink-mute)', padding: '4px 8px 6px', borderBottom: '1px solid var(--aeva-line)', marginBottom: 4, fontWeight: 600 }}>Screens · prototype</div>
+        {Object.entries(screenLabels).map(([k, label]) => (
+          <button key={k} onClick={() => navigate(k)} style={{ textAlign: 'left', padding: '5px 8px', borderRadius: 6, background: screen === k ? 'var(--aeva-ink)' : 'transparent', color: screen === k ? 'var(--aeva-paper)' : 'var(--aeva-ink-soft)', border: 'none', fontSize: 11.5, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-mono)' }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tweaksOn && (
+        <TweaksPanel title="Tweaks" onClose={() => setTweaksOn(false)}>
+          <TweakSection title="Accent color">
+            <TweakSelect
+              value={tweaks.accent}
+              onChange={v => setTweak('accent', v)}
+              options={[
+                { value: 'ember', label: 'Ember (default)' },
+                { value: 'ink', label: 'Ink (mono)' },
+                { value: 'sage', label: 'Sage' },
+              ]}
+            />
+          </TweakSection>
+          <TweakSection title="Density">
+            <TweakRadio
+              value={tweaks.density}
+              onChange={v => setTweak('density', v)}
+              options={[
+                { value: 'cozy', label: 'Cozy' },
+                { value: 'comfortable', label: 'Comfortable' },
+              ]}
+            />
+          </TweakSection>
+          <TweakSection title="Card radius">
+            <TweakRadio
+              value={tweaks.radius}
+              onChange={v => setTweak('radius', v)}
+              options={[
+                { value: 'sharp', label: 'Sharp' },
+                { value: 'soft', label: 'Soft' },
+                { value: 'round', label: 'Round' },
+              ]}
+            />
+          </TweakSection>
+        </TweaksPanel>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

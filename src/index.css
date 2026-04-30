@@ -1,16 +1,15 @@
 @import "tailwindcss";
+@import "./styles/design-tokens.css";
+@import "./styles/components.css";
 
-/* ── Prevent flash of white before React mounts ──
-   html is set to the hero dark purple so the very first
-   paint on the Landing page already shows the dark background.
-   inner pages override via body/component backgrounds. */
+/* ── AEVA Paper background (overrides Tailwind default) ── */
 html {
-  background-color: #0d0a1f;
+  background-color: var(--aeva-paper);
 }
 
 body,
 #root {
-  background-color: #F0F2FF;
+  background-color: var(--aeva-paper);
 }
 
 @keyframes floatBlob {
