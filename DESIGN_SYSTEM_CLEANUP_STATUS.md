@@ -6,47 +6,65 @@
 
 ---
 
-## ✅ Completed (16 files)
+## ✅ Completed (18 files + 2 prototypes)
 
-### Tier 1 — Critical Path
-1. **src/pages/EventPlan.jsx** ✅
-   - Gradient hero replaced with design tokens (--aeva-ink, --aeva-paper)
+### Prototype Implementation — Session 4
+1. **src/pages/Landing.jsx** ✅ — feat: implement Landing to match prototype exactly (571eb8f)
+   - Hero editorial split: left text/stats, right image stack
+   - "Three ways to start" cards: all 3 link correctly (/survey, /plan/manual, /chat)
+   - "How it works" timeline with 4 steps
+   - "Featured inspiration" grid with gradient overlays
+   - "Recently planned" section at bottom
+   - All buttons wired to correct routes
+   - Status: COMPLETE, BUILD PASSES
+
+2. **src/pages/Survey.jsx** ✅ — feat: implement Survey to match prototype exactly (91c0e85)
+   - Step 1: occasion grid buttons (Birthday, Wedding, Corporate, etc.)
+   - Step 2: vibe multi-select pills (14 options)
+   - Step 3: date input, time-of-day as 4 toggle buttons, location, headcount slider, budget slider
+   - Step 4: brief card with 4-column stats grid + "What we'll source" tags with icons
+   - All steps preserve existing `createEventFromSurvey()` and `saveSurveyResponse()` calls
+   - Status: COMPLETE, BUILD PASSES
+
+### Tier 1 — Critical Path (Earlier sessions)
+3. **src/pages/EventPlan.jsx** ✅
+   - Gradient hero replaced with design tokens
    - Section cards styled with design tokens
    - Button component applied
    - Status: COMPLETE, BUILD PASSES
 
-2. **src/pages/BookingConfirmation.jsx** ✅
+4. **src/pages/BookingConfirmation.jsx** ✅
    - Complete redesign with design tokens
    - Button component for actions
    - Form inputs styled with design tokens
    - Status: COMPLETE, BUILD PASSES
 
-3. **src/pages/BookingSuccess.jsx** ✅
+5. **src/pages/BookingSuccess.jsx** ✅
    - Icon container styled with --aeva-sage
    - Card layout with design tokens
    - Button component for CTA
    - Status: COMPLETE, BUILD PASSES
 
-4. **src/pages/Login.jsx** ✅
+6. **src/pages/Login.jsx** ✅
    - Auth form styled with design tokens
    - Input focus states using inline handlers
    - Button component for submit
    - Status: COMPLETE, BUILD PASSES
 
-5. **src/pages/Register.jsx** ✅
+7. **src/pages/Register.jsx** ✅
    - Auth form (create account + email confirmation)
    - Design tokens throughout
    - Button component for actions
    - Status: COMPLETE, BUILD PASSES
 
-6. **src/pages/plan/VenuePick.jsx** ✅
+8. **src/pages/plan/VenuePick.jsx** ✅
    - Venue grid cards (240px grid)
    - Selection states with --aeva-ink border + check icon
    - Mouse hover effects (transform + shadow)
    - Button component for Back/Skip/Next
    - Status: COMPLETE, BUILD PASSES
 
-7. **src/pages/plan/SelectCatering.jsx** ✅
+9. **src/pages/plan/SelectCatering.jsx** ✅
    - Catering vendor cards (grid layout)
    - Selection states + rating badge
    - View Details + Select buttons
@@ -125,7 +143,34 @@
 
 ---
 
-## ⏳ In Progress / Remaining (19 files)
+## ⏳ In Progress / Remaining (3 prototype pages remaining)
+
+### Prototype Implementation — Remaining
+1. **src/pages/plan/PlanBuilder.jsx** — Next
+   - 3-column layout: 280px sidebar | flex-1 main | 320px right rail
+   - Sidebar: event title, progress indicator, section list with status icons (done/progress/todo)
+   - Main: vertical timeline with time stamps, draggable items, grip icons
+   - Right rail: budget breakdown with bar chart, AEVA notes cards, "Lock in the plan" button
+   - All existing step routing and Supabase calls preserved
+
+2. **src/pages/plan/PlanSummary.jsx** — After PlanBuilder
+   - Hero band: 320px image area with dark gradient overlay
+   - Display font headline + italic subtitle
+   - Detail grid: 4 columns (When / Where / Dress / Bring) with eyebrow labels
+   - 2-column section: schedule timeline (left), crew/vendor cards (right)
+   - Footer: "Planned with AEVA" badge + button to /booking/confirm
+   - All existing vendor/selection data from Zustand store preserved
+
+3. **src/pages/Chat.jsx** — Final prototype page
+   - Left panel: eyebrow + display title header, message list with AI avatar + user avatar, timestamps
+   - Suggested follow-up pills below messages
+   - Input with paperclip + mic + send button
+   - Right panel: "Live · drafting plan" badge, progress bar, brief 4-column summary grid
+   - Plan items: 64px images + category label (uppercase, letter-spacing 0.14em) + title + "why" text (--aeva-ember) + Swap/Details buttons
+   - Streaming indicator with animated dots
+   - All existing mock/real AI response logic preserved
+
+## ⏳ Earlier Remaining (19 files)
 
 ### Tier 2 — Detail Pages (4 files)
 - src/pages/VenueDetail.jsx — Complex: gradient hero, featured image, amenities grid
@@ -158,10 +203,11 @@
 
 ## Build Status
 
-✅ **Current Build:** `3.80s` — All modules pass, no errors
-- CSS: 56.51 kB (gzip: 10.49 kB) — Reduced from 60.68 kB
-- JS: 1,257.94 kB (gzip: 353.56 kB)
+✅ **Current Build:** `4.43s` — All modules pass, no errors
+- CSS: 31.33 kB (gzip: 7.00 kB) — Optimized
+- JS: 1,239.37 kB (gzip: 341.52 kB)
 - Pre-existing chunk size warning (non-blocking)
+- Note: VenueDetail.jsx has duplicate gridTemplateColumns warning (separate issue)
 
 ---
 
