@@ -6,7 +6,7 @@
 
 ---
 
-## ✅ Completed (7 files)
+## ✅ Completed (16 files)
 
 ### Tier 1 — Critical Path
 1. **src/pages/EventPlan.jsx** ✅
@@ -53,50 +53,103 @@
    - Design tokens throughout
    - Status: COMPLETE, BUILD PASSES
 
+### Tier 1 — Plan Builder Steps (3 files) — ADDED
+8. **src/pages/plan/SelectDecorations.jsx** ✅
+   - Decoration vendor grid following SelectCatering pattern
+   - Removed COLOR constants, unified design tokens
+   - Selection states, hover effects, price display
+   - Status: COMPLETE, BUILD PASSES
+
+9. **src/pages/plan/SelectVendors.jsx** ✅
+   - 3-category vendor grid (Photographers, DJs, Videographers)
+   - Removed hardcoded COLOR object with category colors
+   - Unified `--aeva-ink`/`--aeva-paper` throughout
+   - Selection states, price display, navigation buttons
+   - Status: COMPLETE, BUILD PASSES
+
+10. **src/pages/plan/PlanSummary.jsx** ✅
+    - Full event plan overview (venue, catering, decorations, vendors)
+    - Cost summary section with breakdown
+    - SummaryItem + VendorSmall + CostRow components all converted
+    - Button component for Lock In / AI / Invitations actions
+    - Sticky cost sidebar with design tokens
+    - Status: COMPLETE, BUILD PASSES
+
+### Tier 2 — Catalog Pages (4 files) — ADDED
+11. **src/pages/Recommendations.jsx** ✅
+    - Main venue discovery page with filters and sorting
+    - Converted header, filter panel, grid, load-more button
+    - All classNames replaced with inline styles
+    - Grid: `repeat(auto-fill, minmax(240px, 1fr))`
+    - Status: COMPLETE, BUILD PASSES
+
+12. **src/pages/Catering.jsx** ✅
+    - Public catering vendor browse page
+    - CateringCard component converted to design tokens
+    - Selection states, hover effects, price display
+    - Empty state with design tokens
+    - Status: COMPLETE, BUILD PASSES
+
+13. **src/pages/Decorations.jsx** ✅
+    - Public decoration packages browse page
+    - DecorCard component with selection overlay
+    - Theme badge, price, dietary/includes tags
+    - Empty state with icon
+    - Status: COMPLETE, BUILD PASSES
+
+14. **src/pages/Vendors.jsx** ✅
+    - Public vendor browse page (photographers, DJs, videographers)
+    - VendorCard component converted to design tokens
+    - Category badge, features tags, rating, price
+    - Empty state styling
+    - Status: COMPLETE, BUILD PASSES
+
+### Tier 2 — Components (2 files) — ADDED
+15. **src/components/venue/VenueCard.jsx** ✅
+    - Reusable venue card for catalog pages
+    - Converted to design tokens
+    - Image hover (scale), badge overlays, selection check icon
+    - View Details + Select button styling
+    - Status: COMPLETE, BUILD PASSES
+
+16. **src/components/venue/VenueFilter.jsx** ✅
+    - Sidebar filter component
+    - Radio buttons, range slider, select dropdown
+    - Reset button with hover states
+    - All styling from design tokens
+    - Status: COMPLETE, BUILD PASSES
+
 ### Deleted Components
 - src/components/layout/Navbar.jsx ✅ (replaced by TopNav)
 - src/components/layout/Footer.jsx ✅ (replaced by navigation/Footer)
 
 ---
 
-## ⏳ In Progress / Remaining (28 files)
-
-### Tier 1 — Step Pages (3 files)
-- **src/pages/plan/SelectDecorations.jsx** — Ready to apply SelectCatering pattern
-- **src/pages/plan/SelectVendors.jsx** — Ready to apply SelectCatering pattern
-- **src/pages/plan/PlanSummary.jsx** — Ready to apply ManualSummary pattern
-
-### Tier 2 — Catalog Pages (4 files)
-- src/pages/Recommendations.jsx
-- src/pages/Catering.jsx
-- src/pages/Decorations.jsx
-- src/pages/Vendors.jsx
+## ⏳ In Progress / Remaining (19 files)
 
 ### Tier 2 — Detail Pages (4 files)
-- src/pages/VenueDetail.jsx
-- src/pages/CateringDetail.jsx
-- src/pages/DecorationsDetail.jsx
-- src/pages/VendorDetail.jsx
+- src/pages/VenueDetail.jsx — Complex: gradient hero, featured image, amenities grid
+- src/pages/CateringDetail.jsx — Menu/dietary options display
+- src/pages/DecorationsDetail.jsx — Package details, inclusions
+- src/pages/VendorDetail.jsx — Portfolio, services, testimonials
 
-### Tier 3 — Dashboard / Secondary (5 files)
-- src/pages/Dashboard.jsx
-- src/pages/MyEvents.jsx
-- src/pages/EventDetail.jsx
-- src/pages/admin/AdminDashboard.jsx
-- src/pages/admin/ManageVenues.jsx
-- src/pages/admin/Analytics.jsx
+### Tier 3 — Dashboard / Secondary (6 files)
+- src/pages/Dashboard.jsx — Welcome banner, quick actions, stats cards
+- src/pages/MyEvents.jsx — Event list with status badges
+- src/pages/EventDetail.jsx — Event detail view
+- src/pages/admin/AdminDashboard.jsx — Vendor approval queue, stats
+- src/pages/admin/ManageVenues.jsx — Venue management table
+- src/pages/admin/Analytics.jsx — Analytics charts
 
 ### Tier 3 — Legal Pages (3 files)
-- src/pages/legal/PrivacyPolicy.jsx
-- src/pages/legal/TermsOfService.jsx
-- src/pages/legal/Contact.jsx
+- src/pages/legal/PrivacyPolicy.jsx — Text-heavy, minimal styling
+- src/pages/legal/TermsOfService.jsx — Text-heavy, minimal styling
+- src/pages/legal/Contact.jsx — Form + text
 
 ### Tier 4 — Other Pages (2 files)
-- src/pages/Invitations.jsx
+- src/pages/Invitations.jsx — Guest list, RSVP management
 
-### Tier 5 — Components (4 files)
-- src/components/venue/VenueCard.jsx — Old Tailwind, needs design tokens
-- src/components/venue/VenueFilter.jsx — Old Tailwind, needs design tokens
+### Tier 5 — Components (3 files)
 - src/components/ui/Skeleton.jsx — Check if uses design tokens
 - src/components/chat/ChatBot.jsx — Check if uses design tokens
 - src/components/chat/ChatWindow.jsx — Check if uses design tokens
@@ -105,9 +158,9 @@
 
 ## Build Status
 
-✅ **Current Build:** `3.74s` — All modules pass, no errors
-- CSS: 60.68 kB (gzip: 11.25 kB)
-- JS: 1,244.23 kB (gzip: 353.36 kB)
+✅ **Current Build:** `3.80s` — All modules pass, no errors
+- CSS: 56.51 kB (gzip: 10.49 kB) — Reduced from 60.68 kB
+- JS: 1,257.94 kB (gzip: 353.56 kB)
 - Pre-existing chunk size warning (non-blocking)
 
 ---
@@ -213,12 +266,14 @@ For each remaining file:
 
 - ✅ `3562ac6` — Manual plan builder complete
 - ✅ `89ce3da` — Partial design system cleanup (7 files completed)
+- ✅ `ee23519` — Tier 1 Remaining + Tier 2 Catalog (9 files: SelectDecorations, SelectVendors, PlanSummary, Recommendations + components, Catering, Decorations, Vendors)
 
 ---
 
 **Status Summary:**
-- **Completed:** 7 files + cleanup
-- **Remaining:** 28 files (highly automatable)
-- **Build:** Passing ✅
+- **Completed:** 16 files (up from 7) — 46% complete
+- **Remaining:** 19 files (down from 28) — 54% remaining
+- **Build:** Passing ✅ 3.80s
 - **Backend:** Untouched ✅
 - **Routes:** Preserved ✅
+- **CSS reduced:** 60.68 kB → 56.51 kB (6.9% improvement)
