@@ -65,16 +65,20 @@ export default function Decorations() {
     };
 
     return (
-        <div className="w-full">
+        <div style={{ width: '100%' }}>
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-display font-bold text-text-dark flex items-center gap-2">
-                    Decorations &amp; Styling <Palette className="text-pink-500 w-6 h-6" />
+            <div style={{ marginBottom: '32px' }}>
+                <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--aeva-ink)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    Decorations &amp; Styling <Palette className="w-6 h-6" style={{ color: 'var(--aeva-ink)' }} />
                 </h1>
-                <p className="text-text-muted mt-1">Bring your vision to life with expert decoration packages.</p>
+                <p style={{ color: 'var(--aeva-ink-soft)', marginTop: '4px' }}>Bring your vision to life with expert decoration packages.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                gap: '24px'
+            }}>
                 {isLoading ? (
                     [1, 2, 3].map(i => <CardSkeleton key={i} />)
                 ) : decorations.length > 0 ? (
@@ -91,12 +95,34 @@ export default function Decorations() {
                         ))}
                     </AnimatePresence>
                 ) : (
-                    <div className="col-span-full bg-white p-12 rounded-3xl border border-gray-100 text-center flex flex-col items-center justify-center w-full min-h-[40vh]">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                            <Palette className="w-8 h-8 text-gray-400" />
+                    <div style={{
+                        gridColumn: '1 / -1',
+                        background: 'var(--aeva-canvas)',
+                        padding: '48px',
+                        borderRadius: 'var(--r-2xl)',
+                        border: '1px solid var(--aeva-line)',
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        minHeight: '40vh'
+                    }}>
+                        <div style={{
+                            width: '80px',
+                            height: '80px',
+                            background: 'var(--aeva-paper-warm)',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: '16px'
+                        }}>
+                            <Palette className="w-8 h-8" style={{ color: 'var(--aeva-ink-soft)' }} />
                         </div>
-                        <h3 className="text-xl font-bold text-text-dark mb-2">No decoration packages available</h3>
-                        <p className="text-text-muted">Please check back later.</p>
+                        <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>No decoration packages available</h3>
+                        <p style={{ color: 'var(--aeva-ink-soft)' }}>Please check back later.</p>
                     </div>
                 )}
             </div>
@@ -115,64 +141,196 @@ function DecorCard({ data, index, isSelected, onSelect, onView }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3, delay: index * 0.08 }}
-            className={`bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border-2 group flex flex-col h-full ${isSelected ? 'border-pink-500 ring-2 ring-pink-100' : 'border-gray-100'
-                }`}
+            style={{
+                background: 'var(--aeva-canvas)',
+                borderRadius: 'var(--r-2xl)',
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'all 300ms',
+                border: isSelected ? '2px solid var(--aeva-ink)' : '2px solid var(--aeva-line)',
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%'
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+            }}
         >
-            <div className="relative h-56 overflow-hidden">
+            <div style={{ position: 'relative', height: '224px', overflow: 'hidden' }}>
                 <img
                     src={data.image}
                     alt={data.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 700ms'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = ''}
                 />
                 {/* Rating badge */}
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-sm font-bold shadow-sm flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" /> {data.rating}
+                <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    background: 'var(--aeva-canvas)',
+                    backdropFilter: 'blur(12px)',
+                    padding: '6px 12px',
+                    borderRadius: 'var(--r-full)',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    boxShadow: 'var(--shadow-sm)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    color: 'var(--aeva-ink)'
+                }}>
+                    <Star className="w-4 h-4" style={{ fill: '#FCD34D', color: '#FCD34D' }} /> {data.rating}
                 </div>
                 {/* Theme badge */}
-                <div className="absolute top-4 left-4 bg-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+                <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    left: '16px',
+                    background: 'var(--aeva-ink)',
+                    color: 'var(--aeva-paper)',
+                    padding: '6px 12px',
+                    borderRadius: 'var(--r-full)',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    boxShadow: 'var(--shadow-md)'
+                }}>
                     {data.theme}
                 </div>
                 {/* Selected overlay */}
                 {isSelected && (
-                    <div className="absolute inset-0 bg-pink-500/20 flex items-center justify-center">
-                        <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center shadow-xl">
-                            <CheckCircle className="w-7 h-7 text-white" />
+                    <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'rgba(0,0,0,0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <div style={{
+                            width: '48px',
+                            height: '48px',
+                            background: 'var(--aeva-ink)',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: 'var(--shadow-xl)'
+                        }}>
+                            <CheckCircle className="w-7 h-7" style={{ color: 'var(--aeva-paper)' }} />
                         </div>
                     </div>
                 )}
             </div>
 
-            <div className="p-6 flex flex-col flex-1">
-                <h3 className="text-xl font-bold font-display text-text-dark mb-1">{data.name}</h3>
-                <p className="text-text-muted text-sm mb-4 line-clamp-2">{data.description}</p>
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '4px' }}>{data.name}</h3>
+                <p style={{
+                    color: 'var(--aeva-ink-soft)',
+                    fontSize: '14px',
+                    marginBottom: '16px',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                }}>{data.description}</p>
 
                 {/* Package includes tags */}
-                <div className="flex flex-wrap gap-2 mb-5">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px' }}>
                     {data.includes.map(item => (
-                        <span key={item} className="text-xs bg-pink-50 text-pink-600 px-2 py-1 rounded-full border border-pink-100">
+                        <span key={item} style={{
+                            fontSize: '12px',
+                            background: 'var(--aeva-paper-warm)',
+                            color: 'var(--aeva-ink)',
+                            padding: '4px 8px',
+                            borderRadius: 'var(--r-full)',
+                            border: '1px solid var(--aeva-line)'
+                        }}>
                             {item}
                         </span>
                     ))}
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-2">
+                <div style={{
+                    marginTop: 'auto',
+                    paddingTop: '16px',
+                    borderTop: '1px solid var(--aeva-line)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px'
+                }}>
                     <button
                         onClick={onView}
-                        className="w-full py-2 rounded-xl text-xs font-bold text-text-muted hover:text-primary transition-colors border border-gray-100 hover:border-primary/20"
+                        style={{
+                            width: '100%',
+                            padding: '8px',
+                            borderRadius: 'var(--r-lg)',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            color: 'var(--aeva-ink-soft)',
+                            transition: 'all 200ms',
+                            border: '1px solid var(--aeva-line)',
+                            background: 'transparent',
+                            cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.color = 'var(--aeva-ink)';
+                            e.currentTarget.style.borderColor = 'var(--aeva-ink)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.color = 'var(--aeva-ink-soft)';
+                            e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                        }}
                     >
                         View Details
                     </button>
-                    <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs text-text-muted uppercase font-bold tracking-wider">Packages from</span>
-                        <span className="font-bold text-pink-500 text-lg">{data.totalPrice.toLocaleString()} EGP</span>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '4px'
+                    }}>
+                        <span style={{ fontSize: '12px', color: 'var(--aeva-ink-soft)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Packages from</span>
+                        <span style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '18px' }}>{data.totalPrice.toLocaleString()} EGP</span>
                     </div>
                     {/* Select button */}
                     <button
                         onClick={onSelect}
-                        className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${isSelected
-                            ? 'bg-pink-500 text-white'
-                            : 'bg-pink-50 hover:bg-pink-500 hover:text-white text-pink-600 border border-pink-200'
-                            }`}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            borderRadius: 'var(--r-lg)',
+                            fontSize: '14px',
+                            fontWeight: 700,
+                            transition: 'all 200ms',
+                            background: isSelected ? 'var(--aeva-ink)' : 'var(--aeva-paper-warm)',
+                            color: isSelected ? 'var(--aeva-paper)' : 'var(--aeva-ink)',
+                            border: isSelected ? 'none' : '1px solid var(--aeva-line)',
+                            cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => {
+                            if (!isSelected) {
+                                e.currentTarget.style.background = 'var(--aeva-ink)';
+                                e.currentTarget.style.color = 'var(--aeva-paper)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (!isSelected) {
+                                e.currentTarget.style.background = 'var(--aeva-paper-warm)';
+                                e.currentTarget.style.color = 'var(--aeva-ink)';
+                            }
+                        }}
                     >
                         {isSelected ? '✓ Selected' : 'Select Package →'}
                     </button>

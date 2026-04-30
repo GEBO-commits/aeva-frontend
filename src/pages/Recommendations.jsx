@@ -7,6 +7,7 @@ import VenueFilter from '../components/venue/VenueFilter';
 import { Sparkles, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { CardSkeleton } from '../components/ui/Skeleton';
 import { usePlanStore } from '../store/plan.store';
+import { Button } from '../components/ui/Button';
 
 export default function Recommendations() {
     const [filters, setFilters] = useState({
@@ -90,32 +91,85 @@ export default function Recommendations() {
     const visibleVenues = filteredVenues.slice(0, visibleCount);
 
     return (
-        <div className="w-full">
+        <div style={{ width: '100%' }}>
             {/* Page Header */}
-            <div className="mb-10">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+            <div style={{ marginBottom: '40px' }}>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '24px',
+                    marginBottom: '32px'
+                }} className="md:flex-row md:items-end md:justify-between">
                     <div>
-                        <h1 className="text-4xl font-display font-bold text-text-dark flex items-center gap-3">
-                            Perfect Venues for You <Sparkles className="text-primary w-8 h-8" />
+                        <h1 style={{ fontSize: '32px', fontWeight: 700, color: 'var(--aeva-ink)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            Perfect Venues for You <Sparkles style={{ color: 'var(--aeva-ink)' }} className="w-8 h-8" />
                         </h1>
-                        <p className="text-text-muted mt-2 text-lg">We've found {filteredVenues.length} amazing venues that match your style.</p>
+                        <p style={{ color: 'var(--aeva-ink-soft)', marginTop: '8px', fontSize: '18px' }}>We've found {filteredVenues.length} amazing venues that match your style.</p>
                     </div>
 
                     {/* Build My Own Plan CTA Header */}
                     <Link
                         to="/plan/build"
-                        className="flex flex-col items-end group"
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'flex-end',
+                            gap: '8px',
+                            textDecoration: 'none'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.querySelector('span').style.color = 'var(--aeva-ink)';
+                            e.currentTarget.querySelector('div').style.borderColor = 'var(--aeva-ink)';
+                            e.currentTarget.querySelector('div').style.backgroundColor = 'var(--aeva-paper-warm)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.querySelector('span').style.color = 'var(--aeva-ink-soft)';
+                            e.currentTarget.querySelector('div').style.borderColor = 'var(--aeva-line)';
+                            e.currentTarget.querySelector('div').style.backgroundColor = 'var(--aeva-canvas)';
+                        }}
                     >
-                        <span className="text-xs font-bold text-text-muted uppercase tracking-widest mb-1 group-hover:text-primary transition-colors text-right">Want to build your own plan?</span>
-                        <div className="bg-white border-2 border-primary/20 px-6 py-3 rounded-2xl font-bold text-primary flex items-center gap-2 group-hover:border-primary group-hover:bg-primary/5 transition-all shadow-sm">
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--aeva-ink-soft)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right', transition: 'color 200ms' }}>Want to build your own plan?</span>
+                        <div style={{
+                            background: 'var(--aeva-canvas)',
+                            border: '2px solid var(--aeva-line)',
+                            padding: '12px 24px',
+                            borderRadius: 'var(--r-xl)',
+                            fontWeight: 700,
+                            color: 'var(--aeva-ink)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            transition: 'all 200ms',
+                            boxShadow: 'var(--shadow-sm)'
+                        }}>
                             Click here to Start Planning →
                         </div>
                     </Link>
                 </div>
 
-                <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    borderBottom: '1px solid var(--aeva-line)',
+                    paddingBottom: '16px'
+                }}>
                     <button
-                        className="md:hidden flex-1 bg-white border border-gray-200 px-4 py-2 rounded-xl flex items-center justify-center gap-2 font-medium"
+                        style={{
+                            flex: 1,
+                            background: 'var(--aeva-canvas)',
+                            border: '1px solid var(--aeva-line)',
+                            padding: '8px 16px',
+                            borderRadius: 'var(--r-lg)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            color: 'var(--aeva-ink)'
+                        }}
+                        className="md:hidden"
                         onClick={() => setShowMobileFilters(!showMobileFilters)}
                     >
                         <SlidersHorizontal className="w-4 h-4" /> Filters
@@ -124,7 +178,22 @@ export default function Recommendations() {
                     <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
-                        className="flex-1 md:w-48 bg-white border border-gray-200 px-4 py-2 rounded-xl focus:outline-none focus:border-primary text-text-dark text-sm font-medium"
+                        style={{
+                            flex: 1,
+                            maxWidth: '192px',
+                            background: 'var(--aeva-canvas)',
+                            border: '1px solid var(--aeva-line)',
+                            padding: '8px 16px',
+                            borderRadius: 'var(--r-lg)',
+                            outline: 'none',
+                            color: 'var(--aeva-ink)',
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            transition: 'all 200ms'
+                        }}
+                        onFocus={(e) => e.currentTarget.style.borderColor = 'var(--aeva-ink)'}
+                        onBlur={(e) => e.currentTarget.style.borderColor = 'var(--aeva-line)'}
                     >
                         <option value="match">Best Match</option>
                         <option value="price-low">Price: Low to High</option>
@@ -133,20 +202,37 @@ export default function Recommendations() {
                 </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-8 items-start">
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '32px',
+                alignItems: 'flex-start'
+            }} className="md:flex-row">
                 {/* Sidebar Filters */}
-                <div className={`w-full md:w-64 shrink-0 transition-all ${showMobileFilters ? 'block' : 'hidden md:block'}`}>
+                <div style={{
+                    width: '100%',
+                    display: showMobileFilters ? 'block' : 'none',
+                    transition: 'all 200ms'
+                }} className="md:block md:w-64 md:shrink-0">
                     <VenueFilter filters={filters} setFilters={setFilters} />
                 </div>
 
                 {/* Venue Grid */}
-                <div className="flex-1 w-full">
+                <div style={{ flex: 1, width: '100%' }}>
                     {isLoading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                            gap: '24px'
+                        }}>
                             {[1, 2, 3, 4, 5, 6].map(i => <CardSkeleton key={i} />)}
                         </div>
                     ) : filteredVenues.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                            gap: '24px'
+                        }}>
                             <AnimatePresence>
                                 {visibleVenues.map((venue, i) => (
                                     <VenueCard
@@ -163,33 +249,77 @@ export default function Recommendations() {
                             </AnimatePresence>
                         </div>
                     ) : (
-                        <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center flex flex-col items-center justify-center w-full min-h-[40vh]">
-                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                                <SlidersHorizontal className="w-8 h-8 text-gray-400" />
+                        <div style={{
+                            background: 'var(--aeva-canvas)',
+                            padding: '48px',
+                            borderRadius: 'var(--r-2xl)',
+                            border: '1px solid var(--aeva-line)',
+                            textAlign: 'center',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                            minHeight: '40vh'
+                        }}>
+                            <div style={{
+                                width: '80px',
+                                height: '80px',
+                                background: 'var(--aeva-paper-warm)',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginBottom: '16px'
+                            }}>
+                                <SlidersHorizontal className="w-8 h-8" style={{ color: 'var(--aeva-ink-soft)' }} />
                             </div>
-                            <h3 className="text-xl font-bold text-text-dark mb-2">No venues found</h3>
-                            <p className="text-text-muted mb-6">Try adjusting your filters to see more results.</p>
-                            <button
-                                onClick={() => {
-                                    setFilters({ type: 'all', maxPrice: '300000', guests: 'any' });
-                                    setVisibleCount(6);
-                                }}
-                                className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-full font-medium transition-colors"
-                            >
+                            <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>No venues found</h3>
+                            <p style={{ color: 'var(--aeva-ink-soft)', marginBottom: '24px' }}>Try adjusting your filters to see more results.</p>
+                            <Button variant="primary" onClick={() => {
+                                setFilters({ type: 'all', maxPrice: '300000', guests: 'any' });
+                                setVisibleCount(6);
+                            }}>
                                 Clear Filters
-                            </button>
+                            </Button>
                         </div>
                     )}
 
                     {!isLoading && filteredVenues.length > visibleCount && (
-                        <div className="mt-12 text-center">
+                        <div style={{ marginTop: '48px', textAlign: 'center' }}>
                             <button
                                 onClick={handleLoadMore}
                                 disabled={isLoadingMore}
-                                className="border-2 border-gray-200 hover:border-primary hover:text-primary text-text-muted px-8 py-3 rounded-full font-bold transition-all shadow-sm flex items-center justify-center gap-2 mx-auto disabled:opacity-75 disabled:cursor-not-allowed"
+                                style={{
+                                    border: '2px solid var(--aeva-line)',
+                                    color: 'var(--aeva-ink)',
+                                    padding: '12px 32px',
+                                    borderRadius: 'var(--r-full)',
+                                    fontWeight: 700,
+                                    transition: 'all 200ms',
+                                    boxShadow: 'var(--shadow-sm)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    margin: '0 auto',
+                                    cursor: 'pointer',
+                                    opacity: isLoadingMore ? 0.75 : 1,
+                                    background: 'var(--aeva-canvas)'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (!isLoadingMore) {
+                                        e.currentTarget.style.borderColor = 'var(--aeva-ink)';
+                                        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                                    e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                                }}
                             >
                                 {isLoadingMore ? (
-                                    <><Loader2 className="w-5 h-5 animate-spin" /> Loading...</>
+                                    <><Loader2 className="w-5 h-5" style={{ animation: 'spin 1s linear infinite' }} /> Loading...</>
                                 ) : (
                                     'Load More Venues'
                                 )}

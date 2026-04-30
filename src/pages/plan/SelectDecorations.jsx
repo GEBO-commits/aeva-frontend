@@ -1,7 +1,5 @@
 /**
- * SelectDecorations.jsx — Step 3 of the Manual Plan Builder
- *
- * On selection: saves to plan store → navigates to /plan/build/vendors
+ * SelectDecorations.jsx — Step 3 of the Plan Builder
  */
 
 import React, { useState, useEffect, useContext } from 'react';
@@ -13,6 +11,7 @@ import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
 import { saveEventSelection } from '../../services/planningService';
 import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
 import { Star, CheckCircle } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 
 export default function SelectDecorations() {
     const navigate = useNavigate();
@@ -73,103 +72,191 @@ export default function SelectDecorations() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto py-8 px-4">
+        <div style={{ maxWidth: '1400px', margin: '0 auto', paddingTop: '32px', paddingX: '16px' }}>
             <PlanProgressBar currentStep={2} />
 
-            <div className="flex items-center justify-between mt-8 mb-6">
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: '32px',
+                marginBottom: '24px'
+            }}>
                 <div>
-                    <h1 className="text-3xl font-display font-bold text-text-dark">🌸 Choose Decorations</h1>
-                    <p className="text-text-muted mt-1">Set the perfect atmosphere for your event.</p>
+                    <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '4px' }}>🌸 Choose Decorations</h1>
+                    <p style={{ color: 'var(--aeva-ink-soft)', marginTop: '4px' }}>Set the perfect atmosphere for your event.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => navigate('/plan/build/catering')}
-                        className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
-                    >
-                        ← Back
-                    </button>
-                    <button
-                        onClick={() => { skipStep(2); navigate('/plan/build/vendors'); }}
-                        className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
-                    >
-                        Skip this step
-                    </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <Button variant="ghost" onClick={() => navigate('/plan/build/catering')}>← Back</Button>
+                    <Button variant="ghost" onClick={() => { skipStep(2); navigate('/plan/build/vendors'); }}>Skip this step</Button>
                     {selectedDecorations && (
-                        <button
-                            onClick={() => navigate('/plan/build/vendors')}
-                            className="bg-pink-500 text-white px-6 py-2.5 rounded-full font-bold hover:bg-pink-600 transition-colors shadow-md flex items-center gap-2"
-                        >
-                            Next Step: Vendors →
-                        </button>
+                        <Button variant="primary" onClick={() => navigate('/plan/build/vendors')}>Next Step: Vendors →</Button>
                     )}
                 </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                gap: '24px'
+            }}>
                 {isLoading ? (
-                    <div>Loading decoration packages...</div>
+                    <div style={{ color: 'var(--aeva-ink-soft)' }}>Loading decoration packages...</div>
                 ) : decorations.length > 0 ? (
                     decorations.map((d, i) => {
-                    const isSelected = selectedDecorations?.id === d.id;
-                    return (
-                        <motion.div
-                            key={d.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.08 }}
-                            onClick={() => handleSelect(d)}
-                            className={`bg-white rounded-2xl overflow-hidden shadow-sm border-2 transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer ${isSelected ? 'border-pink-400 ring-2 ring-pink-100 bg-pink-50' : 'border-gray-100'
-                                }`}
-                        >
-                            <div className="relative">
-                                <img src={d.image} alt={d.name} className="w-full h-48 object-cover" />
-                                {isSelected && (
-                                    <div className="absolute top-3 right-3 w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
-                                        <CheckCircle className="w-5 h-5 text-white" />
+                        const isSelected = selectedDecorations?.id === d.id;
+                        return (
+                            <motion.div
+                                key={d.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.08 }}
+                                onClick={() => handleSelect(d)}
+                                style={{
+                                    background: isSelected ? 'var(--aeva-canvas)' : 'var(--aeva-canvas)',
+                                    borderRadius: 'var(--r-lg)',
+                                    overflow: 'hidden',
+                                    boxShadow: isSelected ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+                                    border: isSelected ? '2px solid var(--aeva-ink)' : '1px solid var(--aeva-line)',
+                                    cursor: 'pointer',
+                                    transition: 'all 200ms'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.boxShadow = isSelected ? 'var(--shadow-md)' : 'var(--shadow-sm)';
+                                    e.currentTarget.style.transform = '';
+                                }}
+                            >
+                                <div style={{ position: 'relative' }}>
+                                    <img src={d.image} alt={d.name} style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                                    {isSelected && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '12px',
+                                            right: '12px',
+                                            width: '32px',
+                                            height: '32px',
+                                            background: 'var(--aeva-ink)',
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <CheckCircle className="w-5 h-5" style={{ color: 'var(--aeva-paper)' }} />
+                                        </div>
+                                    )}
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '12px',
+                                        left: '12px',
+                                        background: 'var(--aeva-ink)',
+                                        color: 'var(--aeva-paper)',
+                                        padding: '4px 8px',
+                                        borderRadius: 'var(--r-full)',
+                                        fontSize: '12px',
+                                        fontWeight: 700
+                                    }}>
+                                        {d.theme}
                                     </div>
-                                )}
-                                <div className="absolute top-3 left-3 bg-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                                    {d.theme}
                                 </div>
-                            </div>
-                            <div className="p-4">
-                                <div className="flex justify-between items-start mb-1">
-                                    <h3 className="font-bold text-text-dark">{d.name}</h3>
-                                    <span className="flex items-center gap-1 text-xs text-gray-500">
-                                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />{d.rating}
-                                    </span>
+                                <div style={{ padding: '16px' }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'flex-start',
+                                        marginBottom: '8px'
+                                    }}>
+                                        <h3 style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '14px' }}>{d.name}</h3>
+                                        <span style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            fontSize: '12px',
+                                            color: 'var(--aeva-ink-soft)'
+                                        }}>
+                                            <Star className="w-3 h-3" style={{ fill: 'currentColor' }} />{d.rating}
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
+                                        {d.includes.slice(0, 3).map(item => (
+                                            <span key={item} style={{
+                                                fontSize: '10px',
+                                                background: 'var(--aeva-paper-warm)',
+                                                color: 'var(--aeva-ink)',
+                                                padding: '2px 6px',
+                                                borderRadius: 'var(--r-full)'
+                                            }}>{item}</span>
+                                        ))}
+                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        paddingTop: '8px',
+                                        borderTop: '1px solid var(--aeva-line)',
+                                        marginBottom: '12px'
+                                    }}>
+                                        <span style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '13px' }}>{d.totalPrice.toLocaleString()} EGP</span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); navigate(`/decorations/${d.id}`); }}
+                                            style={{
+                                                width: '100%',
+                                                padding: '8px',
+                                                background: 'var(--aeva-paper-warm)',
+                                                color: 'var(--aeva-ink)',
+                                                fontSize: '12px',
+                                                fontWeight: 700,
+                                                borderRadius: 'var(--r-md)',
+                                                border: '1px solid var(--aeva-line)',
+                                                cursor: 'pointer',
+                                                transition: 'all 200ms'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--aeva-line)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--aeva-paper-warm)'}
+                                        >
+                                            View Details
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleSelect(d); }}
+                                            style={{
+                                                width: '100%',
+                                                padding: '10px',
+                                                borderRadius: 'var(--r-md)',
+                                                fontSize: '13px',
+                                                fontWeight: 700,
+                                                transition: 'all 200ms',
+                                                background: isSelected ? 'var(--aeva-ink)' : 'var(--aeva-paper-warm)',
+                                                color: isSelected ? 'var(--aeva-paper)' : 'var(--aeva-ink)',
+                                                border: isSelected ? 'none' : '1px solid var(--aeva-line)',
+                                                cursor: 'pointer'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (!isSelected) {
+                                                    e.currentTarget.style.background = 'var(--aeva-ink)';
+                                                    e.currentTarget.style.color = 'var(--aeva-paper)';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (!isSelected) {
+                                                    e.currentTarget.style.background = 'var(--aeva-paper-warm)';
+                                                    e.currentTarget.style.color = 'var(--aeva-ink)';
+                                                }
+                                            }}
+                                        >
+                                            {isSelected ? '✓ Selected' : 'Select Package →'}
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="flex flex-wrap gap-1 my-2">
-                                    {d.includes.slice(0, 3).map(item => (
-                                        <span key={item} className="text-[10px] bg-pink-50 text-pink-600 px-2 py-0.5 rounded-full">{item}</span>
-                                    ))}
-                                </div>
-                                <div className="flex justify-between items-center pt-2 border-t border-gray-100 mb-3">
-                                    <span className="font-bold text-pink-500">{d.totalPrice.toLocaleString()} EGP</span>
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); navigate(`/decorations/${d.id}`); }}
-                                        className="w-full py-2 bg-gray-50 hover:bg-gray-100 text-text-dark text-xs font-bold rounded-xl transition-colors border border-gray-200"
-                                    >
-                                        View Details
-                                    </button>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); handleSelect(d); }}
-                                        className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${isSelected
-                                            ? 'bg-pink-500 text-white'
-                                            : 'bg-pink-50 hover:bg-pink-500 hover:text-white text-pink-600 border border-pink-200'
-                                            }`}
-                                    >
-                                        {isSelected ? '✓ Selected' : 'Select Package →'}
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    );
+                            </motion.div>
+                        );
                     })
                 ) : (
-                    <div className="col-span-full text-center text-text-muted">No decoration packages available</div>
+                    <div style={{ color: 'var(--aeva-ink-soft)', textAlign: 'center', gridColumn: 'span -1' }}>No decoration packages available</div>
                 )}
             </div>
         </div>

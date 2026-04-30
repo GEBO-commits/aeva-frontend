@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getVendors } from '../services/catalogService';
 import { Utensils, Star, Check } from 'lucide-react';
 import { CardSkeleton } from '../components/ui/Skeleton';
+import { Button } from '../components/ui/Button';
 
 export default function Catering() {
     const [isLoading, setIsLoading] = useState(true);
@@ -47,15 +48,19 @@ export default function Catering() {
     }, []);
 
     return (
-        <div className="w-full">
-            <div className="mb-8">
-                <h1 className="text-3xl font-display font-bold text-text-dark flex items-center gap-2">
-                    Catering Services <Utensils className="text-accent w-6 h-6" />
+        <div style={{ width: '100%' }}>
+            <div style={{ marginBottom: '32px' }}>
+                <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--aeva-ink)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    Catering Services <Utensils className="w-6 h-6" style={{ color: 'var(--aeva-ink)' }} />
                 </h1>
-                <p className="text-text-muted mt-1">Discover top-rated caterers for your perfect menu.</p>
+                <p style={{ color: 'var(--aeva-ink-soft)', marginTop: '4px' }}>Discover top-rated caterers for your perfect menu.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                gap: '24px'
+            }}>
                 {isLoading ? (
                     <>
                         {[1, 2, 3].map(i => <CardSkeleton key={i} />)}
@@ -67,12 +72,34 @@ export default function Catering() {
                         ))}
                     </AnimatePresence>
                 ) : (
-                    <div className="col-span-full bg-white p-12 rounded-3xl border border-gray-100 text-center flex flex-col items-center justify-center w-full min-h-[40vh]">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                            <Utensils className="w-8 h-8 text-gray-400" />
+                    <div style={{
+                        gridColumn: '1 / -1',
+                        background: 'var(--aeva-canvas)',
+                        padding: '48px',
+                        borderRadius: 'var(--r-2xl)',
+                        border: '1px solid var(--aeva-line)',
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        minHeight: '40vh'
+                    }}>
+                        <div style={{
+                            width: '80px',
+                            height: '80px',
+                            background: 'var(--aeva-paper-warm)',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: '16px'
+                        }}>
+                            <Utensils className="w-8 h-8" style={{ color: 'var(--aeva-ink-soft)' }} />
                         </div>
-                        <h3 className="text-xl font-bold text-text-dark mb-2">No catering options available</h3>
-                        <p className="text-text-muted">Please check back later.</p>
+                        <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>No catering options available</h3>
+                        <p style={{ color: 'var(--aeva-ink-soft)' }}>Please check back later.</p>
                     </div>
                 )}
             </div>
@@ -87,40 +114,135 @@ function CateringCard({ data, index, onView }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
-            className="bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col h-full"
+            style={{
+                background: 'var(--aeva-canvas)',
+                borderRadius: 'var(--r-2xl)',
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'all 300ms',
+                border: '1px solid var(--aeva-line)',
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%'
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+            }}
         >
-            <div className="relative h-56 overflow-hidden">
-                <img src={data.image} alt={data.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-sm font-bold shadow-sm flex items-center gap-1">
-                    <Star className="w-4 h-4 text-accent fill-current" /> {data.rating}
+            <div style={{ position: 'relative', height: '224px', overflow: 'hidden' }}>
+                <img src={data.image} alt={data.name} style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transition: 'transform 700ms'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = ''}
+                />
+                <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    background: 'var(--aeva-canvas)',
+                    backdropFilter: 'blur(12px)',
+                    padding: '6px 12px',
+                    borderRadius: 'var(--r-full)',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    boxShadow: 'var(--shadow-sm)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    color: 'var(--aeva-ink)'
+                }}>
+                    <Star className="w-4 h-4" style={{ fill: '#FCD34D', color: '#FCD34D' }} /> {data.rating}
                 </div>
-                <div className="absolute bottom-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+                <div style={{
+                    position: 'absolute',
+                    bottom: '16px',
+                    left: '16px',
+                    background: 'var(--aeva-ink)',
+                    color: 'var(--aeva-paper)',
+                    padding: '6px 12px',
+                    borderRadius: 'var(--r-full)',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    boxShadow: 'var(--shadow-md)'
+                }}>
                     {data.type}
                 </div>
             </div>
 
-            <div className="p-6 flex flex-col flex-1">
-                <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold font-display text-text-dark">{data.name}</h3>
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{data.name}</h3>
                 </div>
-                <p className="text-text-muted text-sm mb-4 line-clamp-2">{data.description}</p>
+                <p style={{
+                    color: 'var(--aeva-ink-soft)',
+                    fontSize: '14px',
+                    marginBottom: '16px',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                }}>{data.description}</p>
 
-                <div className="flex flex-wrap gap-2 mb-6">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
                     {data.dietaryOptions.map(opt => (
-                        <span key={opt} className="text-xs bg-gray-50 text-gray-600 px-2 py-1 rounded-md border border-gray-100 flex items-center gap-1">
-                            <Check className="w-3 h-3 text-secondary" /> {opt}
+                        <span key={opt} style={{
+                            fontSize: '12px',
+                            background: 'var(--aeva-paper-warm)',
+                            color: 'var(--aeva-ink)',
+                            padding: '4px 8px',
+                            borderRadius: 'var(--r-md)',
+                            border: '1px solid var(--aeva-line)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                        }}>
+                            <Check className="w-3 h-3" style={{ color: 'var(--aeva-ink)' }} /> {opt}
                         </span>
                     ))}
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
+                <div style={{
+                    marginTop: 'auto',
+                    paddingTop: '16px',
+                    borderTop: '1px solid var(--aeva-line)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
                     <div>
-                        <span className="text-xs text-text-muted block">Starting at</span>
-                        <span className="font-bold text-primary text-lg">{data.startingPrice} EGP / guest</span>
+                        <span style={{ fontSize: '12px', color: 'var(--aeva-ink-soft)', display: 'block' }}>Starting at</span>
+                        <span style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '18px' }}>{data.startingPrice} EGP / guest</span>
                     </div>
                     <button
                         onClick={onView}
-                        className="bg-gray-50 hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-xl font-bold transition-colors text-sm"
+                        style={{
+                            background: 'var(--aeva-paper-warm)',
+                            color: 'var(--aeva-ink)',
+                            padding: '8px 16px',
+                            borderRadius: 'var(--r-lg)',
+                            fontWeight: 700,
+                            transition: 'all 200ms',
+                            fontSize: '14px',
+                            border: '1px solid var(--aeva-line)',
+                            cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'var(--aeva-ink)';
+                            e.currentTarget.style.color = 'var(--aeva-paper)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'var(--aeva-paper-warm)';
+                            e.currentTarget.style.color = 'var(--aeva-ink)';
+                        }}
                     >
                         View Menu
                     </button>

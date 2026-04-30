@@ -13,6 +13,7 @@
 import React from 'react';
 import { MapPin, Users, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Button } from '../ui/Button';
 
 export default function VenueCard({ venue, index, onView, onSelect }) {
     return (
@@ -20,64 +21,129 @@ export default function VenueCard({ venue, index, onView, onSelect }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full"
+            style={{
+                background: 'var(--aeva-canvas)',
+                borderRadius: 'var(--r-2xl)',
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--aeva-line)',
+                transition: 'all 300ms',
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%'
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                e.currentTarget.style.transform = '';
+            }}
         >
             {/* Image */}
-            <div className="relative h-56 overflow-hidden">
+            <div style={{ position: 'relative', height: '224px', overflow: 'hidden' }}>
                 <img
                     src={venue.image}
                     alt={venue.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 500ms'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = ''}
                 />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 text-sm font-bold text-text-dark shadow-sm">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    background: 'var(--aeva-canvas)',
+                    backdropFilter: 'blur(10px)',
+                    padding: '6px 12px',
+                    borderRadius: 'var(--r-full)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    color: 'var(--aeva-ink)',
+                    boxShadow: 'var(--shadow-sm)'
+                }}>
+                    <Star className="w-4 h-4" style={{ fill: '#FCD34D', color: '#FCD34D' }} />
                     {venue.rating}
                 </div>
-                <div className="absolute top-4 left-4">
-                    <span className="bg-primary/90 text-white backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm">
+                <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    left: '16px'
+                }}>
+                    <span style={{
+                        background: 'var(--aeva-ink)',
+                        color: 'var(--aeva-paper)',
+                        backdropFilter: 'blur(10px)',
+                        padding: '6px 12px',
+                        borderRadius: 'var(--r-full)',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        boxShadow: 'var(--shadow-sm)',
+                        display: 'inline-block'
+                    }}>
                         {venue.type}
                     </span>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold font-display text-text-dark mb-2">{venue.name}</h3>
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>{venue.name}</h3>
 
-                <div className="flex flex-col gap-1.5 mb-4">
-                    <div className="flex items-center text-text-muted text-sm gap-2">
-                        <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--aeva-ink-soft)', fontSize: '14px', gap: '8px' }}>
+                        <MapPin className="w-4 h-4" style={{ color: 'var(--aeva-ink-soft)', flexShrink: 0 }} />
                         {venue.location}
                     </div>
-                    <div className="flex items-center text-text-muted text-sm gap-2">
-                        <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <div style={{ display: 'flex', alignItems: 'center', color: 'var(--aeva-ink-soft)', fontSize: '14px', gap: '8px' }}>
+                        <Users className="w-4 h-4" style={{ color: 'var(--aeva-ink-soft)', flexShrink: 0 }} />
                         {venue.minGuests} – {venue.maxGuests} Guests
                     </div>
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-gray-100">
+                <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--aeva-line)' }}>
                     {/* Price row */}
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex flex-col">
-                            <span className="text-xs text-text-muted uppercase font-bold tracking-wider">Starting from</span>
-                            <span className="text-lg font-bold text-primary">{venue.startingPrice.toLocaleString()} EGP</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontSize: '12px', color: 'var(--aeva-ink-soft)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Starting from</span>
+                            <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{venue.startingPrice.toLocaleString()} EGP</span>
                         </div>
                         {/* View Details — navigates to /venues/:id */}
                         <button
                             onClick={() => onView && onView(venue)}
-                            className="bg-gray-50 hover:bg-gray-100 text-text-dark px-4 py-2 rounded-xl transition-colors font-medium text-sm border border-gray-200"
+                            style={{
+                                background: 'var(--aeva-paper-warm)',
+                                color: 'var(--aeva-ink)',
+                                padding: '8px 16px',
+                                borderRadius: 'var(--r-lg)',
+                                transition: 'all 200ms',
+                                fontWeight: 600,
+                                fontSize: '14px',
+                                border: '1px solid var(--aeva-line)',
+                                cursor: 'pointer'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--aeva-line)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--aeva-paper-warm)'}
                         >
                             View Details
                         </button>
                     </div>
 
                     {/* Select This Venue — saves to plan store and goes to catering step */}
-                    <button
-                        onClick={() => onSelect && onSelect(venue)}
-                        className="w-full py-2.5 bg-primary hover:bg-secondary text-white rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md"
-                    >
+                    <Button variant="primary" size="lg" onClick={() => onSelect && onSelect(venue)} style={{ width: '100%' }}>
                         Select This Venue →
-                    </button>
+                    </Button>
                 </div>
             </div>
         </motion.div>

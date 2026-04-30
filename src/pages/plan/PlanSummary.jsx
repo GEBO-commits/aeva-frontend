@@ -12,6 +12,7 @@ import { usePlanStore } from '../../store/plan.store';
 import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
 import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
 import { CheckCircle, Sparkles, Calendar, MapPin, Users, Utensils, Palette, Camera, Music, Video, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 
 export default function PlanSummary() {
     const navigate = useNavigate();
@@ -45,25 +46,30 @@ export default function PlanSummary() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto py-8 px-4">
+        <div style={{ maxWidth: '1400px', margin: '0 auto', paddingTop: '32px', paddingX: '16px' }}>
             <PlanProgressBar currentStep={4} />
 
-            <div className="mt-8 mb-10 flex items-center justify-between">
-                <div className="flex-1">
-                    <h1 className="text-4xl font-display font-bold text-text-dark mb-2">✨ Your Event Plan is Ready!</h1>
-                    <p className="text-text-muted">Review your selections and confirm your dream event.</p>
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: '32px',
+                marginBottom: '40px'
+            }}>
+                <div style={{ flex: 1 }}>
+                    <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>✨ Your Event Plan is Ready!</h1>
+                    <p style={{ color: 'var(--aeva-ink-soft)' }}>Review your selections and confirm your dream event.</p>
                 </div>
-                <button
-                    onClick={() => navigate('/plan/build/vendors')}
-                    className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white ml-4"
-                >
-                    ← Back
-                </button>
+                <Button variant="ghost" onClick={() => navigate('/plan/build/vendors')}>← Back</Button>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr',
+                gap: '32px'
+            }} className="lg:grid-cols-3">
                 {/* Left: Selection Cards */}
-                <div className="lg:col-span-2 space-y-6">
+                <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     {/* Venue */}
                     <SummaryItem
                         title="Venue"
@@ -99,83 +105,168 @@ export default function PlanSummary() {
                     />
 
                     {/* Vendors */}
-                    <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                                <Camera className="text-blue-500" size={20} />
+                    <div style={{
+                        background: 'var(--aeva-canvas)',
+                        borderRadius: 'var(--r-2xl)',
+                        padding: '24px',
+                        border: '1px solid var(--aeva-line)',
+                        boxShadow: 'var(--shadow-sm)'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                            <div style={{
+                                width: '40px',
+                                height: '40px',
+                                background: 'var(--aeva-paper-warm)',
+                                borderRadius: 'var(--r-lg)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                <Camera style={{ color: 'var(--aeva-ink)' }} size={20} />
                             </div>
-                            <h3 className="text-xl font-bold text-text-dark">Vendors</h3>
+                            <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>Vendors</h3>
                             {skippedSteps.includes(3) && (
-                                <span className="ml-2 flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                                <span style={{
+                                    marginLeft: '8px',
+                                    fontSize: '10px',
+                                    fontWeight: 700,
+                                    color: 'var(--aeva-ink-soft)',
+                                    background: 'var(--aeva-paper-warm)',
+                                    padding: '2px 8px',
+                                    borderRadius: 'var(--r-full)',
+                                    border: '1px solid var(--aeva-line)'
+                                }}>
                                     Skipped
                                 </span>
                             )}
                         </div>
-                        <div className="grid sm:grid-cols-3 gap-4">
-                            <VendorSmall role="Photographer" vendor={selectedVendors.photographer} icon={<Camera size={16} />} color="blue" />
-                            <VendorSmall role="DJ" vendor={selectedVendors.dj} icon={<Music size={16} />} color="violet" />
-                            <VendorSmall role="Videographer" vendor={selectedVendors.videographer} icon={<Video size={16} />} color="indigo" />
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                            gap: '16px'
+                        }}>
+                            <VendorSmall role="Photographer" vendor={selectedVendors.photographer} icon={<Camera size={16} />} />
+                            <VendorSmall role="DJ" vendor={selectedVendors.dj} icon={<Music size={16} />} />
+                            <VendorSmall role="Videographer" vendor={selectedVendors.videographer} icon={<Video size={16} />} />
                         </div>
                     </div>
                 </div>
 
                 {/* Right: Cost Summary & Actions */}
-                <div className="lg:col-start-3">
-                    <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl sticky top-24">
-                        <h3 className="text-2xl font-bold text-text-dark mb-6">Cost Summary</h3>
+                <div style={{
+                    background: 'var(--aeva-canvas)',
+                    borderRadius: 'var(--r-2xl)',
+                    padding: '32px',
+                    border: '1px solid var(--aeva-line)',
+                    boxShadow: 'var(--shadow-lg)',
+                    position: 'sticky',
+                    top: '96px'
+                }}>
+                    <h3 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '24px' }}>Cost Summary</h3>
 
-                        <div className="space-y-4 mb-8">
-                            <CostRow label="Venue" value={selectedVenue?.startingPrice} />
-                            <CostRow label="Catering (~100p)" value={selectedCatering ? selectedCatering.pricePerPerson * 100 : 0} />
-                            <CostRow label="Decorations" value={selectedDecorations?.totalPrice} />
-                            <CostRow label="Vendors" value={
-                                (selectedVendors.photographer?.startingPrice || 0) +
-                                (selectedVendors.dj?.startingPrice || 0) +
-                                (selectedVendors.videographer?.startingPrice || 0)
-                            } />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
+                        <CostRow label="Venue" value={selectedVenue?.startingPrice} />
+                        <CostRow label="Catering (~100p)" value={selectedCatering ? selectedCatering.pricePerPerson * 100 : 0} />
+                        <CostRow label="Decorations" value={selectedDecorations?.totalPrice} />
+                        <CostRow label="Vendors" value={
+                            (selectedVendors.photographer?.startingPrice || 0) +
+                            (selectedVendors.dj?.startingPrice || 0) +
+                            (selectedVendors.videographer?.startingPrice || 0)
+                        } />
+                    </div>
+
+                    <div style={{
+                        paddingTop: '24px',
+                        borderTop: '1px solid var(--aeva-line)',
+                        marginBottom: '32px'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '24px', fontWeight: 700 }}>
+                            <span style={{ color: 'var(--aeva-ink)' }}>Total Est.</span>
+                            <span style={{ color: 'var(--aeva-ink)' }}>{totalCost.toLocaleString()} EGP</span>
                         </div>
+                    </div>
 
-                        <div className="pt-6 border-t border-gray-100 mb-8 font-black">
-                            <div className="flex justify-between items-center text-2xl">
-                                <span className="text-text-dark">Total Est.</span>
-                                <span className="text-primary">{totalCost.toLocaleString()} EGP</span>
-                            </div>
-                        </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <Button
+                            variant="primary"
+                            size="lg"
+                            onClick={handleConfirm}
+                            disabled={!hasAnySelection}
+                            title={!hasAnySelection ? "Please make your selections to continue" : ""}
+                            style={{ width: '100%' }}
+                        >
+                            <CheckCircle size={20} /> Lock In This Plan
+                        </Button>
 
-                        <div className="space-y-3">
-                            <button
-                                onClick={handleConfirm}
-                                disabled={!hasAnySelection}
-                                title={!hasAnySelection ? "Please make your selections to continue" : ""}
-                                className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${!hasAnySelection
-                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-2 border-gray-300'
-                                    : 'bg-primary text-white hover:bg-secondary shadow-lg shadow-primary/20'
-                                    }`}
-                            >
-                                <CheckCircle size={20} /> Lock In This Plan
-                            </button>
+                        <button
+                            onClick={handleStartAI}
+                            style={{
+                                width: '100%',
+                                padding: '16px',
+                                background: 'var(--aeva-canvas)',
+                                border: '2px solid var(--aeva-line)',
+                                color: 'var(--aeva-ink)',
+                                borderRadius: 'var(--r-xl)',
+                                fontWeight: 700,
+                                fontSize: '16px',
+                                transition: 'all 200ms',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                cursor: 'pointer',
+                                marginTop: '16px'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--aeva-ink)';
+                                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                                e.currentTarget.style.boxShadow = '';
+                            }}
+                        >
+                            <Sparkles size={20} /> Want a Better One With AI?
+                        </button>
 
-                            <button
-                                onClick={handleStartAI}
-                                className="w-full py-4 bg-white border-2 border-primary/20 text-primary rounded-2xl font-bold text-lg hover:border-primary transition-all flex items-center justify-center gap-2 group mt-4!"
-                            >
-                                <Sparkles size={20} className="group-hover:animate-pulse" /> Want a Better One With AI?
-                            </button>
+                        <button
+                            onClick={() => navigate('/invitations')}
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                background: 'var(--aeva-paper-warm)',
+                                color: 'var(--aeva-ink)',
+                                borderRadius: 'var(--r-lg)',
+                                fontWeight: 700,
+                                fontSize: '14px',
+                                border: '1px solid var(--aeva-line)',
+                                cursor: 'pointer',
+                                transition: 'all 200ms'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--aeva-line)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--aeva-paper-warm)'}
+                        >
+                            Skip to Invitations
+                        </button>
 
-                            <button
-                                onClick={() => navigate('/invitations')}
-                                className="w-full py-3 bg-gray-100 text-text-dark rounded-xl font-bold hover:bg-gray-200 transition-all text-sm"
-                            >
-                                Skip to Invitations
-                            </button>
-
-                            <button
-                                onClick={clearPlan}
-                                className="w-full py-2 text-text-muted hover:text-red-500 transition-colors text-sm font-medium"
-                            >
-                                Reset Selections
-                            </button>
-                        </div>
+                        <button
+                            onClick={clearPlan}
+                            style={{
+                                width: '100%',
+                                padding: '8px',
+                                color: 'var(--aeva-ink-soft)',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'color 200ms'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--aeva-ink)'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'}
+                        >
+                            Reset Selections
+                        </button>
                     </div>
                 </div>
             </div>
@@ -185,58 +276,99 @@ export default function PlanSummary() {
 
 function SummaryItem({ title, icon, item, placeholder, details, price, priceLabel = null, isSkipped }) {
     return (
-        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-6">
-            <div className="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100">
+        <div style={{
+            background: 'var(--aeva-canvas)',
+            borderRadius: 'var(--r-2xl)',
+            padding: '24px',
+            border: '1px solid var(--aeva-line)',
+            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '24px'
+        }}>
+            <div style={{
+                width: '96px',
+                height: '96px',
+                borderRadius: 'var(--r-xl)',
+                overflow: 'hidden',
+                flexShrink: 0,
+                background: 'var(--aeva-paper-warm)',
+                border: '1px solid var(--aeva-line)'
+            }}>
                 {item?.image ? (
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--aeva-ink-soft)' }}>
                         {icon}
                     </div>
                 )}
             </div>
-            <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
+            <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                     {icon}
-                    <h4 className="text-sm font-bold text-text-muted uppercase tracking-widest">{title}</h4>
+                    <h4 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--aeva-ink-soft)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</h4>
                     {isSkipped && (
-                        <span className="ml-2 flex items-center gap-1 text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                        <span style={{
+                            marginLeft: '8px',
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            color: 'var(--aeva-ink-soft)',
+                            background: 'var(--aeva-paper-warm)',
+                            padding: '2px 8px',
+                            borderRadius: 'var(--r-full)',
+                            border: '1px solid var(--aeva-line)'
+                        }}>
                             Skipped
                         </span>
                     )}
                 </div>
                 {item ? (
                     <>
-                        <h3 className="text-xl font-bold text-text-dark">{item.name}</h3>
-                        <p className="text-text-muted text-sm">{details}</p>
+                        <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{item.name}</h3>
+                        <p style={{ color: 'var(--aeva-ink-soft)', fontSize: '14px' }}>{details}</p>
                     </>
                 ) : (
-                    <p className="text-gray-400 italic">{placeholder}</p>
+                    <p style={{ color: 'var(--aeva-ink-soft)', fontStyle: 'italic' }}>{placeholder}</p>
                 )}
             </div>
             {price > 0 && (
-                <div className="text-right">
-                    <p className="text-lg font-bold text-text-dark">{price.toLocaleString()} EGP</p>
-                    {priceLabel && <p className="text-[10px] text-text-muted">{priceLabel}</p>}
+                <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{price.toLocaleString()} EGP</p>
+                    {priceLabel && <p style={{ fontSize: '10px', color: 'var(--aeva-ink-soft)' }}>{priceLabel}</p>}
                 </div>
             )}
         </div>
     );
 }
 
-function VendorSmall({ role, vendor, icon, color }) {
+function VendorSmall({ role, vendor, icon }) {
     return (
-        <div className={`p-4 rounded-2xl border ${vendor ? 'border-primary/20 bg-primary/5' : 'border-gray-100 bg-gray-50'}`}>
-            <p className="text-[10px] uppercase font-bold text-text-muted mb-2">{role}</p>
+        <div style={{
+            padding: '16px',
+            borderRadius: 'var(--r-xl)',
+            border: vendor ? '1px solid var(--aeva-line)' : '1px solid var(--aeva-line)',
+            background: vendor ? 'var(--aeva-paper-warm)' : 'var(--aeva-paper-warm)'
+        }}>
+            <p style={{ fontSize: '10px', fontWeight: 700, color: 'var(--aeva-ink-soft)', marginBottom: '8px', textTransform: 'uppercase' }}>{role}</p>
             {vendor ? (
-                <div className="flex items-center gap-2 relative">
-                    <div className={`w-6 h-6 rounded-lg bg-white flex items-center justify-center text-${color}-500 shadow-sm`}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: 'var(--r-lg)',
+                        background: 'var(--aeva-canvas)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--aeva-ink)',
+                        boxShadow: 'var(--shadow-sm)'
+                    }}>
                         {icon}
                     </div>
-                    <p className="text-xs font-bold text-text-dark truncate flex-1">{vendor.name}</p>
+                    <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--aeva-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{vendor.name}</p>
                 </div>
             ) : (
-                <p className="text-[10px] text-gray-400 italic">Not selected</p>
+                <p style={{ fontSize: '10px', color: 'var(--aeva-ink-soft)', fontStyle: 'italic' }}>Not selected</p>
             )}
         </div>
     );
@@ -244,9 +376,9 @@ function VendorSmall({ role, vendor, icon, color }) {
 
 function CostRow({ label, value }) {
     return (
-        <div className="flex justify-between items-center text-sm">
-            <span className="text-text-muted">{label}</span>
-            <span className="text-text-dark font-semibold">{value ? value.toLocaleString() : 0} EGP</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px' }}>
+            <span style={{ color: 'var(--aeva-ink-soft)' }}>{label}</span>
+            <span style={{ color: 'var(--aeva-ink)', fontWeight: 600 }}>{value ? value.toLocaleString() : 0} EGP</span>
         </div>
     );
 }
