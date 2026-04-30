@@ -5,6 +5,7 @@ import { Calendar, MapPin, DollarSign, ArrowLeft, AlertCircle } from 'lucide-rea
 import { getEvent } from '../services/planningService';
 import { createBooking } from '../services/bookingService';
 import { usePlanStore } from '../store/plan.store';
+import { Button } from '../components/ui/Button';
 
 export default function BookingConfirmation() {
     const location = useLocation();
@@ -67,9 +68,16 @@ export default function BookingConfirmation() {
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex justify-center items-center min-h-[70vh]"
+                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh' }}
             >
-                <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                <div style={{
+                    width: '32px',
+                    height: '32px',
+                    border: '4px solid var(--aeva-line)',
+                    borderTop: '4px solid var(--aeva-ink)',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                }} />
             </motion.div>
         );
     }
@@ -78,116 +86,142 @@ export default function BookingConfirmation() {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{ maxWidth: '1080px', margin: '0 auto', padding: '40px 32px 80px' }}
-            className="max-w-2xl mx-auto py-10"
+            style={{ maxWidth: '56rem', margin: '0 auto', padding: '40px 32px 80px' }}
         >
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+            <div style={{
+                background: 'var(--aeva-canvas)',
+                padding: '32px',
+                borderRadius: 'var(--r-2xl)',
+                boxShadow: 'var(--shadow-lg)',
+                border: '1px solid var(--aeva-line)'
+            }}>
                 {/* Hero Section */}
-                <div className="bg-gradient-to-br from-[#6B3FF3] to-[#a855f7] text-white p-6 rounded-2xl mb-8">
-                    <h1 className="text-3xl font-display font-bold mb-2">Confirm Your Booking</h1>
-                    <p className="text-white/80">Review your event details before confirming</p>
+                <div style={{
+                    background: 'linear-gradient(to bottom right, var(--aeva-ink), var(--aeva-ink-strong))',
+                    color: 'var(--aeva-paper)',
+                    padding: '24px',
+                    borderRadius: 'var(--r-lg)',
+                    marginBottom: '32px'
+                }}>
+                    <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '8px' }}>Confirm Your Booking</h1>
+                    <p style={{ color: 'rgba(250,248,245,0.8)' }}>Review your event details before confirming</p>
                 </div>
 
                 {!eventId ? (
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
-                            <AlertCircle className="w-6 h-6 text-orange-600 flex-shrink-0" />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            background: 'var(--aeva-paper-warm)',
+                            border: '1px solid var(--aeva-line)',
+                            borderRadius: 'var(--r-lg)',
+                            padding: '16px'
+                        }}>
+                            <AlertCircle className="w-6 h-6" style={{ color: 'var(--aeva-ink)', flexShrink: 0 }} />
                             <div>
-                                <p className="text-sm font-bold text-orange-900">No event found.</p>
-                                <p className="text-sm text-orange-800">Please go back and complete the survey first.</p>
+                                <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '4px' }}>No event found.</p>
+                                <p style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)' }}>Please go back and complete the survey first.</p>
                             </div>
                         </div>
-                        <div className="flex justify-center">
-                            <button
-                                onClick={() => navigate('/survey')}
-                                className="px-6 py-3 rounded-full font-bold text-white shadow-lg transition-all bg-gradient-to-r from-[#6B3FF3] to-[#a855f7] hover:shadow-purple-300 hover:scale-105"
-                            >
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <Button variant="primary" onClick={() => navigate('/survey')}>
                                 Back to Survey
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 ) : event ? (
-                    <div className="space-y-6">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                         {/* Event Details */}
-                        <div className="space-y-4">
-                            <div className="flex items-start gap-4">
-                                <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                                <MapPin className="w-5 h-5" style={{ color: 'var(--aeva-ink)', marginTop: '4px', flexShrink: 0 }} />
                                 <div>
-                                    <p className="text-sm text-text-muted">Event</p>
-                                    <p className="text-lg font-bold text-text-dark">{event.title}</p>
+                                    <p style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)' }}>Event</p>
+                                    <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{event.title}</p>
                                 </div>
                             </div>
 
                             {event.event_date && (
-                                <div className="flex items-start gap-4">
-                                    <Calendar className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                                    <Calendar className="w-5 h-5" style={{ color: 'var(--aeva-ink)', marginTop: '4px', flexShrink: 0 }} />
                                     <div>
-                                        <p className="text-sm text-text-muted">Event Date</p>
-                                        <p className="text-lg font-bold text-text-dark">
+                                        <p style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)' }}>Event Date</p>
+                                        <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>
                                             {new Date(event.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                                         </p>
                                     </div>
                                 </div>
                             )}
 
-                            <div className="flex items-start gap-4">
-                                <DollarSign className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                                <DollarSign className="w-5 h-5" style={{ color: 'var(--aeva-ink)', marginTop: '4px', flexShrink: 0 }} />
                                 <div>
-                                    <p className="text-sm text-text-muted">Estimated Total</p>
-                                    <p className="text-lg font-bold text-text-dark">{estimatedTotal.toLocaleString()} EGP</p>
+                                    <p style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)' }}>Estimated Total</p>
+                                    <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{estimatedTotal.toLocaleString()} EGP</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Error Message */}
                         {error && (
-                            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
+                            <div style={{
+                                background: 'var(--aeva-paper-warm)',
+                                border: '1px solid var(--aeva-line)',
+                                borderRadius: 'var(--r-lg)',
+                                padding: '16px',
+                                color: 'var(--aeva-ink)',
+                                fontSize: '14px'
+                            }}>
                                 {error}
                             </div>
                         )}
 
                         {/* Terms Note */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                            <p className="text-sm text-blue-900">
+                        <div style={{
+                            background: 'var(--aeva-paper-warm)',
+                            border: '1px solid var(--aeva-line)',
+                            borderRadius: 'var(--r-lg)',
+                            padding: '16px'
+                        }}>
+                            <p style={{ fontSize: '14px', color: 'var(--aeva-ink)' }}>
                                 By confirming, you agree to our booking terms. A confirmation email will be sent to your registered email address.
                             </p>
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-100">
-                            <button
-                                onClick={() => navigate(-1)}
-                                disabled={isConfirming}
-                                className="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-text-muted hover:bg-gray-100 disabled:opacity-50 transition-all"
-                            >
+                        <div style={{
+                            display: 'flex',
+                            gap: '16px',
+                            paddingTop: '16px',
+                            borderTop: '1px solid var(--aeva-line)'
+                        }}>
+                            <Button variant="ghost" onClick={() => navigate(-1)} disabled={isConfirming}>
                                 <ArrowLeft className="w-4 h-4" /> Back to Plan
-                            </button>
-                            <button
-                                onClick={handleConfirmAndPay}
-                                disabled={isConfirming}
-                                className="flex items-center justify-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all bg-gradient-to-r from-[#6B3FF3] to-[#a855f7] hover:shadow-purple-300 hover:scale-105 disabled:opacity-70"
-                            >
-                                {isConfirming ? (
-                                    <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Confirming...</>
-                                ) : (
-                                    'Confirm and Pay'
-                                )}
-                            </button>
+                            </Button>
+                            <Button variant="primary" size="lg" onClick={handleConfirmAndPay} disabled={isConfirming}>
+                                {isConfirming ? 'Confirming...' : 'Confirm and Pay'}
+                            </Button>
                         </div>
                     </div>
                 ) : !isLoading ? (
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl p-4">
-                            <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
-                            <p className="text-sm font-bold text-red-900">Could not load event details.</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            background: 'var(--aeva-paper-warm)',
+                            border: '1px solid var(--aeva-line)',
+                            borderRadius: 'var(--r-lg)',
+                            padding: '16px'
+                        }}>
+                            <AlertCircle className="w-6 h-6" style={{ color: 'var(--aeva-ink)', flexShrink: 0 }} />
+                            <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--aeva-ink)' }}>Could not load event details.</p>
                         </div>
-                        <div className="flex justify-center">
-                            <button
-                                onClick={() => navigate(-1)}
-                                className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-white shadow-lg transition-all bg-gradient-to-r from-[#6B3FF3] to-[#a855f7] hover:shadow-purple-300 hover:scale-105"
-                            >
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <Button variant="primary" onClick={() => navigate(-1)}>
                                 <ArrowLeft className="w-4 h-4" /> Back to Plan
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 ) : null}

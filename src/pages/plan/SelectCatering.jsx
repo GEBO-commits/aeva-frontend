@@ -1,8 +1,5 @@
 /**
- * SelectCatering.jsx — Step 2 of the Manual Plan Builder
- *
- * Shown after a venue is selected. User picks a catering service.
- * On selection: saves to plan store → navigates to /plan/build/decorations
+ * SelectCatering.jsx — Step 2 of the Plan Builder
  */
 
 import React, { useState, useEffect, useContext } from 'react';
@@ -14,6 +11,7 @@ import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
 import { saveEventSelection } from '../../services/planningService';
 import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
 import { Star, CheckCircle } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 
 export default function SelectCatering() {
     const navigate = useNavigate();
@@ -32,7 +30,6 @@ export default function SelectCatering() {
                     console.error('[SelectCatering] Failed to fetch catering vendors:', error);
                     setCateringData([]);
                 } else {
-                    // Map Supabase vendors to card shape
                     const mapped = (data || []).map(v => {
                         let details = {};
                         if (v.details) {
@@ -66,7 +63,6 @@ export default function SelectCatering() {
         const isSelected = selectedCatering?.id === c.id;
         setCatering(isSelected ? null : c);
 
-        // Save to Supabase if selecting (not deselecting)
         if (!isSelected && c && eventId) {
             const { error } = await saveEventSelection(eventId, 'catering', c.id);
             if (error) {
@@ -76,100 +72,193 @@ export default function SelectCatering() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto py-8 px-4">
+        <div style={{ maxWidth: '1400px', margin: '0 auto', paddingTop: '32px', paddingX: '16px' }}>
             <PlanProgressBar currentStep={1} />
 
-            <div className="flex items-center justify-between mt-8 mb-6">
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: '32px',
+                marginBottom: '24px'
+            }}>
                 <div>
-                    <h1 className="text-3xl font-display font-bold text-text-dark">🍽️ Choose Catering</h1>
-                    <p className="text-text-muted mt-1">Pick the perfect menu style for your guests.</p>
+                    <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '4px' }}>🍽️ Choose Catering</h1>
+                    <p style={{ color: 'var(--aeva-ink-soft)', marginTop: '4px' }}>Pick the perfect menu style for your guests.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => navigate('/plan/build/venue')}
-                        className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
-                    >
-                        ← Back
-                    </button>
-                    <button
-                        onClick={() => { skipStep(1); navigate('/plan/build/decorations'); }}
-                        className="text-text-muted hover:text-text-dark px-4 py-2 font-medium text-sm transition-colors border border-gray-200 rounded-full hover:bg-gray-50 bg-white"
-                    >
-                        Skip this step
-                    </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <Button variant="ghost" onClick={() => navigate('/plan/build/venue')}>← Back</Button>
+                    <Button variant="ghost" onClick={() => { skipStep(1); navigate('/plan/build/decorations'); }}>Skip this step</Button>
                     {selectedCatering && (
-                        <button
-                            onClick={() => navigate('/plan/build/decorations')}
-                            className="bg-orange-400 text-white px-6 py-2.5 rounded-full font-bold hover:bg-orange-500 transition-colors shadow-md flex items-center gap-2"
-                        >
-                            Next Step: Decorations →
-                        </button>
+                        <Button variant="primary" onClick={() => navigate('/plan/build/decorations')}>Next Step: Decorations →</Button>
                     )}
                 </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                gap: '24px'
+            }}>
                 {isLoading ? (
-                    <div>Loading catering options...</div>
+                    <div style={{ color: 'var(--aeva-ink-soft)' }}>Loading catering options...</div>
                 ) : catering.length > 0 ? (
                     catering.map((c, i) => {
-                    const isSelected = selectedCatering?.id === c.id;
-                    return (
-                        <motion.div
-                            key={c.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.08 }}
-                            onClick={() => handleSelect(c)}
-                            className={`bg-white rounded-2xl overflow-hidden shadow-sm border-2 transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer ${isSelected ? 'border-orange-400 ring-2 ring-orange-100 bg-orange-50' : 'border-gray-100'
-                                }`}
-                        >
-                            <div className="relative">
-                                <img src={c.image} alt={c.name} className="w-full h-48 object-cover" />
-                                {isSelected && (
-                                    <div className="absolute top-3 right-3 w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center">
-                                        <CheckCircle className="w-5 h-5 text-white" />
+                        const isSelected = selectedCatering?.id === c.id;
+                        return (
+                            <motion.div
+                                key={c.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.08 }}
+                                onClick={() => handleSelect(c)}
+                                style={{
+                                    background: isSelected ? 'var(--aeva-canvas)' : 'var(--aeva-canvas)',
+                                    borderRadius: 'var(--r-lg)',
+                                    overflow: 'hidden',
+                                    boxShadow: isSelected ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+                                    border: isSelected ? '2px solid var(--aeva-ink)' : '1px solid var(--aeva-line)',
+                                    cursor: 'pointer',
+                                    transition: 'all 200ms'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.boxShadow = isSelected ? 'var(--shadow-md)' : 'var(--shadow-sm)';
+                                    e.currentTarget.style.transform = '';
+                                }}
+                            >
+                                <div style={{ position: 'relative' }}>
+                                    <img src={c.image} alt={c.name} style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
+                                    {isSelected && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '12px',
+                                            right: '12px',
+                                            width: '32px',
+                                            height: '32px',
+                                            background: 'var(--aeva-ink)',
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <CheckCircle className="w-5 h-5" style={{ color: 'var(--aeva-paper)' }} />
+                                        </div>
+                                    )}
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '12px',
+                                        left: '12px',
+                                        background: 'var(--aeva-paper)',
+                                        backdropFilter: 'blur(10px)',
+                                        padding: '4px 8px',
+                                        borderRadius: 'var(--r-full)',
+                                        fontSize: '12px',
+                                        fontWeight: 700,
+                                        color: 'var(--aeva-ink)'
+                                    }}>
+                                        {c.style}
                                     </div>
-                                )}
-                                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-bold">
-                                    {c.style}
                                 </div>
-                            </div>
-                            <div className="p-4">
-                                <div className="flex justify-between items-start mb-1">
-                                    <h3 className="font-bold text-text-dark">{c.name}</h3>
-                                    <span className="flex items-center gap-1 text-xs text-gray-500">
-                                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />{c.rating}
-                                    </span>
+                                <div style={{ padding: '16px' }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'flex-start',
+                                        marginBottom: '8px'
+                                    }}>
+                                        <h3 style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '14px' }}>{c.name}</h3>
+                                        <span style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            fontSize: '12px',
+                                            color: 'var(--aeva-ink-soft)'
+                                        }}>
+                                            <Star className="w-3 h-3" style={{ fill: 'currentColor' }} />{c.rating}
+                                        </span>
+                                    </div>
+                                    <p style={{
+                                        fontSize: '12px',
+                                        color: 'var(--aeva-ink-soft)',
+                                        marginBottom: '12px',
+                                        lineHeight: '1.3',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                        overflow: 'hidden'
+                                    }}>{c.description}</p>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        paddingTop: '8px',
+                                        borderTop: '1px solid var(--aeva-line)',
+                                        marginBottom: '12px',
+                                        fontSize: '12px'
+                                    }}>
+                                        <span style={{ fontWeight: 700, color: 'var(--aeva-ink)' }}>{c.pricePerPerson} EGP/person</span>
+                                        <span style={{ color: 'var(--aeva-ink-soft)' }}>~{(c.pricePerPerson * 100).toLocaleString()}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); navigate(`/catering/${c.id}`); }}
+                                            style={{
+                                                width: '100%',
+                                                padding: '8px',
+                                                background: 'var(--aeva-paper-warm)',
+                                                color: 'var(--aeva-ink)',
+                                                fontSize: '12px',
+                                                fontWeight: 700,
+                                                borderRadius: 'var(--r-md)',
+                                                border: '1px solid var(--aeva-line)',
+                                                cursor: 'pointer',
+                                                transition: 'all 200ms'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--aeva-line)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--aeva-paper-warm)'}
+                                        >
+                                            View Details
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleSelect(c); }}
+                                            style={{
+                                                width: '100%',
+                                                padding: '10px',
+                                                borderRadius: 'var(--r-md)',
+                                                fontSize: '13px',
+                                                fontWeight: 700,
+                                                transition: 'all 200ms',
+                                                background: isSelected ? 'var(--aeva-ink)' : 'var(--aeva-paper-warm)',
+                                                color: isSelected ? 'var(--aeva-paper)' : 'var(--aeva-ink)',
+                                                border: isSelected ? 'none' : '1px solid var(--aeva-line)',
+                                                cursor: 'pointer'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (!isSelected) {
+                                                    e.currentTarget.style.background = 'var(--aeva-ink)';
+                                                    e.currentTarget.style.color = 'var(--aeva-paper)';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (!isSelected) {
+                                                    e.currentTarget.style.background = 'var(--aeva-paper-warm)';
+                                                    e.currentTarget.style.color = 'var(--aeva-ink)';
+                                                }
+                                            }}
+                                        >
+                                            {isSelected ? '✓ Selected' : 'Select Catering →'}
+                                        </button>
+                                    </div>
                                 </div>
-                                <p className="text-xs text-text-muted mb-3 line-clamp-2">{c.description}</p>
-                                <div className="flex justify-between items-center pt-2 border-t border-gray-100 mb-3">
-                                    <span className="font-bold text-orange-500">{c.pricePerPerson} EGP/person</span>
-                                    <span className="text-xs text-gray-400">~{(c.pricePerPerson * 100).toLocaleString()} for 100 guests</span>
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); navigate(`/catering/${c.id}`); }}
-                                        className="w-full py-2 bg-gray-50 hover:bg-gray-100 text-text-dark text-xs font-bold rounded-xl transition-colors border border-gray-200"
-                                    >
-                                        View Details
-                                    </button>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); handleSelect(c); }}
-                                        className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all ${isSelected
-                                            ? 'bg-orange-400 text-white'
-                                            : 'bg-orange-50 hover:bg-orange-400 hover:text-white text-orange-600 border border-orange-200'
-                                            }`}
-                                    >
-                                        {isSelected ? '✓ Selected' : 'Select Catering →'}
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    );
+                            </motion.div>
+                        );
                     })
                 ) : (
-                    <div className="col-span-full text-center text-text-muted">No catering options available</div>
+                    <div style={{ color: 'var(--aeva-ink-soft)', textAlign: 'center', gridColumn: 'span -1' }}>No catering options available</div>
                 )}
             </div>
         </div>

@@ -169,46 +169,93 @@ export default function EventPlan() {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="max-w-4xl mx-auto space-y-8 py-4"
+            style={{ maxWidth: '56rem', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px', paddingBottom: '16px' }}
         >
             {/* ─── Summary hero card ─── */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="bg-gradient-to-br from-[#6B3FF3] to-[#a855f7] text-white p-8 rounded-[2rem] shadow-xl relative overflow-hidden"
+                style={{
+                    background: 'linear-gradient(to bottom right, var(--aeva-ink), var(--aeva-ink-strong))',
+                    color: 'var(--aeva-paper)',
+                    padding: '32px',
+                    borderRadius: 'var(--r-2xl)',
+                    boxShadow: 'var(--shadow-lg)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}
             >
                 {/* Decorative blobs */}
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-                <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none" />
+                <div style={{
+                    position: 'absolute',
+                    top: '-40px',
+                    right: '-40px',
+                    width: '160px',
+                    height: '160px',
+                    background: 'rgba(255,255,255,0.1)',
+                    borderRadius: '50%',
+                    filter: 'blur(64px)',
+                    pointerEvents: 'none'
+                }} />
+                <div style={{
+                    position: 'absolute',
+                    bottom: '-40px',
+                    left: '-40px',
+                    width: '128px',
+                    height: '128px',
+                    background: 'rgba(255,255,255,0.1)',
+                    borderRadius: '50%',
+                    filter: 'blur(40px)',
+                    pointerEvents: 'none'
+                }} />
 
-                <div className="relative z-10">
-                    <p className="text-white/70 text-sm font-medium uppercase tracking-widest mb-2">Your Complete Event Plan</p>
-                    <h1 className="text-4xl font-display font-bold mb-1">Your Dream Event</h1>
-                    <p className="text-white/80 mb-6">Tailored to your preferences, budget, and style.</p>
+                <div style={{ position: 'relative', zIndex: 10 }}>
+                    <p style={{ color: 'rgba(250,248,245,0.7)', fontSize: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Your Complete Event Plan</p>
+                    <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px', color: 'var(--aeva-paper)' }}>Your Dream Event</h1>
+                    <p style={{ color: 'rgba(250,248,245,0.8)', marginBottom: '24px' }}>Tailored to your preferences, budget, and style.</p>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' }}>
                         {/* Match score */}
-                        <div className="bg-white/15 backdrop-blur rounded-2xl p-4 text-center">
-                            <p className="text-3xl font-bold">{plan.matchScore}%</p>
-                            <p className="text-sm text-white/70">Match Score</p>
+                        <div style={{
+                          background: 'rgba(255,255,255,0.15)',
+                          backdropFilter: 'blur(10px)',
+                          borderRadius: 'var(--r-lg)',
+                          padding: '16px',
+                          textAlign: 'center'
+                        }}>
+                            <p style={{ fontSize: '24px', fontWeight: 700, color: 'var(--aeva-paper)' }}>{plan.matchScore}%</p>
+                            <p style={{ fontSize: '12px', color: 'rgba(250,248,245,0.7)' }}>Match Score</p>
                         </div>
                         {/* Total estimate */}
-                        <div className="bg-white/15 backdrop-blur rounded-2xl p-4 text-center">
-                            <p className="text-2xl font-bold">{plan.totalEstimate.toLocaleString()}</p>
-                            <p className="text-sm text-white/70">Est. Total (EGP)</p>
+                        <div style={{
+                          background: 'rgba(255,255,255,0.15)',
+                          backdropFilter: 'blur(10px)',
+                          borderRadius: 'var(--r-lg)',
+                          padding: '16px',
+                          textAlign: 'center'
+                        }}>
+                            <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--aeva-paper)' }}>{plan.totalEstimate.toLocaleString()}</p>
+                            <p style={{ fontSize: '12px', color: 'rgba(250,248,245,0.7)' }}>Est. Total (EGP)</p>
                         </div>
                         {/* Sections */}
-                        <div className="bg-white/15 backdrop-blur rounded-2xl p-4 text-center col-span-2 md:col-span-1">
-                            <p className="text-2xl font-bold">4</p>
-                            <p className="text-sm text-white/70">Plan Sections</p>
+                        <div style={{
+                          background: 'rgba(255,255,255,0.15)',
+                          backdropFilter: 'blur(10px)',
+                          borderRadius: 'var(--r-lg)',
+                          padding: '16px',
+                          textAlign: 'center',
+                          gridColumn: 'span 1'
+                        }}>
+                            <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--aeva-paper)' }}>4</p>
+                            <p style={{ fontSize: '12px', color: 'rgba(250,248,245,0.7)' }}>Plan Sections</p>
                         </div>
                     </div>
                 </div>
             </motion.div>
 
             {/* ─── Section cards, alternating slide-in ─── */}
-            <div className="space-y-6">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 {sections.map((section, i) => (
                     <PlanSectionCard
                         key={section.key}
@@ -223,31 +270,66 @@ export default function EventPlan() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 items-center justify-end pt-4 border-t border-gray-100"
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    alignItems: 'flex-end',
+                    justifyContent: 'flex-end',
+                    paddingTop: '16px',
+                    borderTop: '1px solid var(--aeva-line)'
+                }}
             >
                 <Link
                     to="/recommendations"
-                    className="text-text-muted hover:text-primary transition-colors text-sm font-medium"
+                    style={{
+                        color: 'var(--aeva-ink-soft)',
+                        textDecoration: 'none',
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        transition: 'color 200ms'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--aeva-ink)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'}
                 >
                     ← Browse Venues Instead
                 </Link>
                 <button
                     onClick={() => {
                         if (!isAuthenticated) {
-                            // Save eventId before login redirect so it survives the auth flow
                             if (eventIdFromState) {
                                 localStorage.setItem('aeva_pending_event_id', eventIdFromState);
                             }
                             navigate('/login', { state: { from: '/event-plan' } });
                         } else {
-                            // Use eventId from state, or fall back to localStorage if returning from login
                             const resolvedEventId = eventIdFromState
                                 || localStorage.getItem('aeva_pending_event_id');
                             localStorage.removeItem('aeva_pending_event_id');
                             navigate('/booking/confirm', { state: { eventId: resolvedEventId } });
                         }
                     }}
-                    className="flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all bg-gradient-to-r from-[#6B3FF3] to-[#a855f7] hover:shadow-purple-300 hover:scale-105"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '12px 32px',
+                        borderRadius: 'var(--r-full)',
+                        fontWeight: 700,
+                        color: 'var(--aeva-paper)',
+                        background: 'var(--aeva-ink)',
+                        border: 'none',
+                        boxShadow: 'var(--shadow-md)',
+                        cursor: 'pointer',
+                        transition: 'all 200ms'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                        e.currentTarget.style.transform = '';
+                    }}
                 >
                     <Lock className="w-5 h-5" /> Lock In This Plan
                 </button>
@@ -259,7 +341,6 @@ export default function EventPlan() {
 
 /** ─── Individual section card ─────────────────────────────────── */
 function PlanSectionCard({ section, index }) {
-    // Alternating slide-in direction: even = left, odd = right
     const xDir = index % 2 === 0 ? -40 : 40;
 
     return (
@@ -267,31 +348,66 @@ function PlanSectionCard({ section, index }) {
             initial={{ opacity: 0, x: xDir }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.15 * index }}
-            className={`bg-white rounded-[2rem] shadow-sm border ${section.border} overflow-hidden flex flex-col md:flex-row group hover:shadow-xl transition-shadow duration-300`}
+            style={{
+                background: 'var(--aeva-canvas)',
+                borderRadius: 'var(--r-2xl)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--aeva-line)',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'row',
+                transition: 'box-shadow 300ms'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-sm)'}
         >
             {/* Image */}
-            <div className="md:w-56 h-48 md:h-auto overflow-hidden flex-shrink-0">
+            <div style={{ width: '224px', height: '192px', overflow: 'hidden', flexShrink: 0 }}>
                 <img
                     src={section.image}
                     alt={section.label}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 500ms'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = ''}
                 />
             </div>
 
             {/* Content */}
-            <div className="flex-1 p-6 flex flex-col justify-between">
+            <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
-                    <div className="flex items-center justify-between mb-3">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-white ${section.badge}`}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '4px 12px',
+                            borderRadius: 'var(--r-full)',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            color: 'var(--aeva-paper)',
+                            background: 'var(--aeva-ink)'
+                        }}>
                             {section.icon} {section.label}
                         </span>
-                        <span className="text-lg font-bold text-text-dark">{section.price}</span>
+                        <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{section.price}</span>
                     </div>
-                    <h3 className="text-xl font-bold font-display text-text-dark mb-1">{section.title}</h3>
-                    <p className="text-sm text-text-muted mb-3">{section.sub}</p>
-                    <div className="flex flex-wrap gap-2">
+                    <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>{section.title}</h3>
+                    <p style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)', marginBottom: '12px' }}>{section.sub}</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                         {section.tags.map(tag => (
-                            <span key={tag} className={`text-xs px-2 py-1 rounded-md ${section.bg} text-gray-700 border ${section.border}`}>
+                            <span key={tag} style={{
+                                fontSize: '12px',
+                                padding: '4px 8px',
+                                borderRadius: 'var(--r-md)',
+                                background: 'var(--aeva-paper-warm)',
+                                color: 'var(--aeva-ink)',
+                                border: '1px solid var(--aeva-line)'
+                            }}>
                                 {tag}
                             </span>
                         ))}
@@ -299,9 +415,22 @@ function PlanSectionCard({ section, index }) {
                 </div>
 
                 {/* Swap button */}
-                <div className="flex justify-end mt-4">
-                    {/* TODO: Enable after backend migration */}
-                    <button className="flex items-center gap-1.5 text-sm text-text-muted hover:text-primary transition-colors font-medium">
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+                    <button style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '14px',
+                        color: 'var(--aeva-ink-soft)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: 500,
+                        transition: 'color 200ms'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--aeva-ink)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'}
+                    >
                         <RefreshCw className="w-4 h-4" /> Swap
                     </button>
                 </div>

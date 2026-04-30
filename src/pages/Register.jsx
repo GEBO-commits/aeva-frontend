@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Mail } from 'lucide-react';
+import { Button } from '../components/ui/Button';
 import * as authService from '../services/authService';
 
 const registerSchema = z.object({
@@ -44,105 +45,193 @@ export default function Register() {
     };
 
     return (
-        <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" className="flex justify-center items-center min-h-[70vh]">
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 w-full max-w-md">
+        <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '70vh'
+        }}>
+            <div style={{
+                background: 'var(--aeva-canvas)',
+                padding: '32px',
+                borderRadius: 'var(--r-2xl)',
+                boxShadow: 'var(--shadow-lg)',
+                border: '1px solid var(--aeva-line)',
+                width: '100%',
+                maxWidth: '28rem'
+            }}>
                 {registered ? (
-                    <div className="text-center space-y-6">
-                        <div className="flex justify-center mb-4">
-                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                                <CheckCircle className="w-8 h-8 text-green-600" />
+                    <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            marginBottom: '16px'
+                        }}>
+                            <div style={{
+                                width: '64px',
+                                height: '64px',
+                                background: 'var(--aeva-sage)',
+                                opacity: 0.15,
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                <CheckCircle className="w-8 h-8" style={{ color: 'var(--aeva-sage)' }} />
                             </div>
                         </div>
                         <div>
-                            <h2 className="text-3xl font-display font-bold text-primary mb-2">Check Your Email</h2>
-                            <p className="text-text-muted">We sent a confirmation email to <span className="font-semibold text-text-dark">{registeredEmail}</span></p>
+                            <h2 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>Check Your Email</h2>
+                            <p style={{ color: 'var(--aeva-ink-soft)' }}>We sent a confirmation email to <span style={{ fontWeight: 600, color: 'var(--aeva-ink)' }}>{registeredEmail}</span></p>
                         </div>
-                        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-2">
-                            <div className="flex items-start gap-3">
-                                <Mail className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                <div className="text-left">
-                                    <p className="text-sm font-semibold text-blue-900 mb-1">Please click the link in the email</p>
-                                    <p className="text-sm text-blue-800">to activate your account before logging in.</p>
+                        <div style={{
+                            background: 'var(--aeva-paper-warm)',
+                            border: '1px solid var(--aeva-line)',
+                            borderRadius: 'var(--r-lg)',
+                            padding: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                                <Mail className="w-5 h-5" style={{ color: 'var(--aeva-ink)', marginTop: '2px', flexShrink: 0 }} />
+                                <div style={{ textAlign: 'left' }}>
+                                    <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--aeva-ink)', marginBottom: '4px' }}>Please click the link in the email</p>
+                                    <p style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)' }}>to activate your account before logging in.</p>
                                 </div>
                             </div>
                         </div>
-                        <div className="pt-4 border-t border-gray-100">
-                            <p className="text-sm text-text-muted mb-4">Didn't receive the email? Check your spam folder or try again.</p>
-                            <button
-                                onClick={() => setRegistered(false)}
-                                className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-secondary transition-all shadow-md hover:shadow-lg"
-                            >
+                        <div style={{ paddingTop: '16px', borderTop: '1px solid var(--aeva-line)' }}>
+                            <p style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)', marginBottom: '16px' }}>Didn't receive the email? Check your spam folder or try again.</p>
+                            <Button variant="primary" size="lg" onClick={() => setRegistered(false)} style={{ width: '100%' }}>
                                 Back to Register
-                            </button>
+                            </Button>
                         </div>
-                        <div className="text-center text-text-muted text-sm">
-                            Already confirmed? <Link to="/login" className="text-primary font-bold hover:text-secondary transition-colors">Sign in</Link>
+                        <div style={{ textAlign: 'center', color: 'var(--aeva-ink-soft)', fontSize: '14px' }}>
+                            Already confirmed? <Link to="/login" style={{ color: 'var(--aeva-ink)', fontWeight: 700, textDecoration: 'none', transition: 'color 200ms' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink)'}>Sign in</Link>
                         </div>
                     </div>
                 ) : (
                     <>
-                        <div className="text-center mb-8">
-                            <h2 className="text-3xl font-display font-bold text-primary mb-2">Create Account</h2>
-                            <p className="text-text-muted">Join AEVA and start planning your perfect event today.</p>
+                        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                            <h2 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>Create Account</h2>
+                            <p style={{ color: 'var(--aeva-ink-soft)' }}>Join AEVA and start planning your perfect event today.</p>
                         </div>
 
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                        <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
                             <div>
-                                <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="name">Full Name</label>
+                                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="name">Full Name</label>
                                 <input
                                     {...register('name')}
                                     id="name"
                                     type="text"
                                     placeholder="Emma Johnson"
                                     onChange={(e) => { setAuthError(null); }}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 16px',
+                                        borderRadius: 'var(--r-lg)',
+                                        border: '1px solid var(--aeva-line)',
+                                        background: 'var(--aeva-paper-warm)',
+                                        color: 'var(--aeva-ink)',
+                                        fontSize: '14px',
+                                        transition: 'all 200ms',
+                                        outline: 'none'
+                                    }}
+                                    onFocus={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--aeva-ink)';
+                                        e.currentTarget.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.1)';
+                                    }}
+                                    onBlur={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                                        e.currentTarget.style.boxShadow = '';
+                                    }}
                                 />
-                                {errors.name && <p className="text-accent text-sm mt-1 ml-1">{errors.name.message}</p>}
+                                {errors.name && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.name.message}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="email">Email Address</label>
+                                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="email">Email Address</label>
                                 <input
                                     {...register('email')}
                                     id="email"
                                     type="email"
                                     placeholder="you@example.com"
                                     onChange={(e) => { setAuthError(null); }}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 16px',
+                                        borderRadius: 'var(--r-lg)',
+                                        border: '1px solid var(--aeva-line)',
+                                        background: 'var(--aeva-paper-warm)',
+                                        color: 'var(--aeva-ink)',
+                                        fontSize: '14px',
+                                        transition: 'all 200ms',
+                                        outline: 'none'
+                                    }}
+                                    onFocus={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--aeva-ink)';
+                                        e.currentTarget.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.1)';
+                                    }}
+                                    onBlur={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                                        e.currentTarget.style.boxShadow = '';
+                                    }}
                                 />
-                                {errors.email && <p className="text-accent text-sm mt-1 ml-1">{errors.email.message}</p>}
+                                {errors.email && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.email.message}</p>}
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="password">Password</label>
+                                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="password">Password</label>
                                 <input
                                     {...register('password')}
                                     id="password"
                                     type="password"
                                     placeholder="••••••••"
                                     onChange={(e) => { setAuthError(null); }}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px 16px',
+                                        borderRadius: 'var(--r-lg)',
+                                        border: '1px solid var(--aeva-line)',
+                                        background: 'var(--aeva-paper-warm)',
+                                        color: 'var(--aeva-ink)',
+                                        fontSize: '14px',
+                                        transition: 'all 200ms',
+                                        outline: 'none'
+                                    }}
+                                    onFocus={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--aeva-ink)';
+                                        e.currentTarget.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.1)';
+                                    }}
+                                    onBlur={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                                        e.currentTarget.style.boxShadow = '';
+                                    }}
                                 />
-                                {errors.password && <p className="text-accent text-sm mt-1 ml-1">{errors.password.message}</p>}
+                                {errors.password && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.password.message}</p>}
                             </div>
 
                             {authError && (
-                                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">
+                                <div style={{
+                                    background: 'var(--aeva-paper-warm)',
+                                    border: '1px solid var(--aeva-line)',
+                                    borderRadius: 'var(--r-lg)',
+                                    padding: '12px',
+                                    color: 'var(--aeva-ink)',
+                                    fontSize: '14px'
+                                }}>
                                     {authError}
                                 </div>
                             )}
 
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="w-full bg-primary text-white py-3.5 rounded-xl font-bold hover:bg-secondary transition-all shadow-md hover:shadow-lg disabled:opacity-70 flex justify-center items-center gap-2"
-                            >
-                                {isSubmitting ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : 'Create Account'}
-                            </button>
+                            <Button variant="primary" size="lg" type="submit" disabled={isSubmitting} style={{ width: '100%' }}>
+                                {isSubmitting ? 'Creating account...' : 'Create Account'}
+                            </Button>
                         </form>
 
-                        <div className="mt-8 text-center text-text-muted">
-                            Already have an account? <Link to="/login" className="text-primary font-bold hover:text-secondary transition-colors">Sign in</Link>
+                        <div style={{ textAlign: 'center', color: 'var(--aeva-ink-soft)', fontSize: '14px' }}>
+                            Already have an account? <Link to="/login" style={{ color: 'var(--aeva-ink)', fontWeight: 700, textDecoration: 'none', transition: 'color 200ms' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink)'}>Sign in</Link>
                         </div>
                     </>
                 )}

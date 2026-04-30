@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
+import { Button } from '../components/ui/Button';
 import * as authService from '../services/authService';
 
 const loginSchema = z.object({
@@ -32,7 +33,6 @@ export default function Login() {
     const onSubmit = async (data) => {
         setAuthError(null);
 
-        // Capture current user before login (may be anonymous)
         const { user: currentUser } = await authService.getCurrentAuthUser();
         const anonymousUserId = currentUser?.id;
 
@@ -44,7 +44,6 @@ export default function Login() {
             return;
         }
 
-        // Claim anonymous session if it exists and is different from authenticated user
         if (anonymousUserId && user.id !== anonymousUserId) {
             try {
                 await authService.claimAnonymousSession(anonymousUserId, user.id);
@@ -58,57 +57,109 @@ export default function Login() {
     };
 
     return (
-        <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" className="flex justify-center items-center min-h-[70vh]">
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h2 className="text-3xl font-display font-bold text-primary mb-2">Welcome Back</h2>
-                    <p className="text-text-muted">Sign in to continue planning your event</p>
+        <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '70vh'
+        }}>
+            <div style={{
+                background: 'var(--aeva-canvas)',
+                padding: '32px',
+                borderRadius: 'var(--r-2xl)',
+                boxShadow: 'var(--shadow-lg)',
+                border: '1px solid var(--aeva-line)',
+                width: '100%',
+                maxWidth: '28rem'
+            }}>
+                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                    <h2 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>Welcome Back</h2>
+                    <p style={{ color: 'var(--aeva-ink-soft)' }}>Sign in to continue planning your event</p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div>
-                        <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="email">Email Address</label>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="email">Email Address</label>
                         <input
                             {...register('email')}
                             id="email"
                             type="email"
                             placeholder="you@example.com"
                             onChange={(e) => { setAuthError(null); }}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                borderRadius: 'var(--r-lg)',
+                                border: '1px solid var(--aeva-line)',
+                                background: 'var(--aeva-paper-warm)',
+                                color: 'var(--aeva-ink)',
+                                fontSize: '14px',
+                                transition: 'all 200ms',
+                                outline: 'none'
+                            }}
+                            onFocus={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--aeva-ink)';
+                                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.1)';
+                            }}
+                            onBlur={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                                e.currentTarget.style.boxShadow = '';
+                            }}
                         />
-                        {errors.email && <p className="text-accent text-sm mt-1 ml-1">{errors.email.message}</p>}
+                        {errors.email && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.email.message}</p>}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-text-dark mb-1 ml-1" htmlFor="password">Password</label>
+                        <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="password">Password</label>
                         <input
                             {...register('password')}
                             id="password"
                             type="password"
                             placeholder="••••••••"
                             onChange={(e) => { setAuthError(null); }}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all bg-gray-50 focus:bg-white"
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                borderRadius: 'var(--r-lg)',
+                                border: '1px solid var(--aeva-line)',
+                                background: 'var(--aeva-paper-warm)',
+                                color: 'var(--aeva-ink)',
+                                fontSize: '14px',
+                                transition: 'all 200ms',
+                                outline: 'none'
+                            }}
+                            onFocus={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--aeva-ink)';
+                                e.currentTarget.style.boxShadow = '0 0 0 2px rgba(0,0,0,0.1)';
+                            }}
+                            onBlur={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                                e.currentTarget.style.boxShadow = '';
+                            }}
                         />
-                        {errors.password && <p className="text-accent text-sm mt-1 ml-1">{errors.password.message}</p>}
+                        {errors.password && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.password.message}</p>}
                     </div>
 
                     {authError && (
-                        <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">
+                        <div style={{
+                            background: 'var(--aeva-paper-warm)',
+                            border: '1px solid var(--aeva-line)',
+                            borderRadius: 'var(--r-lg)',
+                            padding: '12px',
+                            color: 'var(--aeva-ink)',
+                            fontSize: '14px'
+                        }}>
                             {authError}
                         </div>
                     )}
 
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full bg-primary text-white py-3.5 rounded-xl font-bold hover:bg-secondary transition-all shadow-md hover:shadow-lg disabled:opacity-70 flex justify-center items-center gap-2"
-                    >
-                        {isSubmitting ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : 'Sign In'}
-                    </button>
+                    <Button variant="primary" size="lg" type="submit" disabled={isSubmitting} style={{ width: '100%' }}>
+                        {isSubmitting ? 'Signing in...' : 'Sign In'}
+                    </Button>
                 </form>
 
-                <div className="mt-8 text-center text-text-muted">
-                    Don't have an account? <Link to="/register" className="text-primary font-bold hover:text-secondary transition-colors">Create one</Link>
+                <div style={{ marginTop: '32px', textAlign: 'center', color: 'var(--aeva-ink-soft)', fontSize: '14px' }}>
+                    Don't have an account? <Link to="/register" style={{ color: 'var(--aeva-ink)', fontWeight: 700, textDecoration: 'none', transition: 'color 200ms' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink)'}>Create one</Link>
                 </div>
             </div>
         </motion.div>
