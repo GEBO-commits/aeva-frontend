@@ -50,6 +50,14 @@ import SelectDecorations from './pages/plan/SelectDecorations';
 import SelectVendors from './pages/plan/SelectVendors';
 import PlanSummary from './pages/plan/PlanSummary';
 
+// Manual Plan Builder pages (public — standalone flow)
+import ManualPlanBuilder from './pages/plan/manual/ManualPlanBuilder';
+import ManualVenuePick from './pages/plan/manual/ManualVenuePick';
+import ManualCatering from './pages/plan/manual/ManualCatering';
+import ManualDecorations from './pages/plan/manual/ManualDecorations';
+import ManualVendors from './pages/plan/manual/ManualVendors';
+import ManualSummary from './pages/plan/manual/ManualSummary';
+
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageVenues from './pages/admin/ManageVenues';
@@ -128,7 +136,7 @@ export default function App() {
             <Route path="/booking/confirm" element={<BookingConfirmation />} />
             <Route path="/booking/success" element={<BookingSuccess />} />
 
-            {/* Manual Plan Builder — nested route flow */}
+            {/* Plan Builder (original) — nested route flow */}
             <Route path="/plan/build" element={<PlanBuilder />}>
               <Route index element={<VenuePick />} />
               <Route path="venue" element={<VenuePick />} />
@@ -136,6 +144,16 @@ export default function App() {
               <Route path="decorations" element={<SelectDecorations />} />
               <Route path="vendors" element={<SelectVendors />} />
               <Route path="summary" element={<PlanSummary />} />
+            </Route>
+
+            {/* Manual Plan Builder — standalone nested route flow */}
+            <Route path="/plan/manual" element={<ManualPlanBuilder />}>
+              <Route index element={<ManualVenuePick />} />
+              <Route path="venue" element={<ManualVenuePick />} />
+              <Route path="catering" element={<ManualCatering />} />
+              <Route path="decorations" element={<ManualDecorations />} />
+              <Route path="vendors" element={<ManualVendors />} />
+              <Route path="summary" element={<ManualSummary />} />
             </Route>
 
             {/* Legal pages — public, no auth */}

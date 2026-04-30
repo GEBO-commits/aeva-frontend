@@ -193,9 +193,143 @@
 
 ---
 
+## Manual Plan Builder Feature (Completed)
+
+A completely new standalone plan builder flow at `/plan/manual` with 5 nested steps. This feature fixes the previous faulty plan builder by using explicit step routing (not history-based navigation), ensuring all selections persist to Supabase, and applying the AEVA design system throughout.
+
+### **Overview**
+
+**What Changed:**
+- Created 6 new components: `ManualPlanBuilder.jsx` (main wrapper), `ManualVenuePick.jsx`, `ManualCatering.jsx`, `ManualDecorations.jsx`, `ManualVendors.jsx`, `ManualSummary.jsx`
+- Added nested route structure in `src/App.jsx` for `/plan/manual` and its 5 steps
+- All steps use explicit route navigation (no history.back())
+- Every selection immediately saves to Supabase via `saveEventSelection()`
+- Loading states with pulse skeleton animations
+- Grid card layouts with visual feedback (border highlight, check icon for selected items)
+
+**What Was Preserved:**
+- All backend service calls: `createEventFromPlanBuilder()`, `getVenues()`, `getVendors()`, `saveEventSelection()`, `updateEvent()`
+- Zustand store for local selection state: `usePlanStore` (selectedVenue, selectedCatering, selectedDecorations, selectedPhotographer, selectedDj, selectedVideographer, getTotalCost)
+- PlanBuilderContext for eventId, eventDate, setEventDate
+- Event creation with source_flow: 'plan_builder' on mount
+- All RLS and authorization logic in Supabase remains unchanged
+
+**Detailed Files:**
+
+#### **1. ManualPlanBuilder.jsx** (`src/pages/plan/manual/ManualPlanBuilder.jsx`)
+- Main wrapper with PlanBuilderContext provider
+- STEPS array defining step order: Venue → Catering → Decorations → Vendors → Summary
+- Explicit step routing via URL (no history.back())
+- Header with title and Cancel button
+- Date input below header (min = tomorrow, required before proceeding)
+- Progress bar showing current step with back/next navigation
+- Outlet for nested step rendering
+- Calls `createEventFromPlanBuilder()` on mount, `updateEvent()` when date changes, `clearPlan()` on cancel
+- Loading spinner during initialization
+
+#### **2. ManualVenuePick.jsx** (`src/pages/plan/manual/ManualVenuePick.jsx`)
+- Step 1: Venue selection
+- Fetches venues via `getVenues()`
+- Grid layout: image (160px), name, rating, location (with MapPin icon), price range, capacity, venue type tag
+- Selected venue highlighted with border and check icon
+- On selection: calls `saveEventSelection(eventId, 'venue', venue.id)`
+- Loading skeleton (pulse animation on 6 placeholder cards)
+- Empty state: "No venues available"
+
+#### **3. ManualCatering.jsx** (`src/pages/plan/manual/ManualCatering.jsx`)
+- Step 2: Catering selection
+- Reusable wrapper calling ManualVendorPicker
+- Props: category='catering', label='Catering', icon='🍽️', storeKey='selectedCatering'
+
+#### **4. ManualDecorations.jsx** (`src/pages/plan/manual/ManualDecorations.jsx`)
+- Step 3: Decorations selection
+- Reusable wrapper calling ManualVendorPicker
+- Props: category='decorations', label='Decorations', icon='🌸', storeKey='selectedDecorations'
+
+#### **5. ManualVendors.jsx** (`src/pages/plan/manual/ManualVendors.jsx`)
+- Step 4: Multiple vendor categories (Photography, DJ, Videography)
+- Each category has its own VendorCategorySection sub-component
+- Each section: fetches vendors, displays grid cards, handles selection with `saveEventSelection()`
+- Vendor categories map: photography → selectedPhotographer, dj → selectedDj, videography → selectedVideographer
+
+#### **6. ManualVendorPicker.jsx** (`src/pages/plan/manual/ManualVendorPicker.jsx`)
+- Reusable component for single vendor category selection
+- Props: category, label, icon, storeKey, setFn, eventSelectionType
+- Fetches via `getVendors(category)`
+- Grid cards: image (140px), name, description, price, feature tags
+- Selected vendor: border highlight, check icon
+- On selection: calls `saveEventSelection(eventId, eventSelectionType, vendor.id)`
+- Loading skeleton (pulse animation)
+- Empty state: centered message
+
+#### **7. ManualSummary.jsx** (`src/pages/plan/manual/ManualSummary.jsx`)
+- Step 5: Review all selections
+- Grid of 6 summary cards (Venue, Catering, Decorations, Photography, DJ, Videography)
+- Each card shows: icon, label, name, description, price (or "Not selected" if empty)
+- Dark center box: "Estimated Total" with getTotalCost()
+- CTA buttons: "Go Back" (navigate to vendors step) and "Lock In This Plan" (navigate to /booking/confirm with eventId)
+
+### **How to Test Manual Plan Builder:**
+
+1. **Start the flow:**
+   - Navigate to `/plan/manual`
+   - Should show step 1 (Venue Pick) with date input and progress bar
+
+2. **Date validation:**
+   - Try selecting today or past date → should not allow
+   - Select tomorrow or later → should persist to event
+
+3. **Venue selection:**
+   - Should see grid of 6+ venue cards (or loading skeleton)
+   - Click any venue → check icon appears, border highlights
+   - Card shows name, location, rating, price range, capacity, type
+   - Navigation continues to next step
+
+4. **Catering step:**
+   - Should show grid of catering vendors
+   - Click to select → visual feedback (border, check)
+   - Back button should navigate to venue step
+   - Next button → decorations step
+
+5. **Decorations step:**
+   - Same flow as catering
+   - Back → catering, Next → vendors
+
+6. **Vendors step (Photography, DJ, Videography):**
+   - Should show 3 categories
+   - Each category has grid of vendor cards
+   - Can select one per category independently
+   - Visual feedback for selected vendors (border, check)
+
+7. **Summary step:**
+   - All 6 items should display (with selected items highlighted, unselected showing "Not selected")
+   - Total cost should display (sum of selected items)
+   - "Go Back" button → vendors step
+   - "Lock In This Plan" → `/booking/confirm` with eventId in state
+
+8. **Verify persistence:**
+   - In browser DevTools → Supabase → event_selections table
+   - Should see entries for each selected vendor (event_id, selection_type, entity_id)
+   - Refresh page mid-flow → selections should persist
+
+### **Routes Updated in App.jsx:**
+```jsx
+<Route path="/plan/manual" element={<ManualPlanBuilder />}>
+  <Route index element={<ManualVenuePick />} />
+  <Route path="venue" element={<ManualVenuePick />} />
+  <Route path="catering" element={<ManualCatering />} />
+  <Route path="decorations" element={<ManualDecorations />} />
+  <Route path="vendors" element={<ManualVendors />} />
+  <Route path="summary" element={<ManualSummary />} />
+</Route>
+```
+
+---
+
 ## Routes Updated
 
 - **`src/App.jsx`** — Added Chat import and route: `<Route path="/chat" element={<Chat />} />`
+- **`src/App.jsx`** — Added Manual Plan Builder imports and nested routes: `/plan/manual` with 5 child routes (venue, catering, decorations, vendors, summary)
 
 ---
 
@@ -306,6 +440,16 @@ After Phase 1 + 2 + 3:
 ### Phase 3 Chat
 - `src/pages/Chat.jsx` (created)
 - `src/App.jsx` (added Chat route)
+
+### Manual Plan Builder
+- `src/pages/plan/manual/ManualPlanBuilder.jsx` (created)
+- `src/pages/plan/manual/ManualVenuePick.jsx` (created)
+- `src/pages/plan/manual/ManualCatering.jsx` (created)
+- `src/pages/plan/manual/ManualDecorations.jsx` (created)
+- `src/pages/plan/manual/ManualVendors.jsx` (created)
+- `src/pages/plan/manual/ManualVendorPicker.jsx` (created)
+- `src/pages/plan/manual/ManualSummary.jsx` (created)
+- `src/App.jsx` (added Manual Plan Builder imports and routes)
 
 ---
 
