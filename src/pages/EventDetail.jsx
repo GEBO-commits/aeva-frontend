@@ -40,23 +40,38 @@ export default function EventDetail() {
 
     if (isLoading) {
         return (
-            <div className="max-w-4xl mx-auto space-y-8">
-                <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                    <Skeleton className="w-24 h-6 rounded-full mb-3" />
-                    <Skeleton className="w-2/3 h-10 rounded-xl mb-4" />
-                    <Skeleton className="w-1/3 h-6 rounded-md mb-6" />
+            <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <div style={{
+                    background: 'var(--aeva-canvas)',
+                    padding: '32px',
+                    borderRadius: 'var(--r-2xl)',
+                    boxShadow: 'var(--shadow-sm)',
+                    border: '1px solid var(--aeva-line)'
+                }}>
+                    <Skeleton style={{ width: '96px', height: '24px', borderRadius: 'var(--r-full)', marginBottom: '12px' }} />
+                    <Skeleton style={{ width: '66%', height: '40px', borderRadius: 'var(--r-xl)', marginBottom: '16px' }} />
+                    <Skeleton style={{ width: '33%', height: '24px', borderRadius: 'var(--r-md)', marginBottom: '24px' }} />
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                        <Skeleton className="w-full h-20 rounded-2xl" />
-                        <Skeleton className="w-full h-20 rounded-2xl" />
-                        <Skeleton className="w-full h-20 rounded-2xl" />
-                        <Skeleton className="w-full h-20 rounded-2xl" />
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2, 1fr)',
+                        gap: '24px',
+                        marginBottom: '32px'
+                    }} className="md:grid-cols-4">
+                        <Skeleton style={{ width: '100%', height: '80px', borderRadius: 'var(--r-2xl)' }} />
+                        <Skeleton style={{ width: '100%', height: '80px', borderRadius: 'var(--r-2xl)' }} />
+                        <Skeleton style={{ width: '100%', height: '80px', borderRadius: 'var(--r-2xl)' }} />
+                        <Skeleton style={{ width: '100%', height: '80px', borderRadius: 'var(--r-2xl)' }} />
                     </div>
 
-                    <Skeleton className="w-48 h-8 rounded-md mb-4" />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Skeleton className="w-full h-24 rounded-2xl" />
-                        <Skeleton className="w-full h-24 rounded-2xl" />
+                    <Skeleton style={{ width: '192px', height: '32px', borderRadius: 'var(--r-md)', marginBottom: '16px' }} />
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr',
+                        gap: '16px'
+                    }} className="md:grid-cols-2">
+                        <Skeleton style={{ width: '100%', height: '96px', borderRadius: 'var(--r-2xl)' }} />
+                        <Skeleton style={{ width: '100%', height: '96px', borderRadius: 'var(--r-2xl)' }} />
                     </div>
                 </div>
             </div>
@@ -64,15 +79,39 @@ export default function EventDetail() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8">
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                <div className="flex justify-between items-start mb-6 border-b pb-6">
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{
+                background: 'var(--aeva-canvas)',
+                padding: '32px',
+                borderRadius: 'var(--r-2xl)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--aeva-line)'
+            }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '24px',
+                    borderBottom: '1px solid var(--aeva-line)',
+                    paddingBottom: '24px'
+                }}>
                     <div>
-                        <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                        <span style={{
+                            display: 'inline-block',
+                            padding: '4px 12px',
+                            background: 'var(--aeva-sage)',
+                            color: 'var(--aeva-paper)',
+                            borderRadius: 'var(--r-full)',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            marginBottom: '12px'
+                        }}>
                             {evt.status}
                         </span>
-                        <h1 className="text-4xl font-display font-bold text-text-dark">{evt.title}</h1>
-                        <p className="text-text-muted mt-2 capitalize">{evt.type} Event</p>
+                        <h1 style={{ fontSize: '36px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{evt.title}</h1>
+                        <p style={{ color: 'var(--aeva-ink-soft)', marginTop: '8px', textTransform: 'capitalize' }}>{evt.type} Event</p>
                     </div>
                     <button
                         onClick={() => {
@@ -83,74 +122,210 @@ export default function EventDetail() {
                                 setIsEditing(true);
                             }
                         }}
-                        className={`px-6 py-2 rounded-full font-medium transition-colors ${isEditing ? 'bg-primary text-white hover:bg-secondary shadow-md' : 'bg-gray-100 hover:bg-gray-200 text-text-dark'}`}
+                        style={{
+                            padding: '8px 24px',
+                            borderRadius: 'var(--r-full)',
+                            fontWeight: 500,
+                            transition: 'all 300ms',
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: isEditing ? 'var(--aeva-ink)' : 'var(--aeva-paper)',
+                            color: isEditing ? 'white' : 'var(--aeva-ink)',
+                            boxShadow: isEditing ? 'var(--shadow-md)' : 'none'
+                        }}
                     >
                         {isEditing ? 'Save Changes' : 'Edit Details'}
                     </button>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                    <div className="bg-gray-50 p-4 rounded-2xl flex flex-col justify-center">
-                        <span className="text-sm font-medium text-text-muted block mb-1">Date</span>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: '24px',
+                    marginBottom: '32px'
+                }} className="md:grid-cols-4">
+                    <div style={{
+                        background: 'var(--aeva-paper)',
+                        padding: '16px',
+                        borderRadius: 'var(--r-2xl)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                    }}>
+                        <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink-soft)', display: 'block', marginBottom: '4px' }}>Date</span>
                         {isEditing ? (
-                            <input type="date" value={editForm.date} onChange={e => setEditForm({ ...editForm, date: e.target.value })} className="font-bold text-text-dark text-sm bg-white border border-gray-200 rounded-lg px-2 py-1 w-full" />
+                            <input type="date" value={editForm.date} onChange={e => setEditForm({ ...editForm, date: e.target.value })} style={{
+                                fontWeight: 700,
+                                color: 'var(--aeva-ink)',
+                                fontSize: '14px',
+                                background: 'var(--aeva-canvas)',
+                                border: '1px solid var(--aeva-line)',
+                                borderRadius: 'var(--r-lg)',
+                                padding: '8px',
+                                width: '100%',
+                                boxSizing: 'border-box'
+                            }} />
                         ) : (
-                            <span className="font-bold text-text-dark text-sm lg:text-lg flex items-center gap-2"><Calendar className="w-4 h-4 text-primary flex-shrink-0" /> {new Date(evt.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            <span style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}><Calendar size={16} style={{ color: 'var(--aeva-ink)' }} /> {new Date(evt.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                         )}
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-2xl flex flex-col justify-center">
-                        <span className="text-sm font-medium text-text-muted block mb-1">Venue</span>
+                    <div style={{
+                        background: 'var(--aeva-paper)',
+                        padding: '16px',
+                        borderRadius: 'var(--r-2xl)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                    }}>
+                        <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink-soft)', display: 'block', marginBottom: '4px' }}>Venue</span>
                         {isEditing ? (
-                            <input type="text" value={editForm.venueName} onChange={e => setEditForm({ ...editForm, venueName: e.target.value })} className="font-bold text-text-dark text-sm bg-white border border-gray-200 rounded-lg px-2 py-1 w-full" />
+                            <input type="text" value={editForm.venueName} onChange={e => setEditForm({ ...editForm, venueName: e.target.value })} style={{
+                                fontWeight: 700,
+                                color: 'var(--aeva-ink)',
+                                fontSize: '14px',
+                                background: 'var(--aeva-canvas)',
+                                border: '1px solid var(--aeva-line)',
+                                borderRadius: 'var(--r-lg)',
+                                padding: '8px',
+                                width: '100%',
+                                boxSizing: 'border-box'
+                            }} />
                         ) : (
-                            <span className="font-bold text-text-dark text-sm lg:text-lg flex items-center gap-2"><MapPin className="w-4 h-4 text-secondary flex-shrink-0" /> <span className="truncate">{evt.venueName}</span></span>
+                            <span style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}><MapPin size={16} style={{ color: 'var(--aeva-ink)', flexShrink: 0 }} /> <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{evt.venueName}</span></span>
                         )}
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-2xl flex flex-col justify-center">
-                        <span className="text-sm font-medium text-text-muted block mb-1">Guests</span>
+                    <div style={{
+                        background: 'var(--aeva-paper)',
+                        padding: '16px',
+                        borderRadius: 'var(--r-2xl)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                    }}>
+                        <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink-soft)', display: 'block', marginBottom: '4px' }}>Guests</span>
                         {isEditing ? (
-                            <input type="number" value={editForm.guestCount} onChange={e => setEditForm({ ...editForm, guestCount: parseInt(e.target.value) || 0 })} className="font-bold text-text-dark text-sm bg-white border border-gray-200 rounded-lg px-2 py-1 w-full" />
+                            <input type="number" value={editForm.guestCount} onChange={e => setEditForm({ ...editForm, guestCount: parseInt(e.target.value) || 0 })} style={{
+                                fontWeight: 700,
+                                color: 'var(--aeva-ink)',
+                                fontSize: '14px',
+                                background: 'var(--aeva-canvas)',
+                                border: '1px solid var(--aeva-line)',
+                                borderRadius: 'var(--r-lg)',
+                                padding: '8px',
+                                width: '100%',
+                                boxSizing: 'border-box'
+                            }} />
                         ) : (
-                            <span className="font-bold text-text-dark text-sm lg:text-lg flex items-center gap-2"><Users className="w-4 h-4 text-accent flex-shrink-0" /> {evt.guestCount}</span>
+                            <span style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}><Users size={16} style={{ color: 'var(--aeva-ink)' }} /> {evt.guestCount}</span>
                         )}
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-2xl flex flex-col justify-center">
-                        <span className="text-sm font-medium text-text-muted block mb-1">Budget</span>
+                    <div style={{
+                        background: 'var(--aeva-paper)',
+                        padding: '16px',
+                        borderRadius: 'var(--r-2xl)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                    }}>
+                        <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink-soft)', display: 'block', marginBottom: '4px' }}>Budget</span>
                         {isEditing ? (
-                            <input type="number" value={editForm.budget} onChange={e => setEditForm({ ...editForm, budget: Number(e.target.value) || 0 })} className="font-bold text-text-dark text-sm bg-white border border-gray-200 rounded-lg px-2 py-1 w-full" />
+                            <input type="number" value={editForm.budget} onChange={e => setEditForm({ ...editForm, budget: Number(e.target.value) || 0 })} style={{
+                                fontWeight: 700,
+                                color: 'var(--aeva-ink)',
+                                fontSize: '14px',
+                                background: 'var(--aeva-canvas)',
+                                border: '1px solid var(--aeva-line)',
+                                borderRadius: 'var(--r-lg)',
+                                padding: '8px',
+                                width: '100%',
+                                boxSizing: 'border-box'
+                            }} />
                         ) : (
-                            <span className="font-bold text-text-dark text-sm lg:text-lg truncate w-full block">{Number(evt.budget).toLocaleString()} EGP</span>
+                            <span style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '14px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '100%', display: 'block' }}>{Number(evt.budget).toLocaleString()} EGP</span>
                         )}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr',
+                    gap: '32px'
+                }} className="lg:grid-cols-3">
                     {/* Left: Planning Checklist */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <section className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                            <h2 className="text-2xl font-display font-bold text-text-dark mb-6">Planning Checklist</h2>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '24px'
+                    }} className="lg:col-span-2">
+                        <section style={{
+                            background: 'var(--aeva-canvas)',
+                            padding: '32px',
+                            borderRadius: 'var(--r-2xl)',
+                            boxShadow: 'var(--shadow-sm)',
+                            border: '1px solid var(--aeva-line)'
+                        }}>
+                            <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '24px' }}>Planning Checklist</h2>
 
-                            <div className="space-y-6">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                                 {checklistData.map((section, sIndex) => (
-                                    <div key={sIndex} className="space-y-3">
-                                        <h3 className="font-bold text-lg text-text-dark flex items-center gap-2">
+                                    <div key={sIndex} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        <h3 style={{ fontWeight: 700, fontSize: '18px', color: 'var(--aeva-ink)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                             {section.icon} {section.title}
                                         </h3>
-                                        <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
+                                        <div style={{
+                                            background: 'var(--aeva-paper)',
+                                            borderRadius: 'var(--r-2xl)',
+                                            padding: '16px',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '12px'
+                                        }}>
                                             {section.tasks.map((task, tIndex) => {
                                                 const taskId = `${sIndex}-${tIndex}`;
+                                                const isCompleted = completedTasks.includes(taskId);
                                                 return (
-                                                    <label key={tIndex} className="flex items-start gap-3 cursor-pointer group">
-                                                        <div className="relative flex items-center justify-center mt-0.5">
+                                                    <label key={tIndex} style={{
+                                                        display: 'flex',
+                                                        alignItems: 'flex-start',
+                                                        gap: '12px',
+                                                        cursor: 'pointer'
+                                                    }}>
+                                                        <div style={{
+                                                            position: 'relative',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            width: '20px',
+                                                            height: '20px',
+                                                            marginTop: '2px',
+                                                            flexShrink: 0
+                                                        }}>
                                                             <input
                                                                 type="checkbox"
-                                                                checked={completedTasks.includes(taskId)}
+                                                                checked={isCompleted}
                                                                 onChange={() => toggleTask(taskId)}
-                                                                className="peer appearance-none w-5 h-5 rounded border-2 border-gray-300 checked:bg-primary checked:border-primary transition-colors cursor-pointer"
+                                                                style={{
+                                                                    appearance: 'none',
+                                                                    width: '20px',
+                                                                    height: '20px',
+                                                                    borderRadius: 'var(--r-md)',
+                                                                    border: '2px solid var(--aeva-line)',
+                                                                    background: isCompleted ? 'var(--aeva-ink)' : 'transparent',
+                                                                    cursor: 'pointer',
+                                                                    transition: 'all 300ms'
+                                                                }}
                                                             />
-                                                            <CheckCircle className="w-3.5 h-3.5 text-white absolute inset-0 m-auto opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                                                            {isCompleted && <CheckCircle size={14} style={{
+                                                                color: 'white',
+                                                                position: 'absolute',
+                                                                pointerEvents: 'none'
+                                                            }} />}
                                                         </div>
-                                                        <span className={`transition-colors ${completedTasks.includes(taskId) ? 'text-gray-400 line-through' : 'text-text-dark group-hover:text-primary'}`}>
+                                                        <span style={{
+                                                            transition: 'all 300ms',
+                                                            color: isCompleted ? 'var(--aeva-ink-soft)' : 'var(--aeva-ink)',
+                                                            textDecoration: isCompleted ? 'line-through' : 'none'
+                                                        }}>
                                                             {task}
                                                         </span>
                                                     </label>
@@ -164,23 +339,75 @@ export default function EventDetail() {
                     </div>
 
                     {/* Right: Modules */}
-                    <div className="space-y-6">
-                        <h3 className="text-xl font-bold font-display text-text-dark">Event Modules</h3>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '24px'
+                    }}>
+                        <h3 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--aeva-ink)' }}>Event Modules</h3>
 
-                        <Link to="/invitations" className="group bg-white border border-gray-100 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-primary/30 flex items-center justify-between transition-all block">
-                            <div className="flex flex-col">
-                                <span className="font-bold text-text-dark group-hover:text-primary transition-colors">Manage Invitations</span>
-                                <span className="text-sm text-text-muted mt-1">Draft & Send RSVPs, Track stats</span>
+                        <Link to="/invitations" style={{
+                            background: 'var(--aeva-canvas)',
+                            border: '1px solid var(--aeva-line)',
+                            padding: '24px',
+                            borderRadius: 'var(--r-2xl)',
+                            boxShadow: 'var(--shadow-sm)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            transition: 'all 300ms',
+                            textDecoration: 'none',
+                            cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                            e.currentTarget.style.borderColor = 'var(--aeva-ink)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                            e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                        }}>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontWeight: 700, color: 'var(--aeva-ink)', transition: 'color 300ms' }} onMouseEnter={(e) => e.target.style.color = 'var(--aeva-ink)'} onMouseLeave={(e) => e.target.style.color = 'var(--aeva-ink)'}>Manage Invitations</span>
+                                <span style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)', marginTop: '4px' }}>Draft & Send RSVPs, Track stats</span>
                             </div>
-                            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all transform group-hover:scale-110">
+                            <div style={{
+                                width: '48px',
+                                height: '48px',
+                                background: 'var(--aeva-paper)',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--aeva-ink)',
+                                transition: 'all 300ms',
+                                transform: 'scale(1)'
+                            }} onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'var(--aeva-ink)';
+                                e.currentTarget.style.color = 'white';
+                                e.currentTarget.style.transform = 'scale(1.1)';
+                            }} onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'var(--aeva-paper)';
+                                e.currentTarget.style.color = 'var(--aeva-ink)';
+                                e.currentTarget.style.transform = 'scale(1)';
+                            }}>
                                 →
                             </div>
                         </Link>
 
-                        <div className="group bg-gray-50 border border-gray-100 p-6 rounded-2xl flex items-center justify-between opacity-60">
-                            <div className="flex flex-col text-left">
-                                <span className="font-bold text-text-dark">Vendor Management</span>
-                                <span className="text-sm text-text-muted mt-1 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Coming soon</span>
+                        <div style={{
+                            background: 'var(--aeva-paper)',
+                            border: '1px solid var(--aeva-line)',
+                            padding: '24px',
+                            borderRadius: 'var(--r-2xl)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            opacity: 0.6
+                        }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+                                <span style={{ fontWeight: 700, color: 'var(--aeva-ink)' }}>Vendor Management</span>
+                                <span style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={14} /> Coming soon</span>
                             </div>
                         </div>
                     </div>

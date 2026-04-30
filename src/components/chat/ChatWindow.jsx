@@ -35,10 +35,35 @@ export default function ChatWindow() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     onClick={() => setIsOpen(true)}
-                    className="fixed bottom-6 right-6 w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform z-50 overflow-hidden group"
+                    style={{
+                        position: 'fixed',
+                        bottom: '24px',
+                        right: '24px',
+                        width: '64px',
+                        height: '64px',
+                        background: '#6B3FF3',
+                        color: 'white',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: 'var(--shadow-2xl)',
+                        border: 'none',
+                        cursor: 'pointer',
+                        zIndex: 50,
+                        overflow: 'hidden',
+                        transition: 'transform 300ms'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
-                    <div className="absolute inset-0 bg-secondary/0 group-hover:bg-secondary/50 transition-colors"></div>
-                    <Sparkles className="w-7 h-7 relative z-10" />
+                    <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'rgba(168, 85, 247, 0)',
+                        transition: 'background 300ms'
+                    }} onMouseEnter={(e) => e.target.style.background = 'rgba(168, 85, 247, 0.5)'} onMouseLeave={(e) => e.target.style.background = 'rgba(168, 85, 247, 0)'}></div>
+                    <Sparkles size={28} style={{ position: 'relative', zIndex: 10 }} />
                 </motion.button>
             )}
 
@@ -49,64 +74,200 @@ export default function ChatWindow() {
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="fixed bottom-6 right-6 w-[380px] h-[600px] max-h-[85vh] bg-white rounded-3xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-100"
+                        style={{
+                            position: 'fixed',
+                            bottom: '24px',
+                            right: '24px',
+                            width: '380px',
+                            height: '600px',
+                            maxHeight: '85vh',
+                            background: 'var(--aeva-canvas)',
+                            borderRadius: 'var(--r-3xl)',
+                            boxShadow: 'var(--shadow-2xl)',
+                            zIndex: 50,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden',
+                            border: '1px solid var(--aeva-line)'
+                        }}
                     >
                         {/* Header */}
-                        <div className="bg-gradient-to-r from-primary to-secondary p-5 flex justify-between items-center text-white shrink-0">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                                    <Sparkles className="w-5 h-5 text-white" />
+                        <div style={{
+                            background: 'linear-gradient(to right, #6B3FF3, #a855f7)',
+                            padding: '20px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            color: 'white',
+                            flexShrink: 0
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    background: 'rgba(255,255,255,0.2)',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backdropFilter: 'blur(8px)'
+                                }}>
+                                    <Sparkles size={20} style={{ color: 'white' }} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold">AEVA Assistant</h3>
-                                    <p className="text-white/80 text-xs text-left">Online & ready to plan</p>
+                                    <h3 style={{ fontWeight: 700 }}>AEVA Assistant</h3>
+                                    <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', textAlign: 'left' }}>Online & ready to plan</p>
                                 </div>
                             </div>
-                            <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white transition-colors bg-white/10 p-2 rounded-full">
-                                <X className="w-5 h-5" />
+                            <button onClick={() => setIsOpen(false)} style={{
+                                color: 'rgba(255,255,255,0.8)',
+                                transition: 'color 300ms',
+                                background: 'rgba(255,255,255,0.1)',
+                                padding: '8px',
+                                borderRadius: '50%',
+                                border: 'none',
+                                cursor: 'pointer'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.8)'}>
+                                <X size={20} />
                             </button>
                         </div>
 
                         {/* Chat Area */}
-                        <div className="flex-1 bg-gray-50 p-5 overflow-y-auto flex flex-col gap-4">
+                        <div style={{
+                            flex: 1,
+                            background: 'var(--aeva-paper)',
+                            padding: '20px',
+                            overflowY: 'auto',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '16px'
+                        }}>
                             {messages.map((msg, i) => (
-                                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[80%] p-3.5 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                                            ? 'bg-primary text-white rounded-br-none'
-                                            : 'bg-white text-text-dark border border-gray-100 shadow-sm rounded-bl-none'
-                                        }`}>
+                                <div key={i} style={{
+                                    display: 'flex',
+                                    justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start'
+                                }}>
+                                    <div style={{
+                                        maxWidth: '80%',
+                                        padding: '14px',
+                                        borderRadius: 'var(--r-2xl)',
+                                        fontSize: '14px',
+                                        lineHeight: 1.5,
+                                        background: msg.role === 'user' ? '#6B3FF3' : 'var(--aeva-canvas)',
+                                        color: msg.role === 'user' ? 'white' : 'var(--aeva-ink)',
+                                        borderBottomRightRadius: msg.role === 'user' ? 0 : 'var(--r-2xl)',
+                                        borderBottomLeftRadius: msg.role === 'user' ? 'var(--r-2xl)' : 0,
+                                        boxShadow: msg.role === 'user' ? 'none' : 'var(--shadow-sm)',
+                                        border: msg.role === 'user' ? 'none' : '1px solid var(--aeva-line)'
+                                    }}>
                                         {msg.text}
                                     </div>
                                 </div>
                             ))}
 
                             {isTyping && (
-                                <div className="flex justify-start">
-                                    <div className="bg-white border border-gray-100 shadow-sm p-4 rounded-2xl rounded-bl-none flex gap-1 items-center max-w-[80%]">
-                                        <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce"></span>
-                                        <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                                        <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
+                                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                                    <div style={{
+                                        background: 'var(--aeva-canvas)',
+                                        border: '1px solid var(--aeva-line)',
+                                        boxShadow: 'var(--shadow-sm)',
+                                        padding: '16px',
+                                        borderRadius: 'var(--r-2xl)',
+                                        borderBottomLeftRadius: 0,
+                                        display: 'flex',
+                                        gap: '4px',
+                                        alignItems: 'center',
+                                        maxWidth: '80%'
+                                    }}>
+                                        <span style={{
+                                            width: '8px',
+                                            height: '8px',
+                                            background: 'rgba(107, 63, 243, 0.4)',
+                                            borderRadius: '50%',
+                                            animation: 'bounce 1.4s infinite'
+                                        }}></span>
+                                        <span style={{
+                                            width: '8px',
+                                            height: '8px',
+                                            background: 'rgba(107, 63, 243, 0.4)',
+                                            borderRadius: '50%',
+                                            animation: 'bounce 1.4s infinite',
+                                            animationDelay: '0.2s'
+                                        }}></span>
+                                        <span style={{
+                                            width: '8px',
+                                            height: '8px',
+                                            background: 'rgba(107, 63, 243, 0.4)',
+                                            borderRadius: '50%',
+                                            animation: 'bounce 1.4s infinite',
+                                            animationDelay: '0.4s'
+                                        }}></span>
                                     </div>
                                 </div>
                             )}
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-4 bg-white border-t border-gray-100 shrink-0">
-                            <div className="flex gap-2">
+                        <div style={{
+                            padding: '16px',
+                            background: 'var(--aeva-canvas)',
+                            borderTop: '1px solid var(--aeva-line)',
+                            flexShrink: 0
+                        }}>
+                            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
                                 <input
                                     type="text"
                                     value={inputStr}
                                     onChange={(e) => setInputStr(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                                     placeholder="Tell me about your event..."
-                                    className="flex-1 bg-gray-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all text-sm"
+                                    style={{
+                                        flex: 1,
+                                        background: 'var(--aeva-paper)',
+                                        padding: '12px 16px',
+                                        borderRadius: 'var(--r-xl)',
+                                        outline: 'none',
+                                        border: '2px solid transparent',
+                                        fontSize: '14px',
+                                        color: 'var(--aeva-ink)',
+                                        boxSizing: 'border-box',
+                                        transition: 'all 300ms'
+                                    }}
+                                    onFocus={(e) => {
+                                        e.target.style.background = 'var(--aeva-canvas)';
+                                        e.target.style.borderColor = 'rgba(107, 63, 243, 0.2)';
+                                    }}
+                                    onBlur={(e) => {
+                                        e.target.style.background = 'var(--aeva-paper)';
+                                        e.target.style.borderColor = 'transparent';
+                                    }}
                                 />
-                                <button onClick={handleSend} className="bg-primary hover:bg-secondary text-white w-12 h-12 rounded-xl flex items-center justify-center transition-colors shrink-0">
-                                    <Send className="w-5 h-5" />
+                                <button onClick={handleSend} style={{
+                                    background: '#6B3FF3',
+                                    color: 'white',
+                                    width: '48px',
+                                    height: '48px',
+                                    borderRadius: 'var(--r-xl)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'background 300ms',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    flexShrink: 0
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#a855f7'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = '#6B3FF3'}>
+                                    <Send size={20} />
                                 </button>
                             </div>
-                            <p className="text-[10px] text-center mt-3 text-gray-400">AI can make mistakes. Verify important info.</p>
+                            <p style={{
+                                fontSize: '10px',
+                                textAlign: 'center',
+                                color: 'var(--aeva-ink-soft)'
+                            }}>AI can make mistakes. Verify important info.</p>
                         </div>
                     </motion.div>
                 )}

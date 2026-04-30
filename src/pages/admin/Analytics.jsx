@@ -19,17 +19,27 @@ const eventTypesData = [
 
 export default function Analytics() {
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             <div>
-                <h1 className="text-3xl font-display font-bold text-text-dark">Platform Analytics</h1>
-                <p className="text-text-muted mt-2">Insights on bookings and user trends.</p>
+                <h1 style={{ fontSize: '32px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>Platform Analytics</h1>
+                <p style={{ color: 'var(--aeva-ink-soft)' }}>Insights on bookings and user trends.</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr',
+                gap: '32px'
+            }} className="lg:grid-cols-2">
                 {/* Bar Chart */}
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                    <h2 className="text-xl font-bold font-display text-text-dark mb-6">Monthly Bookings</h2>
-                    <div className="h-72">
+                <div style={{
+                    background: 'var(--aeva-canvas)',
+                    padding: '32px',
+                    borderRadius: 'var(--r-3xl)',
+                    boxShadow: 'var(--shadow-sm)',
+                    border: '1px solid var(--aeva-line)'
+                }}>
+                    <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '24px' }}>Monthly Bookings</h2>
+                    <div style={{ height: '288px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={bookingsData}>
                                 <XAxis dataKey="month" axisLine={false} tickLine={false} />
@@ -42,9 +52,15 @@ export default function Analytics() {
                 </div>
 
                 {/* Pie Chart */}
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                    <h2 className="text-xl font-bold font-display text-text-dark mb-6">Event Types Distribution</h2>
-                    <div className="h-72">
+                <div style={{
+                    background: 'var(--aeva-canvas)',
+                    padding: '32px',
+                    borderRadius: 'var(--r-3xl)',
+                    boxShadow: 'var(--shadow-sm)',
+                    border: '1px solid var(--aeva-line)'
+                }}>
+                    <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '24px' }}>Event Types Distribution</h2>
+                    <div style={{ height: '288px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -64,11 +80,26 @@ export default function Analytics() {
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
-                    <div className="flex justify-center gap-6 mt-4">
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '24px',
+                        marginTop: '16px'
+                    }}>
                         {eventTypesData.map(item => (
-                            <div key={item.name} className="flex items-center gap-2 text-sm">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                                <span className="text-text-dark font-medium">{item.name}</span>
+                            <div key={item.name} style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                fontSize: '14px'
+                            }}>
+                                <div style={{
+                                    width: '12px',
+                                    height: '12px',
+                                    borderRadius: '50%',
+                                    backgroundColor: item.color
+                                }}></div>
+                                <span style={{ color: 'var(--aeva-ink)', fontWeight: 500 }}>{item.name}</span>
                             </div>
                         ))}
                     </div>

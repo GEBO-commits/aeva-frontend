@@ -35,18 +35,41 @@ export default function MyEvents() {
     }, []);
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-            <div className="flex justify-between items-center mb-8">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '32px'
+            }}>
                 <div>
-                    <h1 className="text-3xl font-display font-bold text-text-dark">My Events</h1>
-                    <p className="text-text-muted">Manage your upcoming and past events.</p>
+                    <h1 style={{ fontSize: '32px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '4px' }}>My Events</h1>
+                    <p style={{ color: 'var(--aeva-ink-soft)' }}>Manage your upcoming and past events.</p>
                 </div>
-                <Link to="/survey" className="bg-primary hover:bg-secondary text-white px-5 py-2.5 rounded-full font-bold shadow-md transition-colors flex items-center gap-2">
-                    <Plus className="w-4 h-4" /> New Event
+                <Link to="/survey" style={{
+                    background: 'var(--aeva-ink)',
+                    color: 'white',
+                    padding: '10px 20px',
+                    borderRadius: 'var(--r-full)',
+                    fontWeight: 700,
+                    boxShadow: 'var(--shadow-md)',
+                    transition: 'opacity 300ms',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
+                    <Plus size={16} /> New Event
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr',
+                gap: '24px'
+            }} className="md:grid-cols-2">
                 {isLoading ? (
                     <>
                         <CardSkeleton />
@@ -61,31 +84,100 @@ export default function MyEvents() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.1 }}
                             onClick={() => navigate(`/events/${evt.id}`)}
-                            className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                            style={{
+                                background: 'var(--aeva-canvas)',
+                                padding: '24px',
+                                borderRadius: 'var(--r-3xl)',
+                                border: '1px solid var(--aeva-line)',
+                                boxShadow: 'var(--shadow-sm)',
+                                transition: 'box-shadow 300ms',
+                                cursor: 'pointer'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-xl)'}
+                            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-sm)'}
                         >
-                            <div className="flex justify-between items-start mb-6">
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                                marginBottom: '24px'
+                            }}>
                                 <div>
-                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 ${evt.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                    <span style={{
+                                        display: 'inline-block',
+                                        padding: '4px 12px',
+                                        borderRadius: 'var(--r-full)',
+                                        fontSize: '12px',
+                                        fontWeight: 700,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        marginBottom: '8px',
+                                        background: evt.status === 'confirmed' ? 'var(--aeva-sage)' : 'var(--aeva-paper-warm)',
+                                        color: evt.status === 'confirmed' ? 'var(--aeva-paper)' : 'var(--aeva-ink)'
+                                    }}>
                                         {evt.status}
                                     </span>
-                                    <h3 className="text-2xl font-bold font-display text-text-dark">{evt.title}</h3>
+                                    <h3 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{evt.title}</h3>
                                 </div>
-                                <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
-                                    <ChevronRight className="w-5 h-5" />
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    background: 'var(--aeva-paper)',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'background-color 300ms, color 300ms'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'var(--aeva-ink)';
+                                    e.currentTarget.style.color = 'white';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'var(--aeva-paper)';
+                                    e.currentTarget.style.color = 'inherit';
+                                }}>
+                                    <ChevronRight size={20} />
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="flex items-center gap-2 text-text-muted text-sm">
-                                    <Calendar className="w-4 h-4 text-primary" />
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr',
+                                gap: '16px'
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    color: 'var(--aeva-ink-soft)',
+                                    fontSize: '14px'
+                                }}>
+                                    <Calendar size={16} style={{ color: 'var(--aeva-ink)' }} />
                                     {new Date(evt.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </div>
-                                <div className="flex items-center gap-2 text-text-muted text-sm">
-                                    <MapPin className="w-4 h-4 text-secondary" />
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    color: 'var(--aeva-ink-soft)',
+                                    fontSize: '14px'
+                                }}>
+                                    <MapPin size={16} style={{ color: 'var(--aeva-ink)' }} />
                                     {evt.venueName}
                                 </div>
-                                <div className="flex items-center gap-2 text-text-muted text-sm col-span-2 border-t border-gray-100 pt-3 mt-1">
-                                    <Users className="w-4 h-4 text-accent" />
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    color: 'var(--aeva-ink-soft)',
+                                    fontSize: '14px',
+                                    gridColumn: '1 / -1',
+                                    borderTop: '1px solid var(--aeva-line)',
+                                    paddingTop: '12px',
+                                    marginTop: '4px'
+                                }}>
+                                    <Users size={16} style={{ color: 'var(--aeva-ink)' }} />
                                     {evt.guestCount} Guests Invited
                                 </div>
                             </div>

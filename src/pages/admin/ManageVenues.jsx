@@ -5,42 +5,103 @@ import { Plus, Edit2, Trash2 } from 'lucide-react';
 
 export default function ManageVenues() {
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-display font-bold text-text-dark">Manage Venues</h1>
-                <button className="bg-primary hover:bg-secondary text-white px-5 py-2.5 rounded-full font-bold shadow-md transition-colors flex items-center gap-2">
-                    <Plus className="w-4 h-4" /> Add Venue
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+            }}>
+                <h1 style={{ fontSize: '32px', fontWeight: 700, color: 'var(--aeva-ink)' }}>Manage Venues</h1>
+                <button style={{
+                    background: 'var(--aeva-ink)',
+                    color: 'white',
+                    padding: '10px 20px',
+                    borderRadius: 'var(--r-full)',
+                    fontWeight: 700,
+                    boxShadow: 'var(--shadow-md)',
+                    transition: 'opacity 300ms',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
+                    <Plus size={16} /> Add Venue
                 </button>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+            <div style={{
+                background: 'var(--aeva-canvas)',
+                borderRadius: 'var(--r-3xl)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--aeva-line)',
+                overflow: 'hidden'
+            }}>
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
                         <thead>
-                            <tr className="bg-gray-50 text-text-muted text-sm border-b border-gray-200">
-                                <th className="p-4 font-semibold">Venue Name</th>
-                                <th className="p-4 font-semibold">Location</th>
-                                <th className="p-4 font-semibold">Type</th>
-                                <th className="p-4 font-semibold">Price (EGP)</th>
-                                <th className="p-4 font-semibold">Capacity</th>
-                                <th className="p-4 font-semibold text-right">Actions</th>
+                            <tr style={{
+                                background: 'var(--aeva-paper)',
+                                color: 'var(--aeva-ink-soft)',
+                                fontSize: '14px',
+                                borderBottom: '1px solid var(--aeva-line)'
+                            }}>
+                                <th style={{ padding: '16px', fontWeight: 600 }}>Venue Name</th>
+                                <th style={{ padding: '16px', fontWeight: 600 }}>Location</th>
+                                <th style={{ padding: '16px', fontWeight: 600 }}>Type</th>
+                                <th style={{ padding: '16px', fontWeight: 600 }}>Price (EGP)</th>
+                                <th style={{ padding: '16px', fontWeight: 600 }}>Capacity</th>
+                                <th style={{ padding: '16px', fontWeight: 600, textAlign: 'right' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {mockVenues.map((v) => (
-                                <tr key={v.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                    <td className="p-4">
-                                        <div className="font-bold text-text-dark">{v.name}</div>
+                                <tr key={v.id} style={{
+                                    borderBottom: '1px solid var(--aeva-line)',
+                                    transition: 'background-color 300ms'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--aeva-paper)'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                    <td style={{ padding: '16px' }}>
+                                        <div style={{ fontWeight: 700, color: 'var(--aeva-ink)' }}>{v.name}</div>
                                     </td>
-                                    <td className="p-4 text-sm text-text-muted">{v.location}</td>
-                                    <td className="p-4">
-                                        <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs uppercase font-bold">{v.type}</span>
+                                    <td style={{ padding: '16px', fontSize: '14px', color: 'var(--aeva-ink-soft)' }}>{v.location}</td>
+                                    <td style={{ padding: '16px' }}>
+                                        <span style={{
+                                            background: 'var(--aeva-paper-warm)',
+                                            color: 'var(--aeva-ink)',
+                                            padding: '4px 8px',
+                                            borderRadius: 'var(--r-md)',
+                                            fontSize: '12px',
+                                            fontWeight: 700,
+                                            textTransform: 'uppercase'
+                                        }}>{v.type}</span>
                                     </td>
-                                    <td className="p-4 font-medium text-text-dark">{v.startingPrice.toLocaleString()}</td>
-                                    <td className="p-4 text-sm text-text-muted">{v.minGuests} - {v.maxGuests}</td>
-                                    <td className="p-4 text-right">
-                                        <button className="p-2 text-gray-400 hover:text-primary transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                        <button className="p-2 text-gray-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                    <td style={{ padding: '16px', fontWeight: 500, color: 'var(--aeva-ink)' }}>{v.startingPrice.toLocaleString()}</td>
+                                    <td style={{ padding: '16px', fontSize: '14px', color: 'var(--aeva-ink-soft)' }}>{v.minGuests} - {v.maxGuests}</td>
+                                    <td style={{ padding: '16px', textAlign: 'right' }}>
+                                        <button style={{
+                                            padding: '8px',
+                                            background: 'transparent',
+                                            border: 'none',
+                                            color: 'var(--aeva-ink-soft)',
+                                            cursor: 'pointer',
+                                            transition: 'color 300ms'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--aeva-ink)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'}><Edit2 size={16} /></button>
+                                        <button style={{
+                                            padding: '8px',
+                                            background: 'transparent',
+                                            border: 'none',
+                                            color: 'var(--aeva-ink-soft)',
+                                            cursor: 'pointer',
+                                            transition: 'color 300ms'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
+                                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'}><Trash2 size={16} /></button>
                                     </td>
                                 </tr>
                             ))}

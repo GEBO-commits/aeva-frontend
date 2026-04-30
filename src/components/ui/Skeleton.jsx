@@ -1,46 +1,73 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
 
-/**
- * Reusable Skeleton loader component
- */
-export default function Skeleton({ className, ...props }) {
+export default function Skeleton({ style, ...props }) {
     return (
         <div
-            className={cn("animate-pulse rounded-md bg-gray-200/80", className)}
+            style={{
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                borderRadius: 'var(--r-md)',
+                background: 'var(--aeva-paper)',
+                ...style
+            }}
             {...props}
         />
     );
 }
 
-// Pre-configured variations
 export function CardSkeleton() {
     return (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col h-full w-full gap-4">
-            <Skeleton className="w-full h-48 rounded-2xl" />
-            <Skeleton className="w-3/4 h-6 mt-2" />
-            <div className="space-y-2 mt-2">
-                <Skeleton className="w-1/2 h-4" />
-                <Skeleton className="w-2/3 h-4" />
+        <div style={{
+            background: 'var(--aeva-canvas)',
+            borderRadius: 'var(--r-3xl)',
+            padding: '24px',
+            boxShadow: 'var(--shadow-sm)',
+            border: '1px solid var(--aeva-line)',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            width: '100%',
+            gap: '16px'
+        }}>
+            <Skeleton style={{ width: '100%', height: '192px', borderRadius: 'var(--r-2xl)' }} />
+            <Skeleton style={{ width: '75%', height: '24px', marginTop: '8px' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                <Skeleton style={{ width: '50%', height: '16px' }} />
+                <Skeleton style={{ width: '66%', height: '16px' }} />
             </div>
-            <div className="mt-auto pt-4 flex justify-between items-end border-t border-gray-100">
-                <div className="space-y-2">
-                    <Skeleton className="w-16 h-3" />
-                    <Skeleton className="w-24 h-5" />
+            <div style={{
+                marginTop: 'auto',
+                paddingTop: '16px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
+                borderTop: '1px solid var(--aeva-line)'
+            }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <Skeleton style={{ width: '64px', height: '12px' }} />
+                    <Skeleton style={{ width: '96px', height: '20px' }} />
                 </div>
-                <Skeleton className="w-24 h-8 rounded-xl" />
+                <Skeleton style={{ width: '96px', height: '32px', borderRadius: 'var(--r-xl)' }} />
             </div>
         </div>
     );
 }
 
-export function TextSkeleton({ lines = 3, className }) {
+export function TextSkeleton({ lines = 3, style }) {
     return (
-        <div className={cn("space-y-3 w-full", className)}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            width: '100%',
+            ...style
+        }}>
             {Array.from({ length: lines }).map((_, i) => (
                 <Skeleton
                     key={i}
-                    className={cn("h-4", i === lines - 1 ? "w-2/3" : "w-full")}
+                    style={{
+                        height: '16px',
+                        width: i === lines - 1 ? '66%' : '100%'
+                    }}
                 />
             ))}
         </div>

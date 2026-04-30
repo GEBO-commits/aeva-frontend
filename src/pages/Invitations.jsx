@@ -53,76 +53,203 @@ export default function Invitations() {
     };
 
     return (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-            <div className="flex justify-between items-center mb-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '24px'
+            }}>
                 <div>
-                    <h1 className="text-3xl font-display font-bold text-text-dark">Manage Invitations</h1>
-                    <p className="text-text-muted mt-1">Design your invite and track live RSVPs for "Emma & James Wedding"</p>
+                    <h1 style={{ fontSize: '32px', fontWeight: 700, color: 'var(--aeva-ink)' }}>Manage Invitations</h1>
+                    <p style={{ color: 'var(--aeva-ink-soft)', marginTop: '4px' }}>Design your invite and track live RSVPs for "Emma & James Wedding"</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    {isSent && <span className="text-sm font-bold text-green-600 animate-pulse hidden sm:block">✅ Mass invites sent successfully!</span>}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                }}>
+                    {isSent && <span style={{
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        color: 'var(--aeva-sage)',
+                        animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        display: 'none'
+                    }} className="sm:block">✅ Mass invites sent successfully!</span>}
                     <button
                         onClick={handleSend}
                         disabled={isSending || isSent}
-                        className={`text-white px-6 py-2 rounded-full font-bold shadow-md transition-all flex items-center gap-2 ${isSent ? 'bg-green-500' : 'bg-primary hover:bg-secondary'
-                            } disabled:opacity-80`}
+                        style={{
+                            color: 'white',
+                            padding: '8px 24px',
+                            borderRadius: 'var(--r-full)',
+                            fontWeight: 700,
+                            boxShadow: 'var(--shadow-md)',
+                            transition: 'all 300ms',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            border: 'none',
+                            cursor: isSending || isSent ? 'not-allowed' : 'pointer',
+                            background: isSent ? 'var(--aeva-sage)' : 'var(--aeva-ink)',
+                            opacity: (isSending || isSent) ? 0.8 : 1
+                        }}
                     >
                         {isSending ? (
-                            <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
+                            <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Sending...</>
                         ) : isSent ? (
-                            <><CheckCircle2 className="w-4 h-4" /> Sent</>
+                            <><CheckCircle2 size={16} /> Sent</>
                         ) : (
-                            <><Send className="w-4 h-4" /> Send Mass Invite</>
+                            <><Send size={16} /> Send Mass Invite</>
                         )}
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr',
+                gap: '32px'
+            }} className="lg:grid-cols-2">
 
                 {/* Left: Settings */}
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 h-fit space-y-6">
-                    <h2 className="text-xl font-bold text-text-dark border-b pb-4">Invitation Settings</h2>
+                <div style={{
+                    background: 'var(--aeva-canvas)',
+                    padding: '32px',
+                    borderRadius: 'var(--r-3xl)',
+                    boxShadow: 'var(--shadow-sm)',
+                    border: '1px solid var(--aeva-line)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '24px'
+                }}>
+                    <h2 style={{
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        color: 'var(--aeva-ink)',
+                        borderBottom: '1px solid var(--aeva-line)',
+                        paddingBottom: '16px'
+                    }}>Invitation Settings</h2>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-text-muted">Personal Message</label>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '14px',
+                            fontWeight: 500,
+                            marginBottom: '8px',
+                            color: 'var(--aeva-ink-soft)'
+                        }}>Personal Message</label>
                         <textarea
                             rows={4}
                             value={inviteText}
                             onChange={(e) => setInviteText(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-primary resize-none"
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                borderRadius: 'var(--r-xl)',
+                                border: '1px solid var(--aeva-line)',
+                                outline: 'none',
+                                fontFamily: 'inherit',
+                                color: 'var(--aeva-ink)',
+                                resize: 'none',
+                                boxSizing: 'border-box'
+                            }}
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '16px'
+                    }}>
                         <div>
-                            <label className="block text-sm font-medium mb-2 text-text-muted">Guest Limit</label>
-                            <input type="number" defaultValue={2} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-primary" />
+                            <label style={{
+                                display: 'block',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                marginBottom: '8px',
+                                color: 'var(--aeva-ink-soft)'
+                            }}>Guest Limit</label>
+                            <input type="number" defaultValue={2} style={{
+                                width: '100%',
+                                padding: '12px',
+                                borderRadius: 'var(--r-xl)',
+                                border: '1px solid var(--aeva-line)',
+                                outline: 'none',
+                                color: 'var(--aeva-ink)',
+                                boxSizing: 'border-box'
+                            }} />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-2 text-text-muted">Theme Color</label>
-                            <div className="flex gap-2 mt-1">
+                            <label style={{
+                                display: 'block',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                marginBottom: '8px',
+                                color: 'var(--aeva-ink-soft)'
+                            }}>Theme Color</label>
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
                                 {['#6B3FF3', '#FF6B6B', '#10B981', '#F59E0B', '#1A1A2E'].map(color => (
                                     <button
                                         key={color}
                                         onClick={() => setThemeColor(color)}
-                                        className={`w-10 h-10 rounded-full border-2 transition-transform ${themeColor === color ? 'border-gray-800 scale-110' : 'border-transparent'}`}
-                                        style={{ backgroundColor: color }}
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '50%',
+                                            border: themeColor === color ? '2px solid var(--aeva-ink)' : '2px solid transparent',
+                                            backgroundColor: color,
+                                            cursor: 'pointer',
+                                            transition: 'transform 300ms',
+                                            transform: themeColor === color ? 'scale(1.1)' : 'scale(1)'
+                                        }}
                                     />
                                 ))}
                             </div>
                         </div>
                     </div>
 
-                    <div className="pt-4 border-t flex flex-col gap-3">
-                        <label className="block text-sm font-medium text-text-dark">Share Link</label>
-                        <div className="flex gap-2">
-                            <input readOnly value="https://aeva.app/rsvp/abc123xz" className="flex-1 bg-gray-50 px-4 py-3 rounded-xl border border-gray-200 text-sm text-text-muted" />
+                    <div style={{
+                        paddingTop: '16px',
+                        borderTop: '1px solid var(--aeva-line)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px'
+                    }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '14px',
+                            fontWeight: 500,
+                            color: 'var(--aeva-ink)'
+                        }}>Share Link</label>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <input readOnly value="https://aeva.app/rsvp/abc123xz" style={{
+                                flex: 1,
+                                background: 'var(--aeva-paper)',
+                                padding: '12px',
+                                borderRadius: 'var(--r-xl)',
+                                border: '1px solid var(--aeva-line)',
+                                fontSize: '14px',
+                                color: 'var(--aeva-ink-soft)',
+                                boxSizing: 'border-box'
+                            }} />
                             <button
                                 onClick={handleCopy}
-                                className={`px-4 py-3 rounded-xl transition-colors font-medium flex items-center gap-2 ${isCopied ? 'bg-green-100 text-green-700' : 'bg-gray-100 hover:bg-gray-200 text-text-dark'}`}
+                                style={{
+                                    padding: '12px',
+                                    borderRadius: 'var(--r-xl)',
+                                    transition: 'all 300ms',
+                                    fontWeight: 500,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    background: isCopied ? 'var(--aeva-sage)' : 'var(--aeva-paper)',
+                                    color: isCopied ? 'var(--aeva-paper)' : 'var(--aeva-ink)'
+                                }}
                             >
-                                {isCopied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                {isCopied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
                                 {isCopied ? 'Copied! ✅' : 'Copy'}
                             </button>
                         </div>
@@ -130,13 +257,56 @@ export default function Invitations() {
                 </div>
 
                 {/* Right: Preview */}
-                <div className="bg-gray-50 p-8 rounded-3xl border border-gray-100 flex items-center justify-center min-h-[500px] relative overflow-hidden">
+                <div style={{
+                    background: 'var(--aeva-paper)',
+                    padding: '32px',
+                    borderRadius: 'var(--r-3xl)',
+                    border: '1px solid var(--aeva-line)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '500px',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
                     {/* Subtle background element tied to theme */}
-                    <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20 transform translate-x-1/3 -translate-y-1/3" style={{ backgroundColor: themeColor }}></div>
+                    <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        width: '256px',
+                        height: '256px',
+                        borderRadius: '50%',
+                        filter: 'blur(48px)',
+                        opacity: 0.2,
+                        transform: 'translateX(33%) translateY(-33%)',
+                        backgroundColor: themeColor
+                    }}></div>
 
-                    <div className="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden relative z-10">
-                        <div className="h-32 p-6 flex items-end justify-center relative group" style={{ backgroundColor: themeColor }}>
-                            <div className="absolute inset-0 bg-black/10"></div>
+                    <div style={{
+                        background: 'var(--aeva-canvas)',
+                        width: '100%',
+                        maxWidth: '448px',
+                        borderRadius: 'var(--r-2xl)',
+                        boxShadow: 'var(--shadow-2xl)',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        zIndex: 10
+                    }}>
+                        <div style={{
+                            height: '128px',
+                            padding: '24px',
+                            display: 'flex',
+                            alignItems: 'flex-end',
+                            justifyContent: 'center',
+                            position: 'relative',
+                            backgroundColor: themeColor
+                        }}>
+                            <div style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: 'rgba(0,0,0,0.1)'
+                            }}></div>
                             {isEditingTitle ? (
                                 <input
                                     autoFocus
@@ -144,27 +314,90 @@ export default function Invitations() {
                                     onChange={(e) => setTempTitle(e.target.value)}
                                     onBlur={saveTitle}
                                     onKeyDown={(e) => e.key === 'Enter' && saveTitle()}
-                                    className="text-3xl font-display font-bold text-center bg-white/20 text-white placeholder-white/70 outline-none border-b-2 border-white/50 focus:border-white relative z-10 w-3/4 px-2"
+                                    style={{
+                                        fontSize: '32px',
+                                        fontWeight: 700,
+                                        textAlign: 'center',
+                                        background: 'rgba(255,255,255,0.2)',
+                                        color: 'white',
+                                        outline: 'none',
+                                        borderBottom: '2px solid rgba(255,255,255,0.5)',
+                                        position: 'relative',
+                                        zIndex: 10,
+                                        width: '75%',
+                                        padding: '8px',
+                                        fontFamily: 'inherit'
+                                    }}
                                 />
                             ) : (
                                 <h3
                                     onClick={() => { setIsEditingTitle(true); setTempTitle(planTitle); }}
-                                    className="text-3xl font-display font-bold text-white relative z-10 cursor-pointer flex items-center justify-center gap-2 w-full mt-auto"
+                                    style={{
+                                        fontSize: '32px',
+                                        fontWeight: 700,
+                                        color: 'white',
+                                        position: 'relative',
+                                        zIndex: 10,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        width: '100%',
+                                        marginTop: 'auto'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.querySelector('svg')?.style?.setProperty('opacity', '1')}
+                                    onMouseLeave={(e) => e.currentTarget.querySelector('svg')?.style?.setProperty('opacity', '0')}
                                 >
                                     {planTitle}
-                                    <Pencil className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                                    <Pencil size={20} style={{ opacity: 0, transition: 'opacity 300ms', flexShrink: 0 }} />
                                 </h3>
                             )}
                         </div>
-                        <div className="p-8 text-center bg-[#fafafa]">
-                            <p className="text-text-dark font-medium italic mb-6 leading-relaxed">
+                        <div style={{
+                            padding: '32px',
+                            textAlign: 'center',
+                            background: '#fafafa'
+                        }}>
+                            <p style={{
+                                color: 'var(--aeva-ink)',
+                                fontWeight: 500,
+                                fontStyle: 'italic',
+                                marginBottom: '24px',
+                                lineHeight: 1.6
+                            }}>
                                 "{inviteText}"
                             </p>
-                            <div className="space-y-4 mb-8">
-                                <div className="bg-white p-3 rounded-xl shadow-sm text-sm"><span className="text-text-muted font-medium">When:</span> Jan 20, 2026 @ 6:00 PM</div>
-                                <div className="bg-white p-3 rounded-xl shadow-sm text-sm"><span className="text-text-muted font-medium">Where:</span> Kempinski Hotel, Cairo</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
+                                <div style={{
+                                    background: 'var(--aeva-canvas)',
+                                    padding: '12px',
+                                    borderRadius: 'var(--r-xl)',
+                                    boxShadow: 'var(--shadow-sm)',
+                                    fontSize: '14px'
+                                }}><span style={{ color: 'var(--aeva-ink-soft)', fontWeight: 500 }}>When:</span> Jan 20, 2026 @ 6:00 PM</div>
+                                <div style={{
+                                    background: 'var(--aeva-canvas)',
+                                    padding: '12px',
+                                    borderRadius: 'var(--r-xl)',
+                                    boxShadow: 'var(--shadow-sm)',
+                                    fontSize: '14px'
+                                }}><span style={{ color: 'var(--aeva-ink-soft)', fontWeight: 500 }}>Where:</span> Kempinski Hotel, Cairo</div>
                             </div>
-                            <button className="w-full text-white py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all" style={{ backgroundColor: themeColor }}>
+                            <button style={{
+                                width: '100%',
+                                color: 'white',
+                                padding: '14px',
+                                borderRadius: 'var(--r-xl)',
+                                fontWeight: 700,
+                                boxShadow: 'var(--shadow-md)',
+                                border: 'none',
+                                cursor: 'pointer',
+                                backgroundColor: themeColor,
+                                transition: 'box-shadow 300ms'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
+                            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-md)'}>
                                 RSVP Now
                             </button>
                         </div>
@@ -173,20 +406,45 @@ export default function Invitations() {
             </div>
 
             {/* Analytics Section */}
-            <div className="mt-12 pt-8 border-t border-gray-100">
-                <h2 className="text-2xl font-display font-bold mb-6 text-text-dark text-center md:text-left">RSVP Analytics</h2>
+            <div style={{
+                marginTop: '48px',
+                paddingTop: '32px',
+                borderTop: '1px solid var(--aeva-line)'
+            }}>
+                <h2 style={{
+                    fontSize: '24px',
+                    fontWeight: 700,
+                    marginBottom: '24px',
+                    color: 'var(--aeva-ink)',
+                    textAlign: 'center'
+                }} className="md:text-left">RSVP Analytics</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr',
+                    gap: '16px',
+                    marginBottom: '32px'
+                }} className="md:grid-cols-4">
                     <StatBox icon={<Users />} label="Total Invited" value="120" />
-                    <StatBox icon={<CheckCircle2 className="text-green-500" />} label="Attending" value="85" />
-                    <StatBox icon={<XCircle className="text-red-500" />} label="Declined" value="15" />
-                    <StatBox icon={<HelpCircle className="text-yellow-500" />} label="Pending" value="20" />
+                    <StatBox icon={<CheckCircle2 style={{ color: '#10B981' }} />} label="Attending" value="85" />
+                    <StatBox icon={<XCircle style={{ color: '#EF4444' }} />} label="Declined" value="15" />
+                    <StatBox icon={<HelpCircle style={{ color: '#F59E0B' }} />} label="Pending" value="20" />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                        <h3 className="text-lg font-bold mb-4">Response Breakdown</h3>
-                        <div className="h-64">
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr',
+                    gap: '32px'
+                }} className="lg:grid-cols-2">
+                    <div style={{
+                        background: 'var(--aeva-canvas)',
+                        padding: '24px',
+                        borderRadius: 'var(--r-3xl)',
+                        boxShadow: 'var(--shadow-sm)',
+                        border: '1px solid var(--aeva-line)'
+                    }}>
+                        <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px', color: 'var(--aeva-ink)' }}>Response Breakdown</h3>
+                        <div style={{ height: '256px' }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
@@ -206,19 +464,40 @@ export default function Invitations() {
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
-                        <div className="flex justify-center gap-6 mt-4">
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '24px',
+                            marginTop: '16px'
+                        }}>
                             {rsvpData.map(item => (
-                                <div key={item.name} className="flex items-center gap-2 text-sm">
-                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                                    <span className="text-text-muted">{item.name}</span>
+                                <div key={item.name} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    fontSize: '14px'
+                                }}>
+                                    <div style={{
+                                        width: '12px',
+                                        height: '12px',
+                                        borderRadius: '50%',
+                                        backgroundColor: item.color
+                                    }}></div>
+                                    <span style={{ color: 'var(--aeva-ink-soft)' }}>{item.name}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                        <h3 className="text-lg font-bold mb-4">Daily Responses (Last 5 Days)</h3>
-                        <div className="h-64">
+                    <div style={{
+                        background: 'var(--aeva-canvas)',
+                        padding: '24px',
+                        borderRadius: 'var(--r-3xl)',
+                        boxShadow: 'var(--shadow-sm)',
+                        border: '1px solid var(--aeva-line)'
+                    }}>
+                        <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px', color: 'var(--aeva-ink)' }}>Daily Responses (Last 5 Days)</h3>
+                        <div style={{ height: '256px' }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={dailyData}>
                                     <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 12 }} />
@@ -237,13 +516,30 @@ export default function Invitations() {
 
 function StatBox({ icon, label, value }) {
     return (
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="bg-gray-50 p-3 rounded-xl text-gray-400">
+        <div style={{
+            background: 'var(--aeva-canvas)',
+            padding: '20px',
+            borderRadius: 'var(--r-2xl)',
+            boxShadow: 'var(--shadow-sm)',
+            border: '1px solid var(--aeva-line)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px'
+        }}>
+            <div style={{
+                background: 'var(--aeva-paper)',
+                padding: '12px',
+                borderRadius: 'var(--r-xl)',
+                color: 'var(--aeva-ink-soft)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
                 {icon}
             </div>
             <div>
-                <p className="text-sm text-text-muted">{label}</p>
-                <p className="text-2xl font-bold text-text-dark">{value}</p>
+                <p style={{ fontSize: '14px', color: 'var(--aeva-ink-soft)', marginBottom: '2px' }}>{label}</p>
+                <p style={{ fontSize: '24px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{value}</p>
             </div>
         </div>
     );
