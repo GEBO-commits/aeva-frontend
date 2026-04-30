@@ -1,28 +1,19 @@
-/**
- * Decorations.jsx
- *
- * Public browse page for decoration packages.
- * Data fields match what's in decorations.mock.js:
- *   theme, includes, totalPrice, rating, image, name, description
- *
- * "Select Package →" saves to plan store and navigates to /plan/build/vendors.
- */
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { getVendors } from '../services/catalogService';
 import { usePlanStore } from '../store/plan.store';
-import { Palette, Star, CheckCircle } from 'lucide-react';
+import { Palette, Star } from 'lucide-react';
 import { CardSkeleton } from '../components/ui/Skeleton';
-
-console.log('✅ Decorations page loaded');
+import { Button } from '../components/ui/Button';
+import { Tag } from '../components/ui/Tag';
 
 export default function Decorations() {
+    const [expanded, setExpanded] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [decorations, setDecorations] = useState([]);
     const navigate = useNavigate();
-    const { setDecorations: setPlanDecorations, selectedDecorations } = usePlanStore();
+    const { setDecorations: setPlanDecorations } = usePlanStore();
 
     useEffect(() => {
         const fetchDecorations = async () => {
@@ -32,7 +23,6 @@ export default function Decorations() {
                 console.error('[Decorations] Failed to fetch decoration vendors:', error);
                 setDecorations([]);
             } else {
-                // Map Supabase vendors table to card shape
                 const mapped = (data || []).map(v => {
                     let details = {};
                     if (v.details) {
@@ -42,7 +32,7 @@ export default function Decorations() {
                         id: v.id,
                         name: v.name,
                         description: v.description,
-                        rating: v.rating,
+                        rating: v.rating || 4.5,
                         image: Array.isArray(v.image_urls)
                             ? v.image_urls[0]
                             : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800'),
@@ -58,284 +48,176 @@ export default function Decorations() {
         fetchDecorations();
     }, []);
 
-    /** Handle selecting a decoration package and moving to the next plan step */
-    const handleSelect = (decor) => {
-        setPlanDecorations(decor);
-        navigate('/plan/build/vendors');
-    };
-
     return (
-        <div style={{ width: '100%' }}>
-            {/* Header */}
-            <div style={{ marginBottom: '32px' }}>
-                <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--aeva-ink)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    Decorations &amp; Styling <Palette className="w-6 h-6" style={{ color: 'var(--aeva-ink)' }} />
-                </h1>
-                <p style={{ color: 'var(--aeva-ink-soft)', marginTop: '4px' }}>Bring your vision to life with expert decoration packages.</p>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 32px 80px', minHeight: '80vh' }}>
+            {/* Hero Section */}
+            <div style={{ marginBottom: 32 }}>
+                <div className="t-eyebrow" style={{ marginBottom: 8, color: 'var(--aeva-ink-mute)' }}>CREATIVE VISION</div>
+                <h1 className="t-display-lg" style={{ marginBottom: 12, maxWidth: 720 }}>Decorations that transform spaces.</h1>
+                <p className="t-body-lg" style={{ color: 'var(--aeva-ink-soft)', maxWidth: 600 }}>
+                    Curated decoration packages for every style. Explore themes, compare details, and bring your vision to life.
+                </p>
             </div>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-                gap: '24px'
-            }}>
-                {isLoading ? (
-                    [1, 2, 3].map(i => <CardSkeleton key={i} />)
-                ) : decorations.length > 0 ? (
-                    <AnimatePresence>
-                        {decorations.map((decor, index) => (
-                            <DecorCard
-                                key={decor.id}
-                                data={decor}
-                                index={index}
-                                isSelected={selectedDecorations?.id === decor.id}
-                                onSelect={() => handleSelect(decor)}
-                                onView={() => navigate(`/decorations/${decor.id}`)}
-                            />
-                        ))}
-                    </AnimatePresence>
-                ) : (
-                    <div style={{
-                        gridColumn: '1 / -1',
-                        background: 'var(--aeva-canvas)',
-                        padding: '48px',
-                        borderRadius: 'var(--r-2xl)',
-                        border: '1px solid var(--aeva-line)',
-                        textAlign: 'center',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '100%',
-                        minHeight: '40vh'
-                    }}>
-                        <div style={{
-                            width: '80px',
-                            height: '80px',
-                            background: 'var(--aeva-paper-warm)',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginBottom: '16px'
-                        }}>
-                            <Palette className="w-8 h-8" style={{ color: 'var(--aeva-ink-soft)' }} />
-                        </div>
-                        <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>No decoration packages available</h3>
-                        <p style={{ color: 'var(--aeva-ink-soft)' }}>Please check back later.</p>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
-
-/**
- * Individual decoration package card.
- * Uses correct field names from decorations.mock.js: theme, includes, totalPrice
- */
-function DecorCard({ data, index, isSelected, onSelect, onView }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3, delay: index * 0.08 }}
-            style={{
-                background: 'var(--aeva-canvas)',
-                borderRadius: 'var(--r-2xl)',
-                overflow: 'hidden',
-                boxShadow: 'var(--shadow-sm)',
-                transition: 'all 300ms',
-                border: isSelected ? '2px solid var(--aeva-ink)' : '2px solid var(--aeva-line)',
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%'
-            }}
-            onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
-            }}
-            onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-            }}
-        >
-            <div style={{ position: 'relative', height: '224px', overflow: 'hidden' }}>
-                <img
-                    src={data.image}
-                    alt={data.name}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transition: 'transform 700ms'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = ''}
-                />
-                {/* Rating badge */}
+            {/* Loading State */}
+            {isLoading ? (
                 <div style={{
-                    position: 'absolute',
-                    top: '16px',
-                    right: '16px',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gap: '24px'
+                }}>
+                    {[1, 2, 3, 4, 5, 6].map(i => <CardSkeleton key={i} />)}
+                </div>
+            ) : decorations.length > 0 ? (
+                <>
+                    {/* Decorations Grid */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                        gap: '24px'
+                    }}>
+                        <AnimatePresence>
+                            {decorations.map((d, i) => {
+                                const isExpanded = expanded === d.id;
+                                return (
+                                    <motion.div
+                                        key={d.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ delay: i * 0.05 }}
+                                        onClick={() => setExpanded(isExpanded ? null : d.id)}
+                                        style={{
+                                            background: 'var(--aeva-canvas)',
+                                            border: `1px solid ${isExpanded ? 'var(--aeva-ink)' : 'var(--aeva-line)'}`,
+                                            borderRadius: 'var(--r-lg)',
+                                            overflow: 'hidden',
+                                            cursor: 'pointer',
+                                            transition: 'all 240ms',
+                                            boxShadow: isExpanded ? 'var(--shadow-lg)' : 'var(--shadow-sm)',
+                                            transform: isExpanded ? 'translateY(-2px)' : 'translateY(0)'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (!isExpanded) {
+                                                e.currentTarget.style.borderColor = 'var(--aeva-line-strong)';
+                                                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (!isExpanded) {
+                                                e.currentTarget.style.borderColor = 'var(--aeva-line)';
+                                                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                                            }
+                                        }}
+                                    >
+                                        {/* Image */}
+                                        <div style={{ position: 'relative', height: 200 }}>
+                                            <img src={d.image} alt={d.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                                            {/* Rating Badge */}
+                                            <div style={{
+                                                position: 'absolute', top: 12, right: 12, padding: '6px 10px',
+                                                background: 'rgba(26,24,20,0.85)', backdropFilter: 'blur(6px)',
+                                                borderRadius: 999, color: 'white', fontSize: 11, fontWeight: 600,
+                                                display: 'flex', alignItems: 'center', gap: 5
+                                            }}>
+                                                <Star size={10} style={{ fill: '#FCD34D', color: '#FCD34D' }}/>
+                                                {d.rating}
+                                            </div>
+                                            {/* Theme Badge */}
+                                            <div style={{
+                                                position: 'absolute', bottom: 12, left: 12, padding: '6px 10px',
+                                                background: 'var(--aeva-ink)', color: 'white',
+                                                borderRadius: 'var(--r-lg)', fontSize: 11, fontWeight: 600
+                                            }}>
+                                                {d.theme}
+                                            </div>
+                                        </div>
+
+                                        {/* Content */}
+                                        <div style={{ padding: 18 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                                                <h3 className="t-display-sm" style={{ maxWidth: '85%' }}>{d.name}</h3>
+                                                <span style={{ fontSize: 14, fontWeight: 600 }}>${d.totalPrice.toLocaleString()}</span>
+                                            </div>
+                                            <p style={{
+                                                fontSize: 12.5, color: 'var(--aeva-ink-mute)', marginBottom: 10,
+                                                lineHeight: 1.4
+                                            }}>
+                                                {d.description}
+                                            </p>
+                                            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 10 }}>
+                                                {d.includes.slice(0, 3).map(t => <Tag key={t} size="sm">{t}</Tag>)}
+                                                {d.includes.length > 3 && <Tag size="sm">+{d.includes.length - 3}</Tag>}
+                                            </div>
+
+                                            {/* Expanded Content */}
+                                            <div style={{
+                                                overflow: 'hidden',
+                                                maxHeight: isExpanded ? 300 : 0,
+                                                transition: 'max-height 360ms ease'
+                                            }}>
+                                                <div style={{ paddingTop: 14, borderTop: '1px solid var(--aeva-line)', marginTop: 10 }}>
+                                                    <p className="t-eyebrow" style={{ marginBottom: 10, color: 'var(--aeva-ink)' }}>Package Includes</p>
+                                                    <ul style={{ fontSize: 13, color: 'var(--aeva-ink-soft)', lineHeight: 1.6, marginBottom: 14, paddingLeft: 16 }}>
+                                                        {d.includes.map((item, idx) => <li key={idx}>• {item}</li>)}
+                                                    </ul>
+                                                    <div style={{ display: 'flex', gap: 8 }}>
+                                                        <Button
+                                                            variant="primary"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setPlanDecorations(d);
+                                                                navigate('/plan/build/vendors');
+                                                            }}
+                                                            style={{ flex: 1 }}
+                                                        >
+                                                            Select Package
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {!isExpanded && (
+                                                <div style={{ fontSize: 12, color: 'var(--aeva-ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                                    Tap to see more →
+                                                </div>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                        </AnimatePresence>
+                    </div>
+                </>
+            ) : (
+                <div style={{
                     background: 'var(--aeva-canvas)',
-                    backdropFilter: 'blur(12px)',
-                    padding: '6px 12px',
-                    borderRadius: 'var(--r-full)',
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    boxShadow: 'var(--shadow-sm)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    color: 'var(--aeva-ink)'
-                }}>
-                    <Star className="w-4 h-4" style={{ fill: '#FCD34D', color: '#FCD34D' }} /> {data.rating}
-                </div>
-                {/* Theme badge */}
-                <div style={{
-                    position: 'absolute',
-                    top: '16px',
-                    left: '16px',
-                    background: 'var(--aeva-ink)',
-                    color: 'var(--aeva-paper)',
-                    padding: '6px 12px',
-                    borderRadius: 'var(--r-full)',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    boxShadow: 'var(--shadow-md)'
-                }}>
-                    {data.theme}
-                </div>
-                {/* Selected overlay */}
-                {isSelected && (
-                    <div style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: 'rgba(0,0,0,0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <div style={{
-                            width: '48px',
-                            height: '48px',
-                            background: 'var(--aeva-ink)',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: 'var(--shadow-xl)'
-                        }}>
-                            <CheckCircle className="w-7 h-7" style={{ color: 'var(--aeva-paper)' }} />
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '4px' }}>{data.name}</h3>
-                <p style={{
-                    color: 'var(--aeva-ink-soft)',
-                    fontSize: '14px',
-                    marginBottom: '16px',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden'
-                }}>{data.description}</p>
-
-                {/* Package includes tags */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px' }}>
-                    {data.includes.map(item => (
-                        <span key={item} style={{
-                            fontSize: '12px',
-                            background: 'var(--aeva-paper-warm)',
-                            color: 'var(--aeva-ink)',
-                            padding: '4px 8px',
-                            borderRadius: 'var(--r-full)',
-                            border: '1px solid var(--aeva-line)'
-                        }}>
-                            {item}
-                        </span>
-                    ))}
-                </div>
-
-                <div style={{
-                    marginTop: 'auto',
-                    paddingTop: '16px',
-                    borderTop: '1px solid var(--aeva-line)',
+                    padding: '48px',
+                    borderRadius: 'var(--r-lg)',
+                    border: '1px solid var(--aeva-line)',
+                    textAlign: 'center',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '8px'
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '40vh'
                 }}>
-                    <button
-                        onClick={onView}
-                        style={{
-                            width: '100%',
-                            padding: '8px',
-                            borderRadius: 'var(--r-lg)',
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            color: 'var(--aeva-ink-soft)',
-                            transition: 'all 200ms',
-                            border: '1px solid var(--aeva-line)',
-                            background: 'transparent',
-                            cursor: 'pointer'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.color = 'var(--aeva-ink)';
-                            e.currentTarget.style.borderColor = 'var(--aeva-ink)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.color = 'var(--aeva-ink-soft)';
-                            e.currentTarget.style.borderColor = 'var(--aeva-line)';
-                        }}
-                    >
-                        View Details
-                    </button>
                     <div style={{
+                        width: '80px',
+                        height: '80px',
+                        background: 'var(--aeva-paper-warm)',
+                        borderRadius: '50%',
                         display: 'flex',
-                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: '4px'
+                        justifyContent: 'center',
+                        marginBottom: '16px'
                     }}>
-                        <span style={{ fontSize: '12px', color: 'var(--aeva-ink-soft)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Packages from</span>
-                        <span style={{ fontWeight: 700, color: 'var(--aeva-ink)', fontSize: '18px' }}>{data.totalPrice.toLocaleString()} EGP</span>
+                        <Palette size={32} style={{ color: 'var(--aeva-ink-soft)' }}/>
                     </div>
-                    {/* Select button */}
-                    <button
-                        onClick={onSelect}
-                        style={{
-                            width: '100%',
-                            padding: '10px',
-                            borderRadius: 'var(--r-lg)',
-                            fontSize: '14px',
-                            fontWeight: 700,
-                            transition: 'all 200ms',
-                            background: isSelected ? 'var(--aeva-ink)' : 'var(--aeva-paper-warm)',
-                            color: isSelected ? 'var(--aeva-paper)' : 'var(--aeva-ink)',
-                            border: isSelected ? 'none' : '1px solid var(--aeva-line)',
-                            cursor: 'pointer'
-                        }}
-                        onMouseEnter={(e) => {
-                            if (!isSelected) {
-                                e.currentTarget.style.background = 'var(--aeva-ink)';
-                                e.currentTarget.style.color = 'var(--aeva-paper)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (!isSelected) {
-                                e.currentTarget.style.background = 'var(--aeva-paper-warm)';
-                                e.currentTarget.style.color = 'var(--aeva-ink)';
-                            }
-                        }}
-                    >
-                        {isSelected ? '✓ Selected' : 'Select Package →'}
-                    </button>
+                    <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>No decoration packages found</h3>
+                    <p style={{ color: 'var(--aeva-ink-soft)' }}>Check back soon for our creative packages.</p>
                 </div>
-            </div>
-        </motion.div>
+            )}
+        </div>
     );
 }
