@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { mockCatering } from '../api/mock/catering.mock';
 import { usePlanStore } from '../store/plan.store';
 import { Star, CheckCircle, Clock, Users, ArrowLeft } from 'lucide-react';
+import { Button } from '../components/ui/Button';
 
 export default function CateringDetail() {
     const { id } = useParams();
@@ -13,7 +14,6 @@ export default function CateringDetail() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Find in mock data
         const found = mockCatering.find(c => c.id === id);
         if (found) {
             setItem(found);
@@ -21,8 +21,8 @@ export default function CateringDetail() {
         setLoading(false);
     }, [id]);
 
-    if (loading) return <div className="min-h-screen bg-surface flex items-center justify-center">Loading...</div>;
-    if (!item) return <div className="min-h-screen bg-surface flex items-center justify-center text-text-muted">Item not found</div>;
+    if (loading) return <div style={{ minHeight: '100vh', background: 'var(--aeva-paper)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>;
+    if (!item) return <div style={{ minHeight: '100vh', background: 'var(--aeva-paper)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--aeva-ink-soft)' }}>Item not found</div>;
 
     const isSelected = selectedCatering?.id === item.id;
 
@@ -32,52 +32,129 @@ export default function CateringDetail() {
     };
 
     return (
-        <div className="min-h-screen bg-surface pt-24 pb-12 px-4">
-            <div className="max-w-5xl mx-auto">
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-6 group">
-                    <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Back
+        <div style={{ minHeight: '100vh', background: 'var(--aeva-paper)', paddingTop: '96px', paddingBottom: '48px', paddingLeft: '16px', paddingRight: '16px' }}>
+            <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+                <button onClick={() => navigate(-1)} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: 'var(--aeva-ink-soft)',
+                    transition: 'color 200ms',
+                    marginBottom: '24px',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '16px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--aeva-ink)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'}
+                className="group">
+                    <ArrowLeft size={18} style={{ transition: 'transform 200ms' }} className="group-hover:-translate-x-1" /> Back
                 </button>
 
-                <div className="bg-white rounded-[32px] overflow-hidden shadow-xl border border-gray-100 flex flex-col md:flex-row">
-                    <div className="md:w-1/2 h-80 md:h-auto relative">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                        <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-bold text-orange-500 shadow-sm">
+                <div style={{
+                    background: 'var(--aeva-canvas)',
+                    borderRadius: 'var(--r-2xl)',
+                    overflow: 'hidden',
+                    boxShadow: 'var(--shadow-xl)',
+                    border: '1px solid var(--aeva-line)',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr'
+                }} className="md:grid-cols-2">
+                    <div style={{ position: 'relative', height: '320px' }} className="md:height-auto">
+                        <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <div style={{
+                            position: 'absolute',
+                            top: '24px',
+                            left: '24px',
+                            background: 'var(--aeva-canvas)',
+                            backdropFilter: 'blur(8px)',
+                            padding: '6px 16px',
+                            borderRadius: 'var(--r-full)',
+                            fontSize: '14px',
+                            fontWeight: 700,
+                            color: 'var(--aeva-ink)',
+                            boxShadow: 'var(--shadow-sm)'
+                        }}>
                             {item.style}
                         </div>
                     </div>
 
-                    <div className="md:w-1/2 p-8 md:p-12 flex flex-col">
-                        <div className="flex justify-between items-start mb-4">
-                            <h1 className="text-3xl font-display font-bold text-text-dark">{item.name}</h1>
-                            <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-sm font-bold">
-                                <Star size={14} className="fill-yellow-500 text-yellow-500" /> {item.rating}
+                    <div style={{
+                        padding: '32px',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }} className="md:padding-12">
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            marginBottom: '16px'
+                        }}>
+                            <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{item.name}</h1>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '4px 12px',
+                                background: 'var(--aeva-paper-warm)',
+                                color: 'var(--aeva-ink)',
+                                borderRadius: 'var(--r-full)',
+                                fontSize: '14px',
+                                fontWeight: 700
+                            }}>
+                                <Star size={14} style={{ fill: '#FCD34D', color: '#FCD34D' }} /> {item.rating}
                             </div>
                         </div>
 
-                        <p className="text-text-muted leading-relaxed mb-8">{item.description}</p>
+                        <p style={{
+                            color: 'var(--aeva-ink-soft)',
+                            lineHeight: 1.6,
+                            marginBottom: '32px'
+                        }}>{item.description}</p>
 
-                        <div className="grid grid-cols-2 gap-4 mb-8">
-                            <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100">
-                                <p className="text-xs text-orange-600 font-bold uppercase tracking-wider mb-1">Price</p>
-                                <p className="text-xl font-bold text-text-dark">{item.pricePerPerson} EGP</p>
-                                <p className="text-[10px] text-orange-600/70">Per person</p>
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(2, 1fr)',
+                            gap: '16px',
+                            marginBottom: '32px'
+                        }}>
+                            <div style={{
+                                padding: '16px',
+                                background: 'var(--aeva-paper-warm)',
+                                borderRadius: 'var(--r-xl)',
+                                border: '1px solid var(--aeva-line)'
+                            }}>
+                                <p style={{ fontSize: '12px', color: 'var(--aeva-ink-soft)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Price</p>
+                                <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{item.pricePerPerson} EGP</p>
+                                <p style={{ fontSize: '10px', color: 'var(--aeva-ink-soft)' }}>Per person</p>
                             </div>
-                            <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100">
-                                <p className="text-xs text-orange-600 font-bold uppercase tracking-wider mb-1">Style</p>
-                                <p className="text-xl font-bold text-text-dark">{item.style}</p>
+                            <div style={{
+                                padding: '16px',
+                                background: 'var(--aeva-paper-warm)',
+                                borderRadius: 'var(--r-xl)',
+                                border: '1px solid var(--aeva-line)'
+                            }}>
+                                <p style={{ fontSize: '12px', color: 'var(--aeva-ink-soft)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Style</p>
+                                <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{item.style}</p>
                             </div>
                         </div>
 
-                        <div className="mt-auto pt-6 border-t border-gray-50 flex flex-col sm:flex-row gap-4">
-                            <button
+                        <div style={{
+                            marginTop: 'auto',
+                            paddingTop: '24px',
+                            borderTop: '1px solid var(--aeva-line)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '16px'
+                        }} className="sm:flex-row">
+                            <Button
+                                variant={isSelected ? 'primary' : 'ghost'}
                                 onClick={handleSelect}
-                                className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${isSelected
-                                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-200'
-                                        : 'bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white'
-                                    }`}
+                                style={{ flex: 1 }}
                             >
                                 {isSelected ? <><CheckCircle size={20} /> Selected</> : 'Select This Catering →'}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
