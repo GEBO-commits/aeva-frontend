@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
 import { Button } from '../components/ui/Button';
 import * as authService from '../services/authService';
-
-const loginSchema = z.object({
-    email: z.string().email('Please enter a valid email'),
-    password: z.string().min(6, 'Password must be at least 6 characters')
-});
 
 const pageVariants = {
     initial: { opacity: 0, y: 20 },
@@ -24,37 +16,61 @@ export default function Login() {
     const location = useLocation();
     const from = location.state?.from || '/dashboard';
     const login = useAuthStore(state => state.login);
-    const [authError, setAuthError] = useState(null);
 
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
-        resolver: zodResolver(loginSchema),
-        mode: 'onSubmit'
-    });
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
 
-    const onSubmit = async (data) => {
-        setAuthError(null);
+    const validate = () => {
+        const newErrors = {};
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            newErrors.email = 'Please enter a valid email';
+        }
+        if (!password || password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters';
+        }
+        return newErrors;
+    };
 
-        const { user: currentUser } = await authService.getCurrentAuthUser();
-        const anonymousUserId = currentUser?.id;
-
-        const { user, error } = await authService.signInWithEmail(data.email, data.password);
-
-        if (error) {
-            console.error('[Login] Auth error:', error);
-            setAuthError(error.message || 'Invalid email or password');
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const validationErrors = validate();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
             return;
         }
+        setErrors({});
+        setIsLoading(true);
 
-        if (anonymousUserId && user.id !== anonymousUserId) {
-            try {
-                await authService.claimAnonymousSession(anonymousUserId, user.id);
-            } catch (mergeError) {
-                console.warn('[Login] Session merge failed, proceeding anyway:', mergeError);
+        try {
+            const { user: currentUser } = await authService.getCurrentAuthUser();
+            const anonymousUserId = currentUser?.id;
+
+            const { user, error } = await authService.signInWithEmail(email, password);
+
+            if (error) {
+                console.error('[Login] Auth error:', error);
+                setErrors({ general: error.message || 'Invalid email or password' });
+                setIsLoading(false);
+                return;
             }
-        }
 
-        login(user);
-        navigate(from, { replace: true });
+            if (anonymousUserId && user.id !== anonymousUserId) {
+                try {
+                    await authService.claimAnonymousSession(anonymousUserId, user.id);
+                } catch (mergeError) {
+                    console.warn('[Login] Session merge failed, proceeding anyway:', mergeError);
+                }
+            }
+
+            login(user);
+            navigate(from, { replace: true });
+        } catch (err) {
+            console.error('[Login] Unexpected error:', err);
+            setErrors({ general: err.message || 'An unexpected error occurred' });
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -78,15 +94,15 @@ export default function Login() {
                     <p style={{ color: 'var(--aeva-ink-soft)' }}>Sign in to continue planning your event</p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div>
                         <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="email">Email Address</label>
                         <input
-                            {...register('email')}
                             id="email"
                             type="email"
                             placeholder="you@example.com"
-                            onChange={(e) => { setAuthError(null); }}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             style={{
                                 width: '100%',
                                 padding: '12px 16px',
@@ -107,17 +123,17 @@ export default function Login() {
                                 e.currentTarget.style.boxShadow = '';
                             }}
                         />
-                        {errors.email && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.email.message}</p>}
+                        {errors.email && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.email}</p>}
                     </div>
 
                     <div>
                         <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="password">Password</label>
                         <input
-                            {...register('password')}
                             id="password"
                             type="password"
                             placeholder="••••••••"
-                            onChange={(e) => { setAuthError(null); }}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             style={{
                                 width: '100%',
                                 padding: '12px 16px',
@@ -138,10 +154,10 @@ export default function Login() {
                                 e.currentTarget.style.boxShadow = '';
                             }}
                         />
-                        {errors.password && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.password.message}</p>}
+                        {errors.password && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.password}</p>}
                     </div>
 
-                    {authError && (
+                    {errors.general && (
                         <div style={{
                             background: 'var(--aeva-paper-warm)',
                             border: '1px solid var(--aeva-line)',
@@ -150,12 +166,12 @@ export default function Login() {
                             color: 'var(--aeva-ink)',
                             fontSize: '14px'
                         }}>
-                            {authError}
+                            {errors.general}
                         </div>
                     )}
 
-                    <Button variant="primary" size="lg" type="submit" disabled={isSubmitting} style={{ width: '100%' }}>
-                        {isSubmitting ? 'Signing in...' : 'Sign In'}
+                    <Button variant="primary" size="lg" type="submit" disabled={isLoading} style={{ width: '100%' }}>
+                        {isLoading ? 'Signing in...' : 'Sign In'}
                     </Button>
                 </form>
 

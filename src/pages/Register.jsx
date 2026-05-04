@@ -1,18 +1,9 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Mail } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import * as authService from '../services/authService';
-
-const registerSchema = z.object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Please enter a valid email'),
-    password: z.string().min(6, 'Password must be at least 6 characters')
-});
 
 const pageVariants = {
     initial: { opacity: 0, scale: 0.95 },
@@ -21,27 +12,55 @@ const pageVariants = {
 };
 
 export default function Register() {
-    const [authError, setAuthError] = useState(null);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
     const [registered, setRegistered] = useState(false);
     const [registeredEmail, setRegisteredEmail] = useState(null);
 
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
-        resolver: zodResolver(registerSchema)
-    });
+    const validate = () => {
+        const newErrors = {};
+        if (!name || name.length < 2) {
+            newErrors.name = 'Name must be at least 2 characters';
+        }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            newErrors.email = 'Please enter a valid email';
+        }
+        if (!password || password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters';
+        }
+        return newErrors;
+    };
 
-    const onSubmit = async (data) => {
-        setAuthError(null);
-
-        const { user, error } = await authService.signUpWithEmail(data.email, data.password, data.name);
-
-        if (error) {
-            console.error('[Register] Auth error:', error);
-            setAuthError(error.message || 'Failed to create account');
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const validationErrors = validate();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
             return;
         }
+        setErrors({});
+        setIsLoading(true);
 
-        setRegisteredEmail(data.email);
-        setRegistered(true);
+        try {
+            const { user, error } = await authService.signUpWithEmail(email, password, name);
+
+            if (error) {
+                console.error('[Register] Auth error:', error);
+                setErrors({ general: error.message || 'Failed to create account' });
+                setIsLoading(false);
+                return;
+            }
+
+            setRegisteredEmail(email);
+            setRegistered(true);
+        } catch (err) {
+            console.error('[Register] Unexpected error:', err);
+            setErrors({ general: err.message || 'An unexpected error occurred' });
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -118,15 +137,15 @@ export default function Register() {
                             <p style={{ color: 'var(--aeva-ink-soft)' }}>Join AEVA and start planning your perfect event today.</p>
                         </div>
 
-                        <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
                             <div>
                                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="name">Full Name</label>
                                 <input
-                                    {...register('name')}
                                     id="name"
                                     type="text"
                                     placeholder="Emma Johnson"
-                                    onChange={(e) => { setAuthError(null); }}
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                     style={{
                                         width: '100%',
                                         padding: '12px 16px',
@@ -147,17 +166,17 @@ export default function Register() {
                                         e.currentTarget.style.boxShadow = '';
                                     }}
                                 />
-                                {errors.name && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.name.message}</p>}
+                                {errors.name && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.name}</p>}
                             </div>
 
                             <div>
                                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="email">Email Address</label>
                                 <input
-                                    {...register('email')}
                                     id="email"
                                     type="email"
                                     placeholder="you@example.com"
-                                    onChange={(e) => { setAuthError(null); }}
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     style={{
                                         width: '100%',
                                         padding: '12px 16px',
@@ -178,17 +197,17 @@ export default function Register() {
                                         e.currentTarget.style.boxShadow = '';
                                     }}
                                 />
-                                {errors.email && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.email.message}</p>}
+                                {errors.email && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.email}</p>}
                             </div>
 
                             <div>
                                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--aeva-ink)', marginBottom: '4px', marginLeft: '4px' }} htmlFor="password">Password</label>
                                 <input
-                                    {...register('password')}
                                     id="password"
                                     type="password"
                                     placeholder="••••••••"
-                                    onChange={(e) => { setAuthError(null); }}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     style={{
                                         width: '100%',
                                         padding: '12px 16px',
@@ -209,10 +228,10 @@ export default function Register() {
                                         e.currentTarget.style.boxShadow = '';
                                     }}
                                 />
-                                {errors.password && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.password.message}</p>}
+                                {errors.password && <p style={{ color: 'var(--aeva-ink)', fontSize: '13px', marginTop: '4px', marginLeft: '4px' }}>{errors.password}</p>}
                             </div>
 
-                            {authError && (
+                            {errors.general && (
                                 <div style={{
                                     background: 'var(--aeva-paper-warm)',
                                     border: '1px solid var(--aeva-line)',
@@ -221,12 +240,12 @@ export default function Register() {
                                     color: 'var(--aeva-ink)',
                                     fontSize: '14px'
                                 }}>
-                                    {authError}
+                                    {errors.general}
                                 </div>
                             )}
 
-                            <Button variant="primary" size="lg" type="submit" disabled={isSubmitting} style={{ width: '100%' }}>
-                                {isSubmitting ? 'Creating account...' : 'Create Account'}
+                            <Button variant="primary" size="lg" type="submit" disabled={isLoading} style={{ width: '100%' }}>
+                                {isLoading ? 'Creating account...' : 'Create Account'}
                             </Button>
                         </form>
 
