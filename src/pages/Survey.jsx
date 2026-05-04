@@ -82,7 +82,7 @@ export default function Survey() {
       }
 
       setIsSubmitting(false);
-      navigate('/event-plan', { state: { eventId: event.id } });
+      navigate('/recommendations', { state: { eventId: event.id } });
     } catch (err) {
       console.error('[Survey] Unexpected error in onSubmit:', err);
       alert('An unexpected error occurred. Please try again.');
