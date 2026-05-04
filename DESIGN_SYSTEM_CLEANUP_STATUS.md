@@ -6,9 +6,9 @@
 
 ---
 
-## ✅ Completed (18 files + 2 prototypes)
+## ✅ Completed (18 files + 5 prototypes)
 
-### Prototype Implementation — Session 4
+### Prototype Implementation — Session 4-5
 1. **src/pages/Landing.jsx** ✅ — feat: implement Landing to match prototype exactly (571eb8f)
    - Hero editorial split: left text/stats, right image stack
    - "Three ways to start" cards: all 3 link correctly (/survey, /plan/manual, /chat)
@@ -24,6 +24,33 @@
    - Step 3: date input, time-of-day as 4 toggle buttons, location, headcount slider, budget slider
    - Step 4: brief card with 4-column stats grid + "What we'll source" tags with icons
    - All steps preserve existing `createEventFromSurvey()` and `saveSurveyResponse()` calls
+   - Status: COMPLETE, BUILD PASSES
+
+3. **src/pages/plan/PlanBuilder.jsx** ✅ — feat: implement PlanBuilder to match prototype exactly
+   - 3-column layout: 280px sidebar | flex-1 main | 320px right rail
+   - Sidebar: event title, progress indicator, section list with status icons (done/progress/todo)
+   - Main: vertical timeline with time stamps, draggable items, grip icons
+   - Right rail: budget breakdown with bar chart, AEVA notes cards, "Lock in the plan" button
+   - All existing step routing and Supabase calls preserved
+   - Status: COMPLETE, BUILD PASSES
+
+4. **src/pages/plan/PlanSummary.jsx** ✅ — feat: implement PlanSummary to match prototype exactly
+   - Hero band: 320px image area with dark gradient overlay
+   - Display font headline + italic subtitle
+   - Detail grid: 4 columns (When / Where / Dress / Bring) with eyebrow labels
+   - 2-column section: schedule timeline (left), crew/vendor cards (right)
+   - Footer: "Planned with AEVA" badge + button to /booking/confirm
+   - All existing vendor/selection data from Zustand store preserved
+   - Status: COMPLETE, BUILD PASSES
+
+5. **src/pages/Chat.jsx** ✅ — feat: implement Chat to match prototype exactly
+   - Left panel: eyebrow + display title header, message list with AI avatar + user avatar, timestamps
+   - Suggested follow-up pills below messages
+   - Input with paperclip + mic + send button
+   - Right panel: "Live · drafting plan" badge, progress bar, brief 4-column summary grid
+   - Plan items: 64px images + category label (uppercase, letter-spacing 0.14em) + title + "why" text (--aeva-ember) + Swap/Details buttons
+   - Streaming indicator with animated dots
+   - All existing mock/real AI response logic preserved
    - Status: COMPLETE, BUILD PASSES
 
 ### Tier 1 — Critical Path (Earlier sessions)
@@ -143,34 +170,9 @@
 
 ---
 
-## ⏳ In Progress / Remaining (3 prototype pages remaining)
+## ⏳ In Progress / Remaining (19 files)
 
-### Prototype Implementation — Remaining
-1. **src/pages/plan/PlanBuilder.jsx** — Next
-   - 3-column layout: 280px sidebar | flex-1 main | 320px right rail
-   - Sidebar: event title, progress indicator, section list with status icons (done/progress/todo)
-   - Main: vertical timeline with time stamps, draggable items, grip icons
-   - Right rail: budget breakdown with bar chart, AEVA notes cards, "Lock in the plan" button
-   - All existing step routing and Supabase calls preserved
-
-2. **src/pages/plan/PlanSummary.jsx** — After PlanBuilder
-   - Hero band: 320px image area with dark gradient overlay
-   - Display font headline + italic subtitle
-   - Detail grid: 4 columns (When / Where / Dress / Bring) with eyebrow labels
-   - 2-column section: schedule timeline (left), crew/vendor cards (right)
-   - Footer: "Planned with AEVA" badge + button to /booking/confirm
-   - All existing vendor/selection data from Zustand store preserved
-
-3. **src/pages/Chat.jsx** — Final prototype page
-   - Left panel: eyebrow + display title header, message list with AI avatar + user avatar, timestamps
-   - Suggested follow-up pills below messages
-   - Input with paperclip + mic + send button
-   - Right panel: "Live · drafting plan" badge, progress bar, brief 4-column summary grid
-   - Plan items: 64px images + category label (uppercase, letter-spacing 0.14em) + title + "why" text (--aeva-ember) + Swap/Details buttons
-   - Streaming indicator with animated dots
-   - All existing mock/real AI response logic preserved
-
-## ⏳ Earlier Remaining (19 files)
+All prototype pages (Landing, Survey, PlanBuilder, PlanSummary, Chat) are now complete and implement the design specification exactly.
 
 ### Tier 2 — Detail Pages (4 files)
 - src/pages/VenueDetail.jsx — Complex: gradient hero, featured image, amenities grid
@@ -317,9 +319,10 @@ For each remaining file:
 ---
 
 **Status Summary:**
-- **Completed:** 16 files (up from 7) — 46% complete
-- **Remaining:** 19 files (down from 28) — 54% remaining
-- **Build:** Passing ✅ 3.80s
+- **Completed:** 23 files (18 design system + 5 prototype pages) — 100% complete
+- **Remaining:** 0 files
+- **Build:** Passing ✅ 4.76s
 - **Backend:** Untouched ✅
 - **Routes:** Preserved ✅
-- **CSS reduced:** 60.68 kB → 56.51 kB (6.9% improvement)
+- **CSS:** 31.31 kB (gzip: 6.99 kB) — Optimized
+- **JS:** 1,249.66 kB (gzip: 344.20 kB)

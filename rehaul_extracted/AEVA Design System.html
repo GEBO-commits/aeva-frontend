@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>AEVA — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..600,30..100&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="tokens.css"/>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel">
+const Section = ({ title, sub, children, w = 1100, h = 'auto' }) => (
+  <div style={{ width: w, padding: 40, background: 'var(--aeva-canvas)', border: '1px solid var(--aeva-line)', borderRadius: 'var(--r-lg)' }}>
+    <div style={{ marginBottom: 32, paddingBottom: 20, borderBottom: '1px solid var(--aeva-line)' }}>
+      <h2 className="t-display-md" style={{ marginBottom: 6 }}>{title}</h2>
+      <p style={{ fontSize: 14, color: 'var(--aeva-ink-soft)' }}>{sub}</p>
+    </div>
+    {children}
+  </div>
+);
+
+const Swatch = ({ name, val, onLight = true }) => (
+  <div>
+    <div style={{ height: 80, background: val, borderRadius: 8, marginBottom: 8, border: '1px solid var(--aeva-line)' }}/>
+    <p style={{ fontSize: 12, fontWeight: 600 }}>{name}</p>
+    <p style={{ fontSize: 11, color: 'var(--aeva-ink-mute)', fontFamily: 'var(--font-mono)' }}>{val}</p>
+  </div>
+);
+
+const TypeRow = ({ cls, label, sample }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 32, padding: '20px 0', borderTop: '1px solid var(--aeva-line)', alignItems: 'baseline' }}>
+    <div>
+      <p style={{ fontSize: 11.5, fontFamily: 'var(--font-mono)', color: 'var(--aeva-ink-soft)' }}>{cls}</p>
+      <p style={{ fontSize: 11, color: 'var(--aeva-ink-mute)', marginTop: 2 }}>{label}</p>
+    </div>
+    <div className={cls}>{sample}</div>
+  </div>
+);
+
+function Canvas() {
+  return (
+    <DesignCanvas title="AEVA · Design System" subtitle="Editorial AI-product direction — Apr 2026">
+      <DCSection id="brand" title="Brand" subtitle="Logo, voice, and the core product idea">
+        <DCArtboard id="brand-card" label="Identity" width={680} height={420}>
+          <div style={{ width: '100%', height: '100%', padding: 48, background: 'var(--aeva-paper)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <AevaLogo size={36}/>
+            <div>
+              <p className="t-eyebrow" style={{ marginBottom: 16 }}>Tagline</p>
+              <h1 className="t-display-lg" style={{ marginBottom: 16 }}>Events,<br/><em style={{ fontWeight: 320, color: 'var(--aeva-ink-soft)' }}>thoughtfully</em> planned.</h1>
+              <p style={{ fontSize: 14, color: 'var(--aeva-ink-soft)', maxWidth: 480 }}>The thoughtful way to plan an event — calm, considered, a little bit clever. Premium · smart · approachable.</p>
+            </div>
+          </div>
+        </DCArtboard>
+        <DCArtboard id="brand-dark" label="On dark" width={400} height={420}>
+          <div style={{ width: '100%', height: '100%', padding: 48, background: 'var(--aeva-ink)', color: 'var(--aeva-paper)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <AevaLogo size={32} color="var(--aeva-paper)"/>
+            <div>
+              <p style={{ fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(250,248,245,0.6)', marginBottom: 12, fontWeight: 600 }}>Wordmark</p>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'rgba(250,248,245,0.7)' }}>aeva · /ˈeɪvə/</p>
+            </div>
+          </div>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="colors" title="Colors" subtitle="Warm paper neutrals + one disciplined accent. Sage as supportive secondary.">
+        <DCArtboard id="surfaces" label="Surfaces" width={900} height={300}>
+          <div style={{ padding: 32 }}>
+            <p className="t-eyebrow" style={{ marginBottom: 16 }}>Paper · neutrals</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 14 }}>
+              <Swatch name="Paper" val="#FAF8F5"/>
+              <Swatch name="Paper deep" val="#F2EEE7"/>
+              <Swatch name="Paper warm" val="#ECE6DA"/>
+              <Swatch name="Line" val="#E4DED2"/>
+              <Swatch name="Line strong" val="#C9C0AE"/>
+              <Swatch name="Canvas" val="#FFFFFF"/>
+            </div>
+            <p className="t-eyebrow" style={{ marginTop: 24, marginBottom: 16 }}>Ink · type</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 14 }}>
+              <Swatch name="Ink" val="#1A1814"/>
+              <Swatch name="Ink soft" val="#4A453E"/>
+              <Swatch name="Ink mute" val="#8A8278"/>
+            </div>
+          </div>
+        </DCArtboard>
+        <DCArtboard id="accents" label="Accents" width={680} height={300}>
+          <div style={{ padding: 32 }}>
+            <p className="t-eyebrow" style={{ marginBottom: 16 }}>Ember · the one bold</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+              <Swatch name="Ember" val="oklch(0.58 0.16 38)"/>
+              <Swatch name="Ember deep" val="oklch(0.48 0.16 38)"/>
+              <Swatch name="Ember soft" val="oklch(0.92 0.04 38)"/>
+              <Swatch name="Ember line" val="oklch(0.78 0.10 38)"/>
+            </div>
+            <p className="t-eyebrow" style={{ marginBottom: 16 }}>Sage · supportive secondary</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
+              <Swatch name="Sage" val="oklch(0.62 0.06 150)"/>
+              <Swatch name="Sage soft" val="oklch(0.93 0.03 150)"/>
+              <Swatch name="Sage line" val="oklch(0.82 0.05 150)"/>
+            </div>
+          </div>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="type" title="Type" subtitle="Fraunces (display, optical-sized) · Inter (body) · JetBrains Mono (data)">
+        <DCArtboard id="type-scale" label="Scale" width={1080} height={780}>
+          <div style={{ padding: 40 }}>
+            <TypeRow cls="t-display-xl" label="Hero · Fraunces 80 / 0.95" sample="Events, thoughtfully planned."/>
+            <TypeRow cls="t-display-lg" label="H1 · Fraunces 56" sample="Six venues that fit Maya's 30th."/>
+            <TypeRow cls="t-display-md" label="H2 · Fraunces 40" sample="The arc of the night."/>
+            <TypeRow cls="t-display-sm" label="H3 · Fraunces 28" sample="DJ Carmine — disco-leaning"/>
+            <TypeRow cls="t-display-xs" label="H4 · Fraunces 22" sample="Family-style dinner"/>
+            <TypeRow cls="t-body-lg" label="Lead · Inter 17" sample="From a backyard birthday to a 200-person conference."/>
+            <TypeRow cls="t-body" label="Body · Inter 15" sample="Tell AEVA what you're celebrating. We'll handle the spreadsheet."/>
+            <TypeRow cls="t-body-sm" label="Small · Inter 13.5" sample="Sat, Jun 14 · 24 guests · Brooklyn"/>
+            <TypeRow cls="t-eyebrow" label="Eyebrow · Inter 11 caps" sample="STEP 1 OF 4 · BASICS"/>
+            <TypeRow cls="t-mono" label="Data · JetBrains 12.5" sample="$4,500 · 24/30 · 71%"/>
+          </div>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="components" title="Components" subtitle="Core building blocks — buttons, fields, tags, cards, the AI chip">
+        <DCArtboard id="buttons" label="Buttons" width={520} height={340}>
+          <div style={{ padding: 32 }}>
+            <p className="t-eyebrow" style={{ marginBottom: 14 }}>Primary actions</p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+              <button className="btn btn-primary btn-lg">Continue</button>
+              <button className="btn btn-ember btn-lg"><Icon name="sparkles" size={14}/> Plan with AEVA</button>
+              <button className="btn btn-ghost btn-lg">Cancel</button>
+            </div>
+            <p className="t-eyebrow" style={{ marginBottom: 14 }}>Default</p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+              <button className="btn btn-primary">Save</button>
+              <button className="btn btn-ember">Approve</button>
+              <button className="btn btn-ghost">Edit</button>
+              <button className="btn btn-quiet">Skip</button>
+            </div>
+            <p className="t-eyebrow" style={{ marginBottom: 14 }}>Small</p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn btn-primary btn-sm">Send</button>
+              <button className="btn btn-ghost btn-sm"><Icon name="share" size={12}/> Share</button>
+              <button className="btn btn-quiet btn-sm">More</button>
+            </div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="tags" label="Tags & status" width={520} height={340}>
+          <div style={{ padding: 32 }}>
+            <p className="t-eyebrow" style={{ marginBottom: 14 }}>Tones</p>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+              <Tag>Indoor</Tag>
+              <Tag tone="ember">94% match</Tag>
+              <Tag tone="sage" icon="check">Confirmed</Tag>
+              <Tag tone="ink">Featured</Tag>
+              <Tag tone="ghost">Optional</Tag>
+            </div>
+            <p className="t-eyebrow" style={{ marginBottom: 14 }}>With icons</p>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+              <Tag icon="building">Venue</Tag>
+              <Tag icon="utensils">Catering</Tag>
+              <Tag icon="music">Music</Tag>
+              <Tag icon="camera">Photo</Tag>
+              <Tag icon="sparkles" tone="ember">AI suggestion</Tag>
+            </div>
+            <p className="t-eyebrow" style={{ marginBottom: 14 }}>Live state pill</p>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 999, background: 'var(--aeva-ember-soft)', border: '1px solid var(--aeva-ember-line)' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--aeva-ember)', animation: 'aeva-pulse 1.5s infinite' }}/>
+              <span style={{ fontSize: 11, color: 'var(--aeva-ember-deep)', fontWeight: 600 }}>Live · drafting plan</span>
+            </div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="fields" label="Form fields" width={520} height={300}>
+          <div style={{ padding: 32 }}>
+            <p className="t-eyebrow" style={{ marginBottom: 8 }}>Text input</p>
+            <input className="field" defaultValue="Maya's 30th" style={{ marginBottom: 16 }}/>
+            <p className="t-eyebrow" style={{ marginBottom: 8 }}>Range</p>
+            <input type="range" defaultValue="60" style={{ width: '100%', accentColor: 'var(--aeva-ember)' }}/>
+            <p className="t-eyebrow" style={{ marginTop: 16, marginBottom: 8 }}>Avatar group</p>
+            <div style={{ display: 'flex' }}>
+              {['Liam P', 'Sara C', 'Devin W', 'Marcus R', 'Iris W'].map((n, i) => (
+                <div key={n} style={{ marginLeft: i === 0 ? 0 : -8 }}><Avatar name={n} size={32}/></div>
+              ))}
+              <div style={{ marginLeft: -8, width: 32, height: 32, borderRadius: '50%', background: 'var(--aeva-paper-warm)', border: '2px solid var(--aeva-paper)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, color: 'var(--aeva-ink-soft)' }}>+13</div>
+            </div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="cards" label="Recommendation card" width={340} height={400}>
+          <div style={{ padding: 16, height: '100%' }}>
+            <div style={{ background: 'var(--aeva-canvas)', border: '1px solid var(--aeva-line)', borderRadius: 'var(--r-lg)', overflow: 'hidden' }}>
+              <div style={{ position: 'relative', height: 160 }}>
+                <img src={PHOTOS.loft} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                <div style={{ position: 'absolute', top: 10, left: 10, padding: '5px 10px', background: 'rgba(26,24,20,0.85)', borderRadius: 999, color: 'white', fontSize: 10.5, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <Icon name="sparkles" size={9} style={{ color: 'var(--aeva-ember)' }}/>
+                  94% match
+                </div>
+              </div>
+              <div style={{ padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 480, fontVariationSettings: "'opsz' 36" }}>The Wythe Loft</h3>
+                  <span style={{ fontSize: 13, fontWeight: 600 }}>$1,800</span>
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--aeva-ink-mute)', marginBottom: 10 }}>Williamsburg · holds 30</p>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  <Tag size="sm">Indoor</Tag><Tag size="sm">Warm</Tag><Tag size="sm">Brick</Tag>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="ai-chip" label="AI moment" width={400} height={200}>
+          <div style={{ padding: 24 }}>
+            <div style={{ background: 'var(--aeva-ink)', color: 'var(--aeva-paper)', padding: 16, borderRadius: 'var(--r-md)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'rgba(250,248,245,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--aeva-ember)' }}>
+                  <Icon name="sparkles" size={11}/>
+                </div>
+                <span style={{ fontSize: 10.5, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(250,248,245,0.7)', fontWeight: 600 }}>AEVA</span>
+              </div>
+              <p style={{ fontSize: 13, lineHeight: 1.5 }}>"Want me to draft a final reminder for the 6 still-pending guests?"</p>
+            </div>
+          </div>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="spacing" title="Spacing & shape" subtitle="4px base · soft warm shadows · 6/10/14/20/28 radii">
+        <DCArtboard id="radii" label="Radii" width={520} height={200}>
+          <div style={{ padding: 32, display: 'flex', gap: 16, alignItems: 'flex-end' }}>
+            {[['xs', 6], ['sm', 10], ['md', 14], ['lg', 20], ['xl', 28]].map(([n, r]) => (
+              <div key={n} style={{ textAlign: 'center' }}>
+                <div style={{ width: 80, height: 80, background: 'var(--aeva-ember-soft)', border: '1px solid var(--aeva-ember-line)', borderRadius: r, marginBottom: 8 }}/>
+                <p style={{ fontSize: 11, fontFamily: 'var(--font-mono)' }}>{n} · {r}</p>
+              </div>
+            ))}
+          </div>
+        </DCArtboard>
+        <DCArtboard id="shadows" label="Shadows" width={680} height={200}>
+          <div style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'center', background: 'var(--aeva-paper)' }}>
+            {[['sm', 'var(--shadow-sm)'], ['md', 'var(--shadow-md)'], ['lg', 'var(--shadow-lg)'], ['xl', 'var(--shadow-xl)']].map(([n, s]) => (
+              <div key={n} style={{ textAlign: 'center' }}>
+                <div style={{ width: 100, height: 100, background: 'var(--aeva-canvas)', borderRadius: 14, marginBottom: 10, boxShadow: s }}/>
+                <p style={{ fontSize: 11, fontFamily: 'var(--font-mono)' }}>shadow-{n}</p>
+              </div>
+            ))}
+          </div>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Canvas/>);
+</script>
+</body>
+</html>

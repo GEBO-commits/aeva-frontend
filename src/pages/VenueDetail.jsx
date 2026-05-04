@@ -45,7 +45,7 @@ export default function VenueDetail() {
         return (
             <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px 48px', minHeight: '80vh' }}>
                 <Skeleton style={{ height: '400px', width: '100%', borderRadius: 'var(--r-lg)', marginBottom: 32 }} />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 32, gridTemplateColumns: 'repeat(auto-fit, minmax(600px, 1fr))' }}>
+                <div style={{ display: 'grid', gap: 32, gridTemplateColumns: 'repeat(auto-fit, minmax(600px, 1fr))' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
                         <div style={{ background: 'var(--aeva-canvas)', padding: 32, borderRadius: 'var(--r-lg)', border: '1px solid var(--aeva-line)' }}>
                             <Skeleton style={{ width: 192, height: 32, marginBottom: 16 }} />
