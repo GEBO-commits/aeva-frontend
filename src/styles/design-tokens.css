@@ -1,71 +1,35 @@
 /* AEVA Design Tokens — Color, Typography, Spacing, Shadows */
 
 :root {
-  /* ─── COLORS ─── */
-  /* Ink (text & dark elements) */
-  --aeva-ink: #1a1814;
-  --aeva-ink-soft: #5d5a56;
-  --aeva-ink-mute: #9b9794;
-  --aeva-ink-strong: #0f0d0b;
-
-  /* Paper (backgrounds) */
-  --aeva-paper: #faf8f5;
-  --aeva-canvas: #ffffff;
-  --aeva-paper-warm: #f3ede5;
-  --aeva-paper-deep: #f5f3f0;
-
-  /* Ember (primary accent) */
-  --aeva-ember: #d4593a;
-  --aeva-ember-soft: rgba(212, 89, 58, 0.1);
-  --aeva-ember-line: rgba(212, 89, 58, 0.3);
-  --aeva-ember-deep: #8b3423;
-
-  /* Sage (secondary accent) */
-  --aeva-sage: #5d9873;
-  --aeva-sage-soft: rgba(93, 152, 115, 0.1);
-  --aeva-sage-deep: #3a6b4f;
-
-  /* Semantic colors */
-  --aeva-warning: #d4a53a;
-  --aeva-danger: #d45a5a;
-  --aeva-success: #5d9873;
-
-  /* Lines & borders */
-  --aeva-line: #e8e4df;
-  --aeva-line-strong: #d9cfc8;
-
-  /* ─── TYPOGRAPHY ─── */
-  --font-display: 'Georgia', 'Garamond', serif;
-  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'SF Mono', 'Monaco', 'Courier New', monospace;
-
-  /* ─── SPACING (8px grid) ─── */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 40px;
-  --space-3xl: 56px;
-  --space-4xl: 64px;
-  --space-5xl: 80px;
-  --space-6xl: 96px;
-
-  /* ─── RADIUS ─── */
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 16px;
-  --r-xl: 20px;
-  --r-2xl: 24px;
-
-  /* ─── SHADOWS ─── */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.16);
-  --shadow-2xl: 0 12px 32px rgba(0, 0, 0, 0.2);
-
-  /* ─── Z-INDEX ─── */
+  --aeva-paper: #FAF8F5;
+  --aeva-paper-deep: #F2EEE7;
+  --aeva-paper-warm: #ECE6DA;
+  --aeva-canvas: #FFFFFF;
+  --aeva-ink: #1A1814;
+  --aeva-ink-soft: #4A453E;
+  --aeva-ink-mute: #8A8278;
+  --aeva-line: #E4DED2;
+  --aeva-line-strong: #C9C0AE;
+  --aeva-ember: oklch(0.58 0.16 38);
+  --aeva-ember-deep: oklch(0.48 0.16 38);
+  --aeva-ember-soft: oklch(0.92 0.04 38);
+  --aeva-ember-line: oklch(0.78 0.10 38);
+  --aeva-sage: oklch(0.62 0.06 150);
+  --aeva-sage-soft: oklch(0.93 0.03 150);
+  --aeva-sage-deep: oklch(0.45 0.08 150);
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(26,24,20,0.04), 0 1px 1px rgba(26,24,20,0.03);
+  --shadow-md: 0 2px 6px rgba(26,24,20,0.06), 0 4px 12px rgba(26,24,20,0.04);
+  --shadow-lg: 0 8px 24px rgba(26,24,20,0.08), 0 4px 8px rgba(26,24,20,0.04);
+  --shadow-xl: 0 24px 48px rgba(26,24,20,0.12), 0 8px 16px rgba(26,24,20,0.06);
   --z-nav: 30;
   --z-modal: 40;
   --z-toast: 50;

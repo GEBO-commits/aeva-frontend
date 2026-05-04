@@ -1,6 +1,6 @@
-@import "tailwindcss";
 @import "./styles/design-tokens.css";
 @import "./styles/components.css";
+@import "tailwindcss";
 
 /* ── AEVA Paper background (overrides Tailwind default) ── */
 html {
@@ -32,26 +32,10 @@ body,
   }
 }
 
-@theme {
-  --color-primary: #6B3FF3;
-  --color-secondary: #9B6CF7;
-  --color-accent: #FF6B6B;
-  --color-background: #F0F2FF;
-  --color-text-dark: #1A1A2E;
-  --color-text-muted: #6B7280;
-  --color-foreground: #FFFFFF;
-
-  --font-display: 'Syne', sans-serif;
-  --font-sans: 'DM Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-}
-
-@layer base {
-  body {
-    background-color: var(--color-background);
-    color: var(--color-text-dark);
-    font-family: var(--font-sans);
-  }
+body {
+  font-family: var(--font-body) !important;
+  background-color: var(--aeva-paper) !important;
+  color: var(--aeva-ink) !important;
 }
 
 @layer utilities {
