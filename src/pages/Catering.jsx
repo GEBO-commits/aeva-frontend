@@ -1,218 +1,346 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { getVendors } from '../services/catalogService';
-import { Utensils, Star, Check } from 'lucide-react';
+import { Sparkles, Star, ChevronLeft, Eye, ArrowRight } from 'lucide-react';
 import { CardSkeleton } from '../components/ui/Skeleton';
-import { Button } from '../components/ui/Button';
+import { usePlanStore } from '../store/plan.store';
 import { Tag } from '../components/ui/Tag';
 
 export default function Catering() {
-    const [expanded, setExpanded] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [catering, setCatering] = useState([]);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { setCatering } = usePlanStore();
+  const [expanded, setExpanded] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [caterers, setCaterers] = useState([]);
 
-    useEffect(() => {
-        const fetchCatering = async () => {
-            setIsLoading(true);
-            const { data, error } = await getVendors('catering');
-            if (error) {
-                console.error('[Catering] Failed to fetch catering vendors:', error);
-                setCatering([]);
-            } else {
-                const mapped = (data || []).map(v => {
-                    let details = {};
-                    if (v.details) {
-                        details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
-                    }
-                    return {
-                        id: v.id,
-                        name: v.name,
-                        description: v.description,
-                        rating: v.rating || 4.5,
-                        image: Array.isArray(v.image_urls)
-                            ? v.image_urls[0]
-                            : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800'),
-                        startingPrice: v.price_min,
-                        dietaryOptions: details.options || [],
-                        menuHighlights: details.specialties || []
-                    };
-                });
-                setCatering(mapped);
-            }
-            setIsLoading(false);
-        };
-        fetchCatering();
-    }, []);
+  useEffect(() => {
+    const fetchCatering = async () => {
+      setIsLoading(true);
+      const { data, error } = await getVendors('catering');
+      if (error) {
+        console.error('[Catering] Failed to fetch catering vendors:', error);
+        setCaterers([]);
+      } else {
+        const mapped = (data || []).map(v => {
+          let details = {};
+          if (v.details) {
+            details = typeof v.details === 'string' ? JSON.parse(v.details) : v.details;
+          }
+          return {
+            id: v.id,
+            name: v.name,
+            description: v.description,
+            rating: v.rating || 4.5,
+            image: Array.isArray(v.image_urls)
+              ? v.image_urls[0]
+              : (JSON.parse(v.image_urls || '[]')[0] || 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800'),
+            startingPrice: v.price_min,
+            dietaryOptions: details.options || [],
+            menuHighlights: details.specialties || []
+          };
+        });
+        setCaterers(mapped);
+      }
+      setIsLoading(false);
+    };
+    fetchCatering();
+  }, []);
+
+  const renderLoadingState = () => {
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+        {[1, 2, 3, 4, 5, 6].map(i => <CardSkeleton key={i} />)}
+      </div>
+    );
+  };
+
+  const renderCard = (v) => {
+    const isExpanded = expanded === v.id;
+    const matchScore = Math.round(70 + Math.random() * 25);
 
     return (
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 32px 80px', minHeight: '80vh' }}>
-            {/* Hero Section */}
-            <div style={{ marginBottom: 32 }}>
-                <div className="t-eyebrow" style={{ marginBottom: 8, color: 'var(--aeva-ink-mute)' }}>CULINARY EXCELLENCE</div>
-                <h1 className="t-display-lg" style={{ marginBottom: 12, maxWidth: 720 }}>Catering that elevates your event.</h1>
-                <p className="t-body-lg" style={{ color: 'var(--aeva-ink-soft)', maxWidth: 600 }}>
-                    Handpicked caterers with diverse menus. Browse options, compare pricing, and find the perfect fit for your guests.
-                </p>
-            </div>
+      <div
+        key={v.id}
+        onClick={() => setExpanded(isExpanded ? null : v.id)}
+        style={{
+          background: 'var(--aeva-canvas)',
+          border: `1px solid ${isExpanded ? 'var(--aeva-ink)' : 'var(--aeva-line)'}`,
+          borderRadius: 'var(--r-lg)',
+          overflow: 'hidden',
+          cursor: 'pointer',
+          transition: 'all 240ms',
+          boxShadow: isExpanded ? 'var(--shadow-lg)' : 'none',
+          position: 'relative'
+        }}
+        onMouseEnter={e => !isExpanded && (e.currentTarget.style.borderColor = 'var(--aeva-line-strong)')}
+        onMouseLeave={e => !isExpanded && (e.currentTarget.style.borderColor = 'var(--aeva-line)')}>
 
-            {/* Loading State */}
-            {isLoading ? (
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                    gap: '24px'
-                }}>
-                    {[1, 2, 3, 4, 5, 6].map(i => <CardSkeleton key={i} />)}
-                </div>
-            ) : catering.length > 0 ? (
-                <>
-                    {/* Catering Grid */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                        gap: '24px'
-                    }}>
-                        <AnimatePresence>
-                            {catering.map((c, i) => {
-                                const isExpanded = expanded === c.id;
-                                return (
-                                    <motion.div
-                                        key={c.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ delay: i * 0.05 }}
-                                        onClick={() => setExpanded(isExpanded ? null : c.id)}
-                                        style={{
-                                            background: 'var(--aeva-canvas)',
-                                            border: `1px solid ${isExpanded ? 'var(--aeva-ink)' : 'var(--aeva-line)'}`,
-                                            borderRadius: 'var(--r-lg)',
-                                            overflow: 'hidden',
-                                            cursor: 'pointer',
-                                            transition: 'all 240ms',
-                                            boxShadow: isExpanded ? 'var(--shadow-lg)' : 'var(--shadow-sm)',
-                                            transform: isExpanded ? 'translateY(-2px)' : 'translateY(0)'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (!isExpanded) {
-                                                e.currentTarget.style.borderColor = 'var(--aeva-line-strong)';
-                                                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (!isExpanded) {
-                                                e.currentTarget.style.borderColor = 'var(--aeva-line)';
-                                                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-                                            }
-                                        }}
-                                    >
-                                        {/* Image */}
-                                        <div style={{ position: 'relative', height: 200 }}>
-                                            <img src={c.image} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
-                                            {/* Rating Badge */}
-                                            <div style={{
-                                                position: 'absolute', top: 12, right: 12, padding: '6px 10px',
-                                                background: 'rgba(26,24,20,0.85)', backdropFilter: 'blur(6px)',
-                                                borderRadius: 999, color: 'white', fontSize: 11, fontWeight: 600,
-                                                display: 'flex', alignItems: 'center', gap: 5
-                                            }}>
-                                                <Star size={10} style={{ fill: '#FCD34D', color: '#FCD34D' }}/>
-                                                {c.rating}
-                                            </div>
-                                        </div>
+        {/* Image */}
+        <div style={{ position: 'relative', height: 200 }}>
+          <img src={v.image} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 
-                                        {/* Content */}
-                                        <div style={{ padding: 18 }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                                                <h3 className="t-display-sm" style={{ maxWidth: '85%' }}>{c.name}</h3>
-                                                <span style={{ fontSize: 14, fontWeight: 600 }}>${c.startingPrice}/guest</span>
-                                            </div>
-                                            <p style={{
-                                                fontSize: 12.5, color: 'var(--aeva-ink-mute)', marginBottom: 10,
-                                                lineHeight: 1.4
-                                            }}>
-                                                {c.description}
-                                            </p>
-                                            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 10 }}>
-                                                {c.dietaryOptions.slice(0, 3).map(t => <Tag key={t} size="sm">{t}</Tag>)}
-                                                {c.dietaryOptions.length > 3 && <Tag size="sm">+{c.dietaryOptions.length - 3}</Tag>}
-                                            </div>
+          {/* Score badge */}
+          <div style={{
+            position: 'absolute', top: 12, left: 12, padding: '6px 10px',
+            background: 'rgba(26,24,20,0.85)', backdropFilter: 'blur(6px)',
+            borderRadius: 999, color: 'white', fontSize: 11, fontWeight: 600,
+            display: 'flex', alignItems: 'center', gap: 5
+          }}>
+            <Sparkles size={10} style={{ color: 'var(--aeva-ember)' }} />
+            {matchScore}% match
+          </div>
 
-                                            {/* Expanded Content */}
-                                            <div style={{
-                                                overflow: 'hidden',
-                                                maxHeight: isExpanded ? 300 : 0,
-                                                transition: 'max-height 360ms ease'
-                                            }}>
-                                                <div style={{ paddingTop: 14, borderTop: '1px solid var(--aeva-line)', marginTop: 10 }}>
-                                                    <p className="t-eyebrow" style={{ marginBottom: 10, color: 'var(--aeva-ink)' }}>Menu Highlights</p>
-                                                    {c.menuHighlights.length > 0 ? (
-                                                        <ul style={{ fontSize: 13, color: 'var(--aeva-ink-soft)', lineHeight: 1.6, marginBottom: 14, paddingLeft: 16 }}>
-                                                            {c.menuHighlights.map((h, idx) => <li key={idx}>• {h}</li>)}
-                                                        </ul>
-                                                    ) : (
-                                                        <p style={{ fontSize: 13, color: 'var(--aeva-ink-soft)', marginBottom: 14 }}>
-                                                            Full menu available on request
-                                                        </p>
-                                                    )}
-                                                    <div style={{ display: 'flex', gap: 8 }}>
-                                                        <Button
-                                                            variant="primary"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                navigate(`/catering/${c.id}`);
-                                                            }}
-                                                            style={{ flex: 1 }}
-                                                        >
-                                                            View Full Menu
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {!isExpanded && (
-                                                <div style={{ fontSize: 12, color: 'var(--aeva-ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                                                    Tap to see more →
-                                                </div>
-                                            )}
-                                        </div>
-                                    </motion.div>
-                                );
-                            })}
-                        </AnimatePresence>
-                    </div>
-                </>
-            ) : (
-                <div style={{
-                    background: 'var(--aeva-canvas)',
-                    padding: '48px',
-                    borderRadius: 'var(--r-lg)',
-                    border: '1px solid var(--aeva-line)',
-                    textAlign: 'center',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    minHeight: '40vh'
-                }}>
-                    <div style={{
-                        width: '80px',
-                        height: '80px',
-                        background: 'var(--aeva-paper-warm)',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '16px'
-                    }}>
-                        <Utensils size={32} style={{ color: 'var(--aeva-ink-soft)' }}/>
-                    </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>No catering options found</h3>
-                    <p style={{ color: 'var(--aeva-ink-soft)' }}>Check back soon for our curated catering partners.</p>
-                </div>
-            )}
+          {/* Rating badge */}
+          <div style={{
+            position: 'absolute', bottom: 12, right: 12, padding: '6px 10px',
+            background: 'rgba(26,24,20,0.85)', backdropFilter: 'blur(6px)',
+            borderRadius: 'var(--r-md)', color: 'white', fontSize: 11, fontWeight: 600,
+            display: 'flex', alignItems: 'center', gap: 4
+          }}>
+            <Star size={10} style={{ fill: 'white' }} />
+            {v.rating}
+          </div>
         </div>
+
+        {/* Body */}
+        <div style={{ padding: 18 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+            <h3 style={{
+              fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 480,
+              fontVariationSettings: "'opsz' 36", margin: 0
+            }}>
+              {v.name}
+            </h3>
+            <span style={{ fontSize: 14, fontWeight: 600, flexShrink: 0 }}>
+              from ${v.startingPrice.toLocaleString()}
+            </span>
+          </div>
+
+          <p style={{
+            fontSize: 12.5, color: 'var(--aeva-ink-soft)', marginBottom: 10, margin: 0
+          }}>
+            {v.description}
+          </p>
+
+          {/* Expansion area */}
+          <div style={{
+            overflow: 'hidden',
+            maxHeight: isExpanded ? 400 : 0,
+            transition: 'max-height 360ms ease'
+          }}>
+            <div style={{ paddingTop: 14, borderTop: '1px solid var(--aeva-line)' }}>
+              <p style={{
+                fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
+                marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6,
+                fontWeight: 600, color: 'var(--aeva-ink)', margin: 0
+              }}>
+                <Sparkles size={11} style={{ color: 'var(--aeva-ember)' }} /> What they offer
+              </p>
+
+              {v.dietaryOptions.length > 0 && (
+                <div style={{ marginBottom: 12 }}>
+                  <span style={{ fontSize: 10, color: 'var(--aeva-ink-mute)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Dietary options
+                  </span>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 6 }}>
+                    {v.dietaryOptions.map(opt => (
+                      <Tag key={opt} size="sm">{opt}</Tag>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {v.menuHighlights.length > 0 && (
+                <div style={{ marginBottom: 14 }}>
+                  <span style={{ fontSize: 10, color: 'var(--aeva-ink-mute)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Specialties
+                  </span>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 6 }}>
+                    {v.menuHighlights.map(spec => (
+                      <Tag key={spec} size="sm">{spec}</Tag>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  style={{
+                    flex: 1, padding: '10px 16px', background: 'var(--aeva-ember)',
+                    color: 'white', border: 'none', borderRadius: 'var(--r-md)',
+                    fontSize: 13, fontWeight: 500, cursor: 'pointer',
+                    transition: 'all 200ms', display: 'inline-flex',
+                    alignItems: 'center', justifyContent: 'center', gap: 6
+                  }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    setCatering(v);
+                    navigate('/plan/build/catering');
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
+                  onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}>
+                  Pick this caterer
+                </button>
+
+                <button
+                  style={{
+                    padding: '10px 16px', background: 'var(--aeva-canvas)',
+                    color: 'var(--aeva-ink)', border: '1px solid var(--aeva-line)',
+                    borderRadius: 'var(--r-md)', fontSize: 13, fontWeight: 500,
+                    cursor: 'pointer', display: 'inline-flex', alignItems: 'center',
+                    justifyContent: 'center', gap: 6, transition: 'all 200ms'
+                  }}
+                  onClick={e => { e.stopPropagation(); navigate(`/vendors/${v.id}`); }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--aeva-line-strong)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--aeva-line)'; }}>
+                  <Eye size={13} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {!isExpanded && (
+            <div style={{ fontSize: 12, color: 'var(--aeva-ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              Tap to see details <ArrowRight size={11} />
+            </div>
+          )}
+        </div>
+      </div>
     );
+  };
+
+  const renderGrid = () => {
+    if (isLoading) return renderLoadingState();
+    if (caterers.length === 0) {
+      return (
+        <div style={{
+          background: 'var(--aeva-canvas)', padding: '48px', borderRadius: 'var(--r-lg)',
+          border: '1px solid var(--aeva-line)', textAlign: 'center', display: 'flex',
+          flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '40vh'
+        }}>
+          <div style={{
+            width: '80px', height: '80px', background: 'var(--aeva-paper-warm)',
+            borderRadius: '50%', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', marginBottom: '16px'
+          }}>
+            <Sparkles size={32} style={{ color: 'var(--aeva-ink-soft)' }} />
+          </div>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px', margin: 0 }}>
+            No caterers found
+          </h3>
+          <p style={{ color: 'var(--aeva-ink-soft)', margin: 0 }}>Try adjusting your filters.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+        {caterers.map(v => renderCard(v))}
+      </div>
+    );
+  };
+
+  const renderContinueBar = () => {
+    if (isLoading || caterers.length === 0) return null;
+
+    return (
+      <div style={{
+        marginTop: 32, padding: 20, background: 'var(--aeva-canvas)',
+        border: '1px solid var(--aeva-line)', borderRadius: 'var(--r-md)',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Sparkles size={16} style={{ color: 'var(--aeva-sage)' }} />
+          <span style={{ fontSize: 13.5 }}>
+            Browse and pick catering · <span style={{ color: 'var(--aeva-ink-mute)' }}>3 more steps to go</span>
+          </span>
+        </div>
+        <button
+          style={{
+            padding: '10px 16px', background: 'var(--aeva-ink)', color: 'var(--aeva-paper)',
+            border: 'none', borderRadius: 'var(--r-md)', fontSize: 13, fontWeight: 500,
+            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+            transition: 'all 200ms'
+          }}
+          onClick={() => navigate('/plan/build/decorations')}
+          onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}>
+          Continue <ArrowRight size={14} />
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 32px 80px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32, gap: 32, flexWrap: 'wrap' }}>
+        <div>
+          <button
+            style={{
+              padding: '8px 12px', borderRadius: 'var(--r-md)', background: 'transparent',
+              border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--aeva-ink-soft)',
+              marginLeft: -10, marginBottom: 16
+            }}
+            onClick={() => navigate(-1)}>
+            <ChevronLeft size={13} /> Back
+          </button>
+          <p style={{ fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--aeva-ink-mute)', marginBottom: 8, fontWeight: 600, margin: 0 }}>
+            Step 2 of 4 · catering
+          </p>
+          <h1 style={{
+            fontFamily: 'var(--font-display)', fontSize: 48, fontWeight: 400,
+            lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: 12, maxWidth: 720, margin: 0
+          }}>
+            Catering that makes it memorable.
+          </h1>
+          <p style={{ fontSize: 16, color: 'var(--aeva-ink-soft)', maxWidth: 600, lineHeight: 1.6, margin: 0 }}>
+            From intimate to grand. Find a caterer that matches your vision.
+          </p>
+        </div>
+
+        {/* Filters */}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {['all', 'italian', 'modern', 'family'].map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{
+                padding: '8px 14px', borderRadius: 999,
+                background: filter === f ? 'var(--aeva-ink)' : 'var(--aeva-canvas)',
+                color: filter === f ? 'var(--aeva-paper)' : 'var(--aeva-ink-soft)',
+                border: filter === f ? 'none' : '1px solid var(--aeva-line)',
+                fontSize: 12.5, fontWeight: 500, cursor: 'pointer',
+                textTransform: 'capitalize', transition: 'all 200ms'
+              }}
+              onMouseEnter={e => { if (filter !== f) e.currentTarget.style.borderColor = 'var(--aeva-line-strong)'; }}
+              onMouseLeave={e => { if (filter !== f) e.currentTarget.style.borderColor = 'var(--aeva-line)'; }}>
+              {f}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Brief strip */}
+      <div style={{
+        display: 'flex', gap: 16, padding: '14px 20px', background: 'var(--aeva-paper-warm)',
+        border: '1px solid var(--aeva-line)', borderRadius: 'var(--r-md)', marginBottom: 32,
+        alignItems: 'center', flexWrap: 'wrap'
+      }}>
+        <Sparkles size={16} style={{ color: 'var(--aeva-ember)', flexShrink: 0 }} />
+        <span style={{ fontSize: 12.5, color: 'var(--aeva-ink-soft)' }}>For an event of:</span>
+        <Tag size="sm">24 people</Tag>
+        <Tag size="sm">Summer evening</Tag>
+        <Tag size="sm">Brooklyn</Tag>
+      </div>
+
+      {/* Grid */}
+      {renderGrid()}
+
+      {/* Continue bar */}
+      {renderContinueBar()}
+    </div>
+  );
 }
