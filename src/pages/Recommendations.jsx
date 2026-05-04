@@ -261,7 +261,7 @@ export default function Recommendations() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Sparkles size={16} style={{ color: 'var(--aeva-sage)' }} />
           <span style={{ fontSize: 13.5 }}>
-            Browse and pick a venue · <span style={{ color: 'var(--aeva-ink-mute)' }}>4 more steps to go</span>
+            Browse and pick a venue · <span style={{ color: 'var(--aeva-ink-mute)' }}>Next: Catering → Decorations → Vendors → Summary</span>
           </span>
         </div>
         <button
