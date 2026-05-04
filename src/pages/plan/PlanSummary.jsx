@@ -1,384 +1,122 @@
-/**
- * PlanSummary.jsx — Step 5 of the Manual Plan Builder
- *
- * Displays a full overview of all selected items (Venue, Catering, Decorations, Vendors)
- * and the total computed cost.
- */
-
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { usePlanStore } from '../../store/plan.store';
-import { PlanBuilderContext } from '../../contexts/PlanBuilderContext';
-import { PlanProgressBar } from '../../components/plan/PlanProgressBar';
-import { CheckCircle, Sparkles, Calendar, MapPin, Users, Utensils, Palette, Camera, Music, Video, ArrowRight, AlertTriangle } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
+import { Download, Share2, Mail, ChevronLeft, Sparkles } from 'lucide-react';
 
 export default function PlanSummary() {
-    const navigate = useNavigate();
-    const { eventId } = useContext(PlanBuilderContext);
-    const {
-        selectedVenue,
-        selectedCatering,
-        selectedDecorations,
-        selectedVendors,
-        skippedSteps,
-        getTotalCost,
-        clearPlan
-    } = usePlanStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { getTotalCost } = usePlanStore();
 
-    const hasAnySelection = Boolean(
-        selectedVenue ||
-        selectedCatering ||
-        selectedDecorations ||
-        Object.values(selectedVendors).some(Boolean)
-    );
+  // Mock data matching prototype
+  const eventTitle = "Maya turns thirty.";
+  const eventSubtitle = "An evening of pasta, candles, and questionable dancing.";
+  const eventDate = "Sat, Jun 14";
+  const eventTime = "6:00 — 11:00 PM";
+  const eventLocation = "The Wythe Loft";
+  const eventAddress = "212 Wythe Ave, Brooklyn";
+  const totalSpend = 4900;
+  const totalCost = getTotalCost() || totalSpend;
 
-    const totalCost = getTotalCost();
-
-    const handleConfirm = () => {
-        navigate('/booking/confirm', { state: { eventId } });
-    };
-
-    const handleStartAI = () => {
-        // Navigate to dashboard and auto-open chat
-        navigate('/dashboard', { state: { openChat: true } });
-    };
-
-    return (
-        <div style={{ maxWidth: '1400px', margin: '0 auto', paddingTop: '32px', paddingX: '16px' }}>
-            <PlanProgressBar currentStep={4} />
-
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginTop: '32px',
-                marginBottom: '40px'
-            }}>
-                <div style={{ flex: 1 }}>
-                    <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '8px' }}>✨ Your Event Plan is Ready!</h1>
-                    <p style={{ color: 'var(--aeva-ink-soft)' }}>Review your selections and confirm your dream event.</p>
-                </div>
-                <Button variant="ghost" onClick={() => navigate('/plan/build/vendors')}>← Back</Button>
-            </div>
-
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr',
-                gap: '32px'
-            }} className="lg:grid-cols-3">
-                {/* Left: Selection Cards */}
-                <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    {/* Venue */}
-                    <SummaryItem
-                        title="Venue"
-                        icon={<MapPin className="text-primary" size={20} />}
-                        item={selectedVenue}
-                        placeholder="No venue selected yet"
-                        details={selectedVenue ? `${selectedVenue.location} · ${selectedVenue.maxGuests} Guests` : ''}
-                        price={selectedVenue?.startingPrice}
-                        isSkipped={skippedSteps.includes(0)}
-                    />
-
-                    {/* Catering */}
-                    <SummaryItem
-                        title="Catering"
-                        icon={<Utensils className="text-orange-500" size={20} />}
-                        item={selectedCatering}
-                        placeholder="No catering selected yet"
-                        details={selectedCatering ? `${selectedCatering.style} · ${selectedCatering.pricePerPerson} EGP/person` : ''}
-                        price={selectedCatering ? selectedCatering.pricePerPerson * 100 : 0} // ~100 guests
-                        priceLabel="~For 100 guests"
-                        isSkipped={skippedSteps.includes(1)}
-                    />
-
-                    {/* Decorations */}
-                    <SummaryItem
-                        title="Decorations"
-                        icon={<Palette className="text-pink-500" size={20} />}
-                        item={selectedDecorations}
-                        placeholder="No decorations selected yet"
-                        details={selectedDecorations ? `${selectedDecorations.theme}` : ''}
-                        price={selectedDecorations?.totalPrice}
-                        isSkipped={skippedSteps.includes(2)}
-                    />
-
-                    {/* Vendors */}
-                    <div style={{
-                        background: 'var(--aeva-canvas)',
-                        borderRadius: 'var(--r-2xl)',
-                        padding: '24px',
-                        border: '1px solid var(--aeva-line)',
-                        boxShadow: 'var(--shadow-sm)'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                            <div style={{
-                                width: '40px',
-                                height: '40px',
-                                background: 'var(--aeva-paper-warm)',
-                                borderRadius: 'var(--r-lg)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                                <Camera style={{ color: 'var(--aeva-ink)' }} size={20} />
-                            </div>
-                            <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>Vendors</h3>
-                            {skippedSteps.includes(3) && (
-                                <span style={{
-                                    marginLeft: '8px',
-                                    fontSize: '10px',
-                                    fontWeight: 700,
-                                    color: 'var(--aeva-ink-soft)',
-                                    background: 'var(--aeva-paper-warm)',
-                                    padding: '2px 8px',
-                                    borderRadius: 'var(--r-full)',
-                                    border: '1px solid var(--aeva-line)'
-                                }}>
-                                    Skipped
-                                </span>
-                            )}
-                        </div>
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                            gap: '16px'
-                        }}>
-                            <VendorSmall role="Photographer" vendor={selectedVendors.photographer} icon={<Camera size={16} />} />
-                            <VendorSmall role="DJ" vendor={selectedVendors.dj} icon={<Music size={16} />} />
-                            <VendorSmall role="Videographer" vendor={selectedVendors.videographer} icon={<Video size={16} />} />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right: Cost Summary & Actions */}
-                <div style={{
-                    background: 'var(--aeva-canvas)',
-                    borderRadius: 'var(--r-2xl)',
-                    padding: '32px',
-                    border: '1px solid var(--aeva-line)',
-                    boxShadow: 'var(--shadow-lg)',
-                    position: 'sticky',
-                    top: '96px'
-                }}>
-                    <h3 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--aeva-ink)', marginBottom: '24px' }}>Cost Summary</h3>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
-                        <CostRow label="Venue" value={selectedVenue?.startingPrice} />
-                        <CostRow label="Catering (~100p)" value={selectedCatering ? selectedCatering.pricePerPerson * 100 : 0} />
-                        <CostRow label="Decorations" value={selectedDecorations?.totalPrice} />
-                        <CostRow label="Vendors" value={
-                            (selectedVendors.photographer?.startingPrice || 0) +
-                            (selectedVendors.dj?.startingPrice || 0) +
-                            (selectedVendors.videographer?.startingPrice || 0)
-                        } />
-                    </div>
-
-                    <div style={{
-                        paddingTop: '24px',
-                        borderTop: '1px solid var(--aeva-line)',
-                        marginBottom: '32px'
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '24px', fontWeight: 700 }}>
-                            <span style={{ color: 'var(--aeva-ink)' }}>Total Est.</span>
-                            <span style={{ color: 'var(--aeva-ink)' }}>{totalCost.toLocaleString()} EGP</span>
-                        </div>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <Button
-                            variant="primary"
-                            size="lg"
-                            onClick={handleConfirm}
-                            disabled={!hasAnySelection}
-                            title={!hasAnySelection ? "Please make your selections to continue" : ""}
-                            style={{ width: '100%' }}
-                        >
-                            <CheckCircle size={20} /> Lock In This Plan
-                        </Button>
-
-                        <button
-                            onClick={handleStartAI}
-                            style={{
-                                width: '100%',
-                                padding: '16px',
-                                background: 'var(--aeva-canvas)',
-                                border: '2px solid var(--aeva-line)',
-                                color: 'var(--aeva-ink)',
-                                borderRadius: 'var(--r-xl)',
-                                fontWeight: 700,
-                                fontSize: '16px',
-                                transition: 'all 200ms',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                cursor: 'pointer',
-                                marginTop: '16px'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.borderColor = 'var(--aeva-ink)';
-                                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.borderColor = 'var(--aeva-line)';
-                                e.currentTarget.style.boxShadow = '';
-                            }}
-                        >
-                            <Sparkles size={20} /> Want a Better One With AI?
-                        </button>
-
-                        <button
-                            onClick={() => navigate('/invitations')}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                background: 'var(--aeva-paper-warm)',
-                                color: 'var(--aeva-ink)',
-                                borderRadius: 'var(--r-lg)',
-                                fontWeight: 700,
-                                fontSize: '14px',
-                                border: '1px solid var(--aeva-line)',
-                                cursor: 'pointer',
-                                transition: 'all 200ms'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--aeva-line)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--aeva-paper-warm)'}
-                        >
-                            Skip to Invitations
-                        </button>
-
-                        <button
-                            onClick={clearPlan}
-                            style={{
-                                width: '100%',
-                                padding: '8px',
-                                color: 'var(--aeva-ink-soft)',
-                                fontSize: '14px',
-                                fontWeight: 500,
-                                background: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                transition: 'color 200ms'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--aeva-ink)'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--aeva-ink-soft)'}
-                        >
-                            Reset Selections
-                        </button>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div style={{ maxWidth: 1080, margin: '0 auto', padding: '40px 32px 80px', background: 'var(--aeva-paper)' }}>
+      {/* Top navigation */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 32 }}>
+        <button style={{ padding: '8px 12px', borderRadius: 'var(--r-md)', background: 'transparent', border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--aeva-ink-soft)', marginLeft: -10 }} onClick={() => navigate('/plan/builder')}>
+          <ChevronLeft size={13}/> Back to plan
+        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button style={{ padding: '8px 12px', borderRadius: 'var(--r-md)', background: 'var(--aeva-canvas)', border: '1px solid var(--aeva-line)', fontSize: 13, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }} onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--aeva-line-strong)'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--aeva-line)'; }}><Download size={13}/> Download PDF</button>
+          <button style={{ padding: '8px 12px', borderRadius: 'var(--r-md)', background: 'var(--aeva-canvas)', border: '1px solid var(--aeva-line)', fontSize: 13, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }} onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--aeva-line-strong)'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--aeva-line)'; }}><Share2 size={13}/> Share link</button>
+          <button style={{ padding: '8px 12px', borderRadius: 'var(--r-md)', background: 'var(--aeva-ember)', color: 'white', border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }} onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }} onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}><Mail size={13}/> Send invitations</button>
         </div>
-    );
-}
+      </div>
 
-function SummaryItem({ title, icon, item, placeholder, details, price, priceLabel = null, isSkipped }) {
-    return (
-        <div style={{
-            background: 'var(--aeva-canvas)',
-            borderRadius: 'var(--r-2xl)',
-            padding: '24px',
-            border: '1px solid var(--aeva-line)',
-            boxShadow: 'var(--shadow-sm)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '24px'
-        }}>
-            <div style={{
-                width: '96px',
-                height: '96px',
-                borderRadius: 'var(--r-xl)',
-                overflow: 'hidden',
-                flexShrink: 0,
-                background: 'var(--aeva-paper-warm)',
-                border: '1px solid var(--aeva-line)'
-            }}>
-                {item?.image ? (
-                    <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--aeva-ink-soft)' }}>
-                        {icon}
-                    </div>
-                )}
+      {/* The shareable event card */}
+      <div style={{ background: 'var(--aeva-canvas)', border: '1px solid var(--aeva-line)', borderRadius: 'var(--r-xl)', overflow: 'hidden', boxShadow: 'var(--shadow-lg)' }}>
+        {/* Hero band */}
+        <div style={{ position: 'relative', height: 320, overflow: 'hidden', background: 'linear-gradient(135deg, var(--aeva-ember-soft) 0%, var(--aeva-sage-soft) 100%)' }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 30%, rgba(26,24,20,0.85) 100%)' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 40, color: 'white' }}>
+            <p style={{ fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.7, marginBottom: 12, fontWeight: 600 }}>Event No. 042 · You're invited</p>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 64, fontWeight: 380, lineHeight: 0.95, letterSpacing: '-0.03em', marginBottom: 8, fontVariationSettings: "'opsz' 144, 'SOFT' 100" }}>
+              {eventTitle}
+            </h1>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontStyle: 'italic', fontWeight: 320, opacity: 0.85 }}>
+              {eventSubtitle}
+            </p>
+          </div>
+        </div>
+
+        {/* Detail grid */}
+        <div style={{ padding: 40 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, paddingBottom: 32, marginBottom: 32, borderBottom: '1px solid var(--aeva-line)' }}>
+            {[
+              ['When', eventDate, eventTime],
+              ['Where', eventLocation, eventAddress],
+              ['Dress', 'Smart casual', 'Layers · we\'ll dance'],
+              ['Bring', 'Yourself', 'Photos & a song to request']
+            ].map(([k, v, sub]) => (
+              <div key={k}>
+                <p className="t-eyebrow" style={{ marginBottom: 8 }}>{k}</p>
+                <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 2 }}>{v}</p>
+                <p style={{ fontSize: 12, color: 'var(--aeva-ink-mute)' }}>{sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Schedule & Crew */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, marginBottom: 32 }}>
+            <div>
+              <p className="t-eyebrow" style={{ marginBottom: 14 }}>The arc of the night</p>
+              {[
+                ['6:00', 'Doors + cocktails'],
+                ['7:00', 'Family-style dinner'],
+                ['8:15', 'Cake & a song'],
+                ['8:40', 'DJ set begins'],
+                ['11:00', 'Last call']
+              ].map(([t, x]) => (
+                <div key={t} style={{ display: 'grid', gridTemplateColumns: '60px 1fr', gap: 16, padding: '8px 0', borderTop: '1px solid var(--aeva-line)' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--aeva-ink-mute)' }}>{t} PM</span>
+                  <span style={{ fontSize: 14 }}>{x}</span>
+                </div>
+              ))}
             </div>
-            <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    {icon}
-                    <h4 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--aeva-ink-soft)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</h4>
-                    {isSkipped && (
-                        <span style={{
-                            marginLeft: '8px',
-                            fontSize: '10px',
-                            fontWeight: 700,
-                            color: 'var(--aeva-ink-soft)',
-                            background: 'var(--aeva-paper-warm)',
-                            padding: '2px 8px',
-                            borderRadius: 'var(--r-full)',
-                            border: '1px solid var(--aeva-line)'
-                        }}>
-                            Skipped
-                        </span>
-                    )}
+            <div>
+              <p className="t-eyebrow" style={{ marginBottom: 14 }}>Crew</p>
+              {[
+                ['Venue', 'The Wythe Loft'],
+                ['Catering', 'Sunday Supper Co.'],
+                ['Music', 'DJ Carmine'],
+                ['Photo', 'Lou Mendez'],
+                ['Decor', 'Petal & Pine']
+              ].map(([k, n]) => (
+                <div key={k} style={{ display: 'grid', gridTemplateColumns: '40px 60px 1fr', gap: 12, padding: '8px 0', borderTop: '1px solid var(--aeva-line)', alignItems: 'center' }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 8, background: 'linear-gradient(135deg, var(--aeva-ember-soft) 0%, var(--aeva-sage-soft) 100%)', overflow: 'hidden' }} />
+                  <span style={{ fontSize: 11, color: 'var(--aeva-ink-mute)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600 }}>{k}</span>
+                  <span style={{ fontSize: 14, fontWeight: 500 }}>{n}</span>
                 </div>
-                {item ? (
-                    <>
-                        <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{item.name}</h3>
-                        <p style={{ color: 'var(--aeva-ink-soft)', fontSize: '14px' }}>{details}</p>
-                    </>
-                ) : (
-                    <p style={{ color: 'var(--aeva-ink-soft)', fontStyle: 'italic' }}>{placeholder}</p>
-                )}
+              ))}
             </div>
-            {price > 0 && (
-                <div style={{ textAlign: 'right' }}>
-                    <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--aeva-ink)' }}>{price.toLocaleString()} EGP</p>
-                    {priceLabel && <p style={{ fontSize: '10px', color: 'var(--aeva-ink-soft)' }}>{priceLabel}</p>}
-                </div>
-            )}
-        </div>
-    );
-}
+          </div>
 
-function VendorSmall({ role, vendor, icon }) {
-    return (
-        <div style={{
-            padding: '16px',
-            borderRadius: 'var(--r-xl)',
-            border: vendor ? '1px solid var(--aeva-line)' : '1px solid var(--aeva-line)',
-            background: vendor ? 'var(--aeva-paper-warm)' : 'var(--aeva-paper-warm)'
-        }}>
-            <p style={{ fontSize: '10px', fontWeight: 700, color: 'var(--aeva-ink-soft)', marginBottom: '8px', textTransform: 'uppercase' }}>{role}</p>
-            {vendor ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: 'var(--r-lg)',
-                        background: 'var(--aeva-canvas)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'var(--aeva-ink)',
-                        boxShadow: 'var(--shadow-sm)'
-                    }}>
-                        {icon}
-                    </div>
-                    <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--aeva-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{vendor.name}</p>
-                </div>
-            ) : (
-                <p style={{ fontSize: '10px', color: 'var(--aeva-ink-soft)', fontStyle: 'italic' }}>Not selected</p>
-            )}
+          {/* Footer */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 20, background: 'var(--aeva-paper-warm)', borderRadius: 'var(--r-md)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--aeva-ink)', color: 'var(--aeva-ember)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Sparkles size={14} />
+              </div>
+              <div>
+                <p style={{ fontSize: 12.5, fontWeight: 600 }}>Planned with AEVA</p>
+                <p style={{ fontSize: 11, color: 'var(--aeva-ink-mute)' }}>aeva.events/maya30 · pw: brooklyn</p>
+              </div>
+            </div>
+            <button style={{ padding: '8px 16px', borderRadius: 'var(--r-md)', background: 'var(--aeva-ink)', color: 'var(--aeva-paper)', border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={() => navigate('/booking/confirm', { state: { eventId: location.state?.eventId } })} onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }} onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}>
+              Lock In This Plan <ChevronLeft size={12} style={{ transform: 'rotate(180deg)' }}/>
+            </button>
+          </div>
         </div>
-    );
-}
-
-function CostRow({ label, value }) {
-    return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px' }}>
-            <span style={{ color: 'var(--aeva-ink-soft)' }}>{label}</span>
-            <span style={{ color: 'var(--aeva-ink)', fontWeight: 600 }}>{value ? value.toLocaleString() : 0} EGP</span>
-        </div>
-    );
+      </div>
+    </div>
+  );
 }
