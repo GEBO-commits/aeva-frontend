@@ -11,7 +11,7 @@ export default function VendorDetail() {
 
     useEffect(() => {
         const fetch = async () => {
-            const { data, error } = await getVendors('photographer');
+            const { data, error } = await getVendors();
             if (!error && data) {
                 const found = data.find(v => v.id === id);
                 if (found) {
@@ -26,7 +26,7 @@ export default function VendorDetail() {
                         rating: found.rating,
                         image: Array.isArray(found.image_urls) ? found.image_urls[0] : (JSON.parse(found.image_urls || '[]')[0] || 'https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg?w=800'),
                         priceMin: found.price_min,
-                        category: details.category || 'Photographer'
+                        category: found.category || 'Vendor'
                     });
                 }
             }
