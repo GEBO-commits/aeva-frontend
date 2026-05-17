@@ -204,6 +204,61 @@ export async function getEvent(eventId) {
 }
 
 /**
+ * Fetch all events owned by a user, joined with their bookings and venue selection.
+ * Returns events ordered by event_date descending (upcoming first if filtered).
+ * @param {string} userId - UUID of the authenticated user
+ * @returns {Promise<{events, error}>} events have shape { ...event, booking, venue }
+ */
+export async function getMyEvents(userId) {
+  if (!userId) return { events: [], error: null };
+  try {
+    const { data: events, error } = await supabase
+      .from('events')
+      .select(`
+        id, title, event_type, event_date, city, guest_count, status, budget_max, created_at,
+        bookings ( id, status, total_amount, created_at ),
+        event_selections ( selection_type, entity_id )
+      `)
+      .eq('user_id', userId)
+      .order('event_date', { ascending: false, nullsFirst: false });
+
+    if (error) {
+      console.error('[planningService] Failed to fetch user events:', error);
+      return { events: [], error };
+    }
+
+    // Resolve venue names for events that have a venue selection.
+    const venueIds = events
+      .map(e => e.event_selections?.find(s => s.selection_type === 'venue')?.entity_id)
+      .filter(Boolean);
+
+    let venueMap = {};
+    if (venueIds.length > 0) {
+      const { data: venues } = await supabase
+        .from('venues')
+        .select('id, name, city')
+        .in('id', venueIds);
+      venueMap = Object.fromEntries((venues || []).map(v => [v.id, v]));
+    }
+
+    const enriched = events.map(e => {
+      const venueSel = e.event_selections?.find(s => s.selection_type === 'venue');
+      const booking = (e.bookings && e.bookings[0]) || null;
+      return {
+        ...e,
+        booking,
+        venue: venueSel ? venueMap[venueSel.entity_id] || null : null,
+      };
+    });
+
+    return { events: enriched, error: null };
+  } catch (err) {
+    console.error('[planningService] Unexpected error in getMyEvents:', err);
+    return { events: [], error: err };
+  }
+}
+
+/**
  * Update an event (title, status, etc.).
  * @param {string} eventId - UUID of the event
  * @param {Object} updates - Fields to update
