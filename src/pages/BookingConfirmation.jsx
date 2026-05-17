@@ -50,7 +50,10 @@ export default function BookingConfirmation() {
         setIsConfirming(true);
         setError(null);
 
-        const { booking, error: bookingError } = await createBooking(eventId);
+        const { booking, error: bookingError } = await createBooking(eventId, {
+            status: 'pending',
+            totalAmount: estimatedTotal,
+        });
 
         if (bookingError) {
             console.error('[BookingConfirmation] Failed to create booking:', bookingError);

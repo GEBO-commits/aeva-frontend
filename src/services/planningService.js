@@ -259,6 +259,56 @@ export async function getMyEvents(userId) {
 }
 
 /**
+ * Fetch a single event with its bookings, selections, and resolved venue.
+ * Used by EventDetail page.
+ * @param {string} eventId - UUID of the event
+ * @returns {Promise<{event, error}>} event has shape { ...event, booking, venue, selections }
+ */
+export async function getEventDetail(eventId) {
+  if (!eventId) return { event: null, error: new Error('eventId required') };
+  try {
+    const { data: event, error } = await supabase
+      .from('events')
+      .select(`
+        *,
+        bookings ( id, status, total_amount, subtotal, created_at ),
+        event_selections ( selection_type, entity_id, notes )
+      `)
+      .eq('id', eventId)
+      .single();
+
+    if (error) {
+      console.error('[planningService] Failed to fetch event detail:', error);
+      return { event: null, error };
+    }
+
+    const venueSel = event.event_selections?.find(s => s.selection_type === 'venue');
+    let venue = null;
+    if (venueSel?.entity_id) {
+      const { data: v } = await supabase
+        .from('venues')
+        .select('id, name, city, image_urls')
+        .eq('id', venueSel.entity_id)
+        .single();
+      venue = v || null;
+    }
+
+    return {
+      event: {
+        ...event,
+        booking: event.bookings?.[0] || null,
+        selections: event.event_selections || [],
+        venue,
+      },
+      error: null,
+    };
+  } catch (err) {
+    console.error('[planningService] Unexpected error in getEventDetail:', err);
+    return { event: null, error: err };
+  }
+}
+
+/**
  * Update an event (title, status, etc.).
  * @param {string} eventId - UUID of the event
  * @param {Object} updates - Fields to update

@@ -12,19 +12,24 @@ import { supabase } from '../lib/supabaseClient';
  * RLS ownership enforced through event_id → events.user_id = auth.uid()
  * Status transitions: draft → pending (after lock-in) → confirmed (after payment) → completed
  * @param {string} eventId - UUID of the event
+ * @param {Object} [opts] - { status, totalAmount }
  * @returns {Promise<{booking, error}>}
  */
-export async function createBooking(eventId) {
+export async function createBooking(eventId, opts = {}) {
   try {
+    const payload = {
+      event_id: eventId,
+      status: opts.status || 'pending',
+      currency: 'EGP',
+    };
+    if (opts.totalAmount && opts.totalAmount > 0) {
+      payload.subtotal = opts.totalAmount;
+      payload.total_amount = opts.totalAmount;
+    }
+
     const { data: booking, error } = await supabase
       .from('bookings')
-      .insert([
-        {
-          event_id: eventId,
-          status: 'draft',
-          currency: 'EGP'
-        }
-      ])
+      .insert([payload])
       .select()
       .single();
 
