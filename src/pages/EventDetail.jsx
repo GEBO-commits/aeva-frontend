@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, Users, MapPin, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Calendar, Users, MapPin, Clock, AlertCircle, Utensils, Palette, Camera, Music, Video, Truck } from 'lucide-react';
 import Skeleton from '../components/ui/Skeleton';
 import { getEventDetail, updateEvent } from '../services/planningService';
+import { supabase } from '../lib/supabaseClient';
 
 function statusClasses(status) {
     switch (status) {
@@ -20,10 +21,7 @@ export default function EventDetail() {
     const [isLoading, setIsLoading] = useState(true);
     const [event, setEvent] = useState(null);
     const [loadError, setLoadError] = useState(null);
-    const [completedTasks, setCompletedTasks] = useState(() => {
-        const saved = localStorage.getItem(`aeva_checklist_${id}`);
-        return saved ? JSON.parse(saved) : [];
-    });
+    const [selectedItems, setSelectedItems] = useState({});
 
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState({});
@@ -45,6 +43,31 @@ export default function EventDetail() {
                     guest_count: data.guest_count || 0,
                     budget_max: data.budget_max || 0,
                 });
+
+                // Fetch details for selected items
+                if (data.selections && data.selections.length > 0) {
+                    const items = {};
+                    for (const sel of data.selections) {
+                        if (sel.selection_type === 'venue') continue; // Already have venue
+
+                        let tableName = '';
+                        if (sel.selection_type === 'catering') tableName = 'vendors';
+                        else if (sel.selection_type === 'decorations') tableName = 'vendors';
+                        else if (['photographer', 'videographer', 'dj'].includes(sel.selection_type)) tableName = 'vendors';
+
+                        if (tableName && sel.entity_id) {
+                            const { data: itemData } = await supabase
+                                .from(tableName)
+                                .select('id, name, image_urls')
+                                .eq('id', sel.entity_id)
+                                .single();
+                            if (itemData) {
+                                items[sel.selection_type] = itemData;
+                            }
+                        }
+                    }
+                    setSelectedItems(items);
+                }
             }
             setIsLoading(false);
         }
@@ -52,15 +75,6 @@ export default function EventDetail() {
         return () => { cancelled = true; };
     }, [id]);
 
-    useEffect(() => {
-        if (id) localStorage.setItem(`aeva_checklist_${id}`, JSON.stringify(completedTasks));
-    }, [completedTasks, id]);
-
-    const toggleTask = (taskId) => {
-        setCompletedTasks(prev =>
-            prev.includes(taskId) ? prev.filter(x => x !== taskId) : [...prev, taskId]
-        );
-    };
 
     const handleSave = async () => {
         setIsSaving(true);
@@ -195,36 +209,121 @@ export default function EventDetail() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
                         <section className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                            <h2 className="text-2xl font-display font-bold text-text-dark mb-6">Planning Checklist</h2>
-                            <div className="space-y-6">
-                                {checklistData.map((section, sIndex) => (
-                                    <div key={sIndex} className="space-y-3">
-                                        <h3 className="font-bold text-lg text-text-dark flex items-center gap-2">
-                                            {section.icon} {section.title}
-                                        </h3>
-                                        <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
-                                            {section.tasks.map((task, tIndex) => {
-                                                const taskId = `${sIndex}-${tIndex}`;
-                                                return (
-                                                    <label key={tIndex} className="flex items-start gap-3 cursor-pointer group">
-                                                        <div className="relative flex items-center justify-center mt-0.5">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={completedTasks.includes(taskId)}
-                                                                onChange={() => toggleTask(taskId)}
-                                                                className="peer appearance-none w-5 h-5 rounded border-2 border-gray-300 checked:bg-primary checked:border-primary transition-colors cursor-pointer"
-                                                            />
-                                                            <CheckCircle className="w-3.5 h-3.5 text-white absolute inset-0 m-auto opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                                                        </div>
-                                                        <span className={`transition-colors ${completedTasks.includes(taskId) ? 'text-gray-400 line-through' : 'text-text-dark group-hover:text-primary'}`}>
-                                                            {task}
-                                                        </span>
-                                                    </label>
-                                                );
-                                            })}
+                            <h2 className="text-2xl font-display font-bold text-text-dark mb-6">Selected Items</h2>
+                            <div className="space-y-4">
+                                {event.venue ? (
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <MapPin className="w-5 h-5 text-secondary flex-shrink-0" />
+                                            <span className="text-sm font-semibold text-text-muted uppercase tracking-wide">Venue</span>
                                         </div>
+                                        <h3 className="font-bold text-lg text-text-dark ml-8">{event.venue.name}</h3>
+                                        <p className="text-sm text-text-muted ml-8">{event.venue.city || 'Location'}</p>
                                     </div>
-                                ))}
+                                ) : (
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-300">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <MapPin className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                                            <span className="text-sm font-semibold text-text-muted uppercase tracking-wide">Venue</span>
+                                        </div>
+                                        <p className="text-sm text-text-muted ml-8">Not selected yet</p>
+                                    </div>
+                                )}
+
+                                {selectedItems.catering ? (
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <Utensils className="w-5 h-5 text-orange-500 flex-shrink-0" />
+                                            <span className="text-sm font-semibold text-text-muted uppercase tracking-wide">Catering</span>
+                                        </div>
+                                        <h3 className="font-bold text-lg text-text-dark ml-8">{selectedItems.catering.name}</h3>
+                                    </div>
+                                ) : (
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-300">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <Utensils className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                                            <span className="text-sm font-semibold text-text-muted uppercase tracking-wide">Catering</span>
+                                        </div>
+                                        <p className="text-sm text-text-muted ml-8">Not selected yet</p>
+                                    </div>
+                                )}
+
+                                {selectedItems.decorations ? (
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <Palette className="w-5 h-5 text-pink-500 flex-shrink-0" />
+                                            <span className="text-sm font-semibold text-text-muted uppercase tracking-wide">Decorations</span>
+                                        </div>
+                                        <h3 className="font-bold text-lg text-text-dark ml-8">{selectedItems.decorations.name}</h3>
+                                    </div>
+                                ) : (
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-300">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <Palette className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                                            <span className="text-sm font-semibold text-text-muted uppercase tracking-wide">Decorations</span>
+                                        </div>
+                                        <p className="text-sm text-text-muted ml-8">Not selected yet</p>
+                                    </div>
+                                )}
+
+                                <div className="border-t border-gray-200 pt-4 mt-4">
+                                    <h3 className="text-sm font-bold text-text-muted uppercase tracking-wide mb-3">Vendors</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {selectedItems.photographer ? (
+                                            <div className="bg-blue-50 rounded-xl p-3 border border-blue-200">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Camera className="w-4 h-4 text-blue-600" />
+                                                    <span className="text-xs font-semibold text-blue-600 uppercase">Photographer</span>
+                                                </div>
+                                                <p className="text-sm font-semibold text-text-dark">{selectedItems.photographer.name}</p>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-gray-50 rounded-xl p-3 border border-dashed border-gray-300">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Camera className="w-4 h-4 text-gray-400" />
+                                                    <span className="text-xs font-semibold text-gray-400 uppercase">Photographer</span>
+                                                </div>
+                                                <p className="text-xs text-text-muted">Not selected</p>
+                                            </div>
+                                        )}
+
+                                        {selectedItems.videographer ? (
+                                            <div className="bg-purple-50 rounded-xl p-3 border border-purple-200">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Video className="w-4 h-4 text-purple-600" />
+                                                    <span className="text-xs font-semibold text-purple-600 uppercase">Videographer</span>
+                                                </div>
+                                                <p className="text-sm font-semibold text-text-dark">{selectedItems.videographer.name}</p>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-gray-50 rounded-xl p-3 border border-dashed border-gray-300">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Video className="w-4 h-4 text-gray-400" />
+                                                    <span className="text-xs font-semibold text-gray-400 uppercase">Videographer</span>
+                                                </div>
+                                                <p className="text-xs text-text-muted">Not selected</p>
+                                            </div>
+                                        )}
+
+                                        {selectedItems.dj ? (
+                                            <div className="bg-red-50 rounded-xl p-3 border border-red-200">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Music className="w-4 h-4 text-red-600" />
+                                                    <span className="text-xs font-semibold text-red-600 uppercase">DJ / Music</span>
+                                                </div>
+                                                <p className="text-sm font-semibold text-text-dark">{selectedItems.dj.name}</p>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-gray-50 rounded-xl p-3 border border-dashed border-gray-300">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Music className="w-4 h-4 text-gray-400" />
+                                                    <span className="text-xs font-semibold text-gray-400 uppercase">DJ / Music</span>
+                                                </div>
+                                                <p className="text-xs text-text-muted">Not selected</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -269,107 +368,3 @@ export default function EventDetail() {
         </div>
     );
 }
-
-const checklistData = [
-    {
-        title: "Before You Start",
-        icon: "🎯",
-        tasks: [
-            "Define event type (wedding / birthday / corporate)",
-            "Set your total budget (in EGP)",
-            "Choose a date and backup date",
-            "Estimate guest count",
-            "Decide indoor or outdoor"
-        ]
-    },
-    {
-        title: "Venue",
-        icon: "🏛️",
-        tasks: [
-            "Search and shortlist 3 venues",
-            "Check availability for your date",
-            "Confirm capacity fits your guest count",
-            "Visit the venue in person",
-            "Review contract and payment terms",
-            "Pay deposit to confirm booking"
-        ]
-    },
-    {
-        title: "Catering",
-        icon: "🍽️",
-        tasks: [
-            "Decide menu style (buffet / plated / stations)",
-            "Handle dietary restrictions (vegetarian, halal, etc.)",
-            "Arrange cake if needed",
-            "Confirm drinks and beverages",
-            "Confirm number of waitstaff"
-        ]
-    },
-    {
-        title: "Decorations",
-        icon: "🎨",
-        tasks: [
-            "Choose a theme and color palette",
-            "Hire a decorator or DIY",
-            "Order flowers / centerpieces",
-            "Arrange lighting and candles",
-            "Table setup and linens"
-        ]
-    },
-    {
-        title: "Vendors",
-        icon: "📸",
-        tasks: [
-            "Book photographer",
-            "Book videographer",
-            "Book DJ or live band",
-            "Arrange transportation if needed",
-            "Book makeup artist (if wedding)"
-        ]
-    },
-    {
-        title: "Invitations",
-        icon: "💌",
-        tasks: [
-            "Finalize guest list",
-            "Send save-the-date (6-8 weeks before)",
-            "Send formal invitations (4 weeks before)",
-            "Track RSVPs",
-            "Follow up with non-responders",
-            "Share event location/directions"
-        ]
-    },
-    {
-        title: "Week Before",
-        icon: "📋",
-        tasks: [
-            "Confirm all vendors and bookings",
-            "Share timeline with everyone involved",
-            "Prepare payment envelopes for vendors",
-            "Assign roles to helpers/family",
-            "Prepare emergency kit (safety pins, medicine, charger, etc.)"
-        ]
-    },
-    {
-        title: "Day Of",
-        icon: "🎉",
-        tasks: [
-            "Arrive early to venue",
-            "Supervise setup",
-            "Brief all vendors on the schedule",
-            "Designate a point-of-contact person",
-            "Enjoy your event! 🥳"
-        ]
-    },
-    {
-        title: "After the Event",
-        icon: "✅",
-        tasks: [
-            "Send thank-you messages to guests",
-            "Pay remaining vendor balances",
-            "Collect photos/videos from photographer",
-            "Leave venue reviews",
-            "Archive everything for memories"
-        ]
-    }
-];

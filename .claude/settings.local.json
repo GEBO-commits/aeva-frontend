@@ -4,7 +4,8 @@
       "Bash(npm list *)",
       "Bash(npm run *)",
       "Bash(node -c src/lib/supabaseClient.js)",
-      "Bash(node -c src/services/index.js)"
+      "Bash(node -c src/services/index.js)",
+      "Bash(git fetch *)"
     ]
   }
 }
