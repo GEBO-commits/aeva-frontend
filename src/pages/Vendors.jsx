@@ -112,6 +112,7 @@ export default function Vendors() {
                         </button>
                     </div>
                 )}
+                </div>
             </div>
         </div>
     );
