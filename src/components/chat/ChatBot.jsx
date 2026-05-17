@@ -17,7 +17,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Sparkles } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { getChatReply } from '../../services/aiService';
 
 /** Quick-prompt chips shown above the input field */
 const QUICK_PROMPTS = [
@@ -27,29 +28,6 @@ const QUICK_PROMPTS = [
     'Birthday party 🎂',
 ];
 
-/**
- * Returns an AI response string based on keyword matching.
- * @param {string} message - The user's raw message
- * @returns {string} AI reply
- */
-function getAIResponse(message) {
-    const lower = message.toLowerCase();
-    if (lower.includes('wedding'))
-        return "Perfect! I found 6 elegant indoor venues for weddings in Cairo. What's your approximate budget? 💍";
-    if (lower.includes('birthday'))
-        return "Fun! For birthdays I recommend checking our outdoor venues. How many guests are you expecting? 🎂";
-    if (lower.includes('corporate'))
-        return "For corporate events, we have premium hotel ballrooms and conference halls. What's your guest count?";
-    if (lower.includes('budget') || /\d{4,}/.test(lower))
-        return "Great! Based on your budget, I'm filtering the best venues and catering options... Check /recommendations now! 🏛️";
-    if (lower.includes('catering') || lower.includes('food'))
-        return "We have 6 top-rated caterers from buffet to fine dining. Head to /catering to browse them! 🍽️";
-    if (lower.includes('venue'))
-        return "I can show you dozens of stunning venues across Cairo. Tell me your event type, guest count and budget and I'll filter them for you!";
-    if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey'))
-        return "Hi there! 👋 I'm AEVA. Tell me: what type of event are you planning, how many guests, and your budget?";
-    return "I can help you build the perfect event! Tell me the type (wedding, birthday, corporate), your guest count, and total budget. 🎉";
-}
 
 /** Format a Date object as HH:MM */
 function formatTime(date) {
@@ -58,6 +36,7 @@ function formatTime(date) {
 
 export default function ChatBot() {
     const location = useLocation();
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [isDismissed, setIsDismissed] = useState(false);
     const [messages, setMessages] = useState([
@@ -65,6 +44,7 @@ export default function ChatBot() {
     ]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [chatHistory, setChatHistory] = useState([]);
     const messagesEndRef = useRef(null);
 
     // Auto-open if navigated with { openChat: true }
@@ -77,17 +57,25 @@ export default function ChatBot() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
-    const sendMessage = (text) => {
+    const sendMessage = async (text) => {
         const content = (text || input).trim();
         if (!content) return;
         const userMsg = { role: 'user', content, timestamp: new Date() };
         setMessages(prev => [...prev, userMsg]);
+        setChatHistory(prev => [...prev, { role: 'user', content }].slice(-10));
         setInput('');
         setIsTyping(true);
-        setTimeout(() => {
-            setIsTyping(false);
-            setMessages(prev => [...prev, { role: 'ai', content: getAIResponse(content), timestamp: new Date() }]);
-        }, 1500);
+        const eventId = localStorage.getItem('aeva_pending_event_id') || null;
+        const { reply, cards, error } = await getChatReply(content, eventId, chatHistory);
+        setIsTyping(false);
+        const aiMsg = {
+            role: 'ai',
+            content: reply || "I'm here to help you plan your perfect event! What type of event are you planning?",
+            cards: cards || [],
+            timestamp: new Date()
+        };
+        setMessages(prev => [...prev, aiMsg]);
+        setChatHistory(prev => [...prev, { role: 'ai', content: aiMsg.content }].slice(-10));
     };
 
     const handleKey = (e) => {
@@ -141,6 +129,31 @@ export default function ChatBot() {
                                             }`}>
                                             {msg.content}
                                         </div>
+                                        {msg.cards && msg.cards.length > 0 && (
+                                            <div className="flex gap-2 overflow-x-auto mt-2 pb-1 max-w-xs">
+                                                {msg.cards.slice(0, 3).map(card => (
+                                                    <div
+                                                        key={card.id}
+                                                        onClick={() => card.url && navigate(card.url)}
+                                                        className="flex-shrink-0 w-36 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200"
+                                                    >
+                                                        {card.image_urls && (
+                                                            <img
+                                                                src={Array.isArray(card.image_urls) ? card.image_urls[0] : (JSON.parse(card.image_urls || '[]')[0] || '')}
+                                                                alt={card.name}
+                                                                className="w-full h-20 object-cover"
+                                                                onError={e => e.target.style.display='none'}
+                                                            />
+                                                        )}
+                                                        <div className="p-2">
+                                                            <p className="text-xs font-bold text-gray-800 truncate">{card.name}</p>
+                                                            <p className="text-xs text-gray-500 truncate">{card.city}</p>
+                                                            <p className="text-xs text-primary font-semibold">{card.price_min?.toLocaleString()} EGP</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                         <span className="text-[10px] text-gray-400 px-1">{formatTime(msg.timestamp)}</span>
                                     </div>
                                 </div>

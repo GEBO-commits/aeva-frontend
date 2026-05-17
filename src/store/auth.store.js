@@ -46,6 +46,24 @@ export const useAuthStore = create(
             restoreSession: async () => {
                 const { user, error } = await authService.getCurrentAuthUser();
 
+                if (error && error.message?.includes('Auth session missing')) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    const { user: retryUser } = await authService.getCurrentAuthUser();
+                    if (retryUser && retryUser.is_anonymous !== true && retryUser.email) {
+                        set({
+                            user: {
+                                ...retryUser,
+                                display_name: retryUser.user_metadata?.full_name
+                                    || retryUser.email?.split('@')[0]
+                                    || 'User'
+                            },
+                            isAuthenticated: true,
+                            isAdmin: false,
+                        });
+                    }
+                    return;
+                }
+
                 if (error) {
                     console.error('[auth.store] Failed to restore session:', error);
                     return;

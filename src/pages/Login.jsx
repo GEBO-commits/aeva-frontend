@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
 import * as authService from '../services/authService';
+import { supabase } from '../lib/supabaseClient';
 
 const loginSchema = z.object({
     email: z.string().email('Please enter a valid email'),
@@ -26,11 +27,19 @@ export default function Login() {
     const [authError, setAuthError] = useState(null);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
-        resolver: zodResolver(loginSchema)
+        resolver: zodResolver(loginSchema),
+        mode: 'onSubmit'
     });
 
     const onSubmit = async (data) => {
+        if (isSubmitting) return;
         setAuthError(null);
+
+        // Ensure anonymous session is ready before login
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            await new Promise(resolve => setTimeout(resolve, 800));
+        }
 
         // Capture current user before login (may be anonymous)
         const { user: currentUser } = await authService.getCurrentAuthUser();
@@ -49,7 +58,9 @@ export default function Login() {
             try {
                 await authService.claimAnonymousSession(anonymousUserId, user.id);
             } catch (mergeError) {
-                console.warn('[Login] Session merge failed, proceeding anyway:', mergeError);
+                console.error('[Login] Session merge failed:', mergeError);
+                setAuthError('Session initialization failed. Please try again.');
+                return;
             }
         }
 

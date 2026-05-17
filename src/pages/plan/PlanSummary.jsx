@@ -145,12 +145,8 @@ export default function PlanSummary() {
                         <div className="space-y-3">
                             <button
                                 onClick={handleConfirm}
-                                disabled={!hasAnySelection}
-                                title={!hasAnySelection ? "Please make your selections to continue" : ""}
-                                className={`w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${!hasAnySelection
-                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-2 border-gray-300'
-                                    : 'bg-primary text-white hover:bg-secondary shadow-lg shadow-primary/20'
-                                    }`}
+                                disabled={false}
+                                className="w-full py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 bg-primary text-white hover:bg-secondary shadow-lg shadow-primary/20"
                             >
                                 <CheckCircle size={20} /> Lock In This Plan
                             </button>

@@ -89,7 +89,9 @@ export async function getCurrentAuthUser() {
     const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error) {
-      console.error('[authService] Failed to get current user:', error);
+      if (!error.message?.includes('Auth session missing')) {
+        console.error('[authService] Failed to get current user:', error);
+      }
       return { user: null, error };
     }
 
@@ -102,7 +104,7 @@ export async function getCurrentAuthUser() {
 
 /**
  * Claim an anonymous planning session after user logs in.
- * Transfers planning_sessions and events from anonymous user_id to authenticated user_id.
+ * Calls Edge Function to transfer planning_sessions and events with service role bypass.
  * Idempotent: safe to call multiple times with same IDs.
  * @param {string} anonymousUserId - UUID of the anonymous session user
  * @param {string} authenticatedUserId - UUID of the newly authenticated user
@@ -110,24 +112,12 @@ export async function getCurrentAuthUser() {
  */
 export async function claimAnonymousSession(anonymousUserId, authenticatedUserId) {
   try {
-    // Update planning_sessions: transfer ownership from anonymous to authenticated user
-    const { error: sessionError } = await supabase
-      .from('planning_sessions')
-      .update({ user_id: authenticatedUserId })
-      .eq('user_id', anonymousUserId);
+    const { data, error } = await supabase.functions.invoke('claim-session', {
+      body: { anonymousUserId, authenticatedUserId }
+    });
 
-    if (sessionError) {
-      throw new Error(`Failed to transfer planning_sessions: ${sessionError.message}`);
-    }
-
-    // Update events: transfer ownership from anonymous to authenticated user
-    const { error: eventError } = await supabase
-      .from('events')
-      .update({ user_id: authenticatedUserId })
-      .eq('user_id', anonymousUserId);
-
-    if (eventError) {
-      throw new Error(`Failed to transfer events: ${eventError.message}`);
+    if (error) {
+      throw new Error(error.message || 'Edge function call failed');
     }
 
     console.log(`[authService] Session merge complete: ${anonymousUserId} → ${authenticatedUserId}`);
