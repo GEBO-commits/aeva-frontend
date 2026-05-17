@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { getVendors } from '../services/catalogService';
-import { Utensils, Star, Check } from 'lucide-react';
+import CateringFilter from '../components/catering/CateringFilter';
+import { Utensils, Star, Check, SlidersHorizontal } from 'lucide-react';
 import { CardSkeleton } from '../components/ui/Skeleton';
 
 export default function Catering() {
     const [isLoading, setIsLoading] = useState(true);
     const [catering, setCatering] = useState([]);
+    const [filters, setFilters] = useState({ maxPrice: '5000', rating: 'all' });
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -46,6 +49,19 @@ export default function Catering() {
         fetchCatering();
     }, []);
 
+    const filteredCatering = useMemo(() => {
+        let result = [...catering];
+
+        result = result.filter(c => c.startingPrice <= parseInt(filters.maxPrice));
+
+        if (filters.rating !== 'all') {
+            const minRating = parseFloat(filters.rating);
+            result = result.filter(c => c.rating >= minRating);
+        }
+
+        return result;
+    }, [catering, filters]);
+
     return (
         <div className="w-full">
             <div className="mb-8">
@@ -53,28 +69,48 @@ export default function Catering() {
                     Catering Services <Utensils className="text-accent w-6 h-6" />
                 </h1>
                 <p className="text-text-muted mt-1">Discover top-rated caterers for your perfect menu.</p>
+
+                <button
+                    className="md:hidden mt-4 bg-white border border-gray-200 px-4 py-2 rounded-xl flex items-center justify-center gap-2 font-medium text-sm"
+                    onClick={() => setShowMobileFilters(!showMobileFilters)}
+                >
+                    <SlidersHorizontal className="w-4 h-4" /> Filters
+                </button>
             </div>
 
+            <div className="flex flex-col md:flex-row gap-8 items-start">
+                <div className={`w-full md:w-64 shrink-0 transition-all ${showMobileFilters ? 'block' : 'hidden md:block'}`}>
+                    <CateringFilter filters={filters} setFilters={setFilters} />
+                </div>
+
+                <div className="flex-1 w-full">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {isLoading ? (
                     <>
                         {[1, 2, 3].map(i => <CardSkeleton key={i} />)}
                     </>
-                ) : catering.length > 0 ? (
+                ) : filteredCatering.length > 0 ? (
                     <AnimatePresence>
-                        {catering.map((caterer, index) => (
+                        {filteredCatering.map((caterer, index) => (
                             <CateringCard key={caterer.id} data={caterer} index={index} onView={() => navigate(`/catering/${caterer.id}`)} />
                         ))}
                     </AnimatePresence>
                 ) : (
                     <div className="col-span-full bg-white p-12 rounded-3xl border border-gray-100 text-center flex flex-col items-center justify-center w-full min-h-[40vh]">
                         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                            <Utensils className="w-8 h-8 text-gray-400" />
+                            <SlidersHorizontal className="w-8 h-8 text-gray-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-text-dark mb-2">No catering options available</h3>
-                        <p className="text-text-muted">Please check back later.</p>
+                        <h3 className="text-xl font-bold text-text-dark mb-2">No catering options found</h3>
+                        <p className="text-text-muted mb-6">Try adjusting your filters to see more results.</p>
+                        <button
+                            onClick={() => setFilters({ maxPrice: '5000', rating: 'all' })}
+                            className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-full font-medium transition-colors text-sm"
+                        >
+                            Clear Filters
+                        </button>
                     </div>
                 )}
+                </div>
             </div>
         </div>
     );
