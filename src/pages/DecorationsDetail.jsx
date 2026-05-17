@@ -1,34 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { mockDecorations } from '../api/mock/decorations.mock';
-import { usePlanStore } from '../store/plan.store';
-import { Star, CheckCircle, Palette, ArrowLeft, Tag } from 'lucide-react';
+import { getVendors } from '../services/catalogService';
+import { Star, ArrowLeft } from 'lucide-react';
 
 export default function DecorationsDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { setDecorations, selectedDecorations } = usePlanStore();
     const [item, setItem] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const found = mockDecorations.find(d => d.id === id);
-        if (found) {
-            setItem(found);
-        }
-        setLoading(false);
+        const fetch = async () => {
+            const { data, error } = await getVendors('decorations');
+            if (!error && data) {
+                const found = data.find(d => d.id === id);
+                if (found) {
+                    let details = {};
+                    if (found.details) {
+                        details = typeof found.details === 'string' ? JSON.parse(found.details) : found.details;
+                    }
+                    setItem({
+                        id: found.id,
+                        name: found.name,
+                        description: found.description,
+                        rating: found.rating,
+                        image: Array.isArray(found.image_urls) ? found.image_urls[0] : (JSON.parse(found.image_urls || '[]')[0] || 'https://images.pexels.com/photos/2339012/pexels-photo-2339012.jpeg?w=800'),
+                        priceMin: found.price_min,
+                        priceMax: found.price_max,
+                        includes: details.includes || []
+                    });
+                }
+            }
+            setLoading(false);
+        };
+        fetch();
     }, [id]);
 
     if (loading) return <div className="min-h-screen bg-surface flex items-center justify-center">Loading...</div>;
     if (!item) return <div className="min-h-screen bg-surface flex items-center justify-center text-text-muted">Item not found</div>;
-
-    const isSelected = selectedDecorations?.id === item.id;
-
-    const handleSelect = () => {
-        setDecorations(item);
-        navigate('/plan/build/vendors');
-    };
 
     return (
         <div className="min-h-screen bg-surface pt-24 pb-12 px-4">
@@ -53,29 +62,30 @@ export default function DecorationsDetail() {
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 mb-6">
-                            {item.includes.map(inc => (
-                                <span key={inc} className="px-3 py-1 bg-pink-50 text-pink-600 rounded-full text-xs font-bold border border-pink-100 flex items-center gap-1">
-                                    <Tag size={12} /> {inc}
-                                </span>
-                            ))}
-                        </div>
+                        <p className="text-text-muted leading-relaxed mb-8">{item.description}</p>
 
-                        <div className="p-6 bg-pink-50 rounded-2xl border border-pink-100 mb-8">
-                            <p className="text-xs text-pink-600 font-bold uppercase tracking-wider mb-1">Package Price</p>
-                            <p className="text-3xl font-display font-black text-pink-600">{item.totalPrice.toLocaleString()} EGP</p>
-                        </div>
+                        {item.includes && item.includes.length > 0 && (
+                            <div className="mb-8">
+                                <p className="text-xs text-pink-600 font-bold uppercase tracking-wider mb-3">Includes</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {item.includes.map(inc => (
+                                        <span key={inc} className="px-3 py-1 bg-pink-50 text-pink-600 rounded-full text-xs font-bold border border-pink-100">
+                                            {inc}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-                        <div className="mt-auto pt-6 border-t border-gray-50 flex flex-col sm:flex-row gap-4">
-                            <button
-                                onClick={handleSelect}
-                                className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${isSelected
-                                        ? 'bg-pink-500 text-white shadow-lg shadow-pink-200'
-                                        : 'bg-pink-50 text-pink-600 border border-pink-200 hover:bg-pink-500 hover:text-white'
-                                    }`}
-                            >
-                                {isSelected ? <><CheckCircle size={20} /> Selected</> : 'Select This Package →'}
-                            </button>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="p-4 bg-pink-50 rounded-2xl border border-pink-100">
+                                <p className="text-xs text-pink-600 font-bold uppercase tracking-wider mb-1">Starting From</p>
+                                <p className="text-xl font-bold text-text-dark">{item.priceMin.toLocaleString()} EGP</p>
+                            </div>
+                            <div className="p-4 bg-pink-50 rounded-2xl border border-pink-100">
+                                <p className="text-xs text-pink-600 font-bold uppercase tracking-wider mb-1">Up To</p>
+                                <p className="text-xl font-bold text-text-dark">{item.priceMax.toLocaleString()} EGP</p>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,35 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { mockCatering } from '../api/mock/catering.mock';
-import { usePlanStore } from '../store/plan.store';
-import { Star, CheckCircle, Clock, Users, ArrowLeft } from 'lucide-react';
+import { getVendors } from '../services/catalogService';
+import { Star, ArrowLeft } from 'lucide-react';
 
 export default function CateringDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { setCatering, selectedCatering } = usePlanStore();
     const [item, setItem] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Find in mock data
-        const found = mockCatering.find(c => c.id === id);
-        if (found) {
-            setItem(found);
-        }
-        setLoading(false);
+        const fetch = async () => {
+            const { data, error } = await getVendors('catering');
+            if (!error && data) {
+                const found = data.find(c => c.id === id);
+                if (found) {
+                    let details = {};
+                    if (found.details) {
+                        details = typeof found.details === 'string' ? JSON.parse(found.details) : found.details;
+                    }
+                    setItem({
+                        id: found.id,
+                        name: found.name,
+                        description: found.description,
+                        rating: found.rating,
+                        image: Array.isArray(found.image_urls) ? found.image_urls[0] : (JSON.parse(found.image_urls || '[]')[0] || 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg?w=800'),
+                        pricePerPerson: found.price_min,
+                        priceMax: found.price_max,
+                        specialties: details.specialties || []
+                    });
+                }
+            }
+            setLoading(false);
+        };
+        fetch();
     }, [id]);
 
     if (loading) return <div className="min-h-screen bg-surface flex items-center justify-center">Loading...</div>;
     if (!item) return <div className="min-h-screen bg-surface flex items-center justify-center text-text-muted">Item not found</div>;
-
-    const isSelected = selectedCatering?.id === item.id;
-
-    const handleSelect = () => {
-        setCatering(item);
-        navigate('/plan/build/decorations');
-    };
 
     return (
         <div className="min-h-screen bg-surface pt-24 pb-12 px-4">
@@ -58,27 +66,29 @@ export default function CateringDetail() {
 
                         <div className="grid grid-cols-2 gap-4 mb-8">
                             <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100">
-                                <p className="text-xs text-orange-600 font-bold uppercase tracking-wider mb-1">Price</p>
-                                <p className="text-xl font-bold text-text-dark">{item.pricePerPerson} EGP</p>
+                                <p className="text-xs text-orange-600 font-bold uppercase tracking-wider mb-1">Starting From</p>
+                                <p className="text-xl font-bold text-text-dark">{item.pricePerPerson.toLocaleString()} EGP</p>
                                 <p className="text-[10px] text-orange-600/70">Per person</p>
                             </div>
                             <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100">
-                                <p className="text-xs text-orange-600 font-bold uppercase tracking-wider mb-1">Style</p>
-                                <p className="text-xl font-bold text-text-dark">{item.style}</p>
+                                <p className="text-xs text-orange-600 font-bold uppercase tracking-wider mb-1">Up To</p>
+                                <p className="text-xl font-bold text-text-dark">{item.priceMax.toLocaleString()} EGP</p>
+                                <p className="text-[10px] text-orange-600/70">Per person</p>
                             </div>
                         </div>
 
-                        <div className="mt-auto pt-6 border-t border-gray-50 flex flex-col sm:flex-row gap-4">
-                            <button
-                                onClick={handleSelect}
-                                className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${isSelected
-                                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-200'
-                                        : 'bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white'
-                                    }`}
-                            >
-                                {isSelected ? <><CheckCircle size={20} /> Selected</> : 'Select This Catering →'}
-                            </button>
-                        </div>
+                        {item.specialties && item.specialties.length > 0 && (
+                            <div className="mb-8">
+                                <p className="text-xs text-orange-600 font-bold uppercase tracking-wider mb-3">Specialties</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {item.specialties.map(spec => (
+                                        <span key={spec} className="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-xs font-bold border border-orange-100">
+                                            {spec}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

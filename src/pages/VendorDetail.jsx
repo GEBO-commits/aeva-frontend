@@ -1,38 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockVendors } from '../api/mock/vendors.mock';
-import { usePlanStore } from '../store/plan.store';
-import { Star, CheckCircle, ArrowLeft, Camera, Music, Video } from 'lucide-react';
-
-const CATEGORY_MAP = { Photographer: 'photographer', DJ: 'dj', Videographer: 'videographer' };
-const ICON_MAP = { photographer: Camera, dj: Music, videographer: Video };
+import { getVendors } from '../services/catalogService';
+import { Star, ArrowLeft } from 'lucide-react';
 
 export default function VendorDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { setVendor, selectedVendors } = usePlanStore();
     const [item, setItem] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const found = mockVendors.find(v => v.id === id);
-        if (found) {
-            setItem(found);
-        }
-        setLoading(false);
+        const fetch = async () => {
+            const { data, error } = await getVendors('photographer');
+            if (!error && data) {
+                const found = data.find(v => v.id === id);
+                if (found) {
+                    let details = {};
+                    if (found.details) {
+                        details = typeof found.details === 'string' ? JSON.parse(found.details) : found.details;
+                    }
+                    setItem({
+                        id: found.id,
+                        name: found.name,
+                        description: found.description,
+                        rating: found.rating,
+                        image: Array.isArray(found.image_urls) ? found.image_urls[0] : (JSON.parse(found.image_urls || '[]')[0] || 'https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg?w=800'),
+                        priceMin: found.price_min,
+                        category: details.category || 'Photographer'
+                    });
+                }
+            }
+            setLoading(false);
+        };
+        fetch();
     }, [id]);
 
     if (loading) return <div className="min-h-screen bg-surface flex items-center justify-center">Loading...</div>;
     if (!item) return <div className="min-h-screen bg-surface flex items-center justify-center text-text-muted">Vendor not found</div>;
-
-    const catKey = CATEGORY_MAP[item.category];
-    const isSelected = selectedVendors[catKey]?.id === item.id;
-    const Icon = ICON_MAP[catKey] || Camera;
-
-    const handleSelect = () => {
-        setVendor(catKey, isSelected ? null : item);
-        navigate('/plan/build/vendors');
-    };
 
     return (
         <div className="min-h-screen bg-surface pt-24 pb-12 px-4">
@@ -44,8 +48,8 @@ export default function VendorDetail() {
                 <div className="bg-white rounded-[32px] overflow-hidden shadow-xl border border-gray-100 flex flex-col md:flex-row">
                     <div className="md:w-1/2 h-80 md:h-auto relative">
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                        <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-bold text-primary shadow-sm flex items-center gap-2">
-                            <Icon size={16} /> {item.category}
+                        <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-bold text-primary shadow-sm">
+                            {item.category}
                         </div>
                     </div>
 
@@ -57,25 +61,11 @@ export default function VendorDetail() {
                             </div>
                         </div>
 
-                        <p className="text-text-muted leading-relaxed mb-8">
-                            Premium {item.category} services in {item.location || 'Cairo'}. Known for exceptional quality and reliability in capturing or creating the perfect atmosphere for your special events.
-                        </p>
+                        <p className="text-text-muted leading-relaxed mb-8">{item.description}</p>
 
-                        <div className="p-6 bg-primary/5 rounded-2xl border border-primary/10 mb-8">
+                        <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
                             <p className="text-xs text-primary font-bold uppercase tracking-wider mb-1">Starting From</p>
-                            <p className="text-3xl font-display font-black text-primary">{item.startingPrice.toLocaleString()} EGP</p>
-                        </div>
-
-                        <div className="mt-auto pt-6 border-t border-gray-50 flex flex-col sm:flex-row gap-4">
-                            <button
-                                onClick={handleSelect}
-                                className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${isSelected
-                                        ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                                        : 'bg-primary/5 text-primary border border-primary/20 hover:bg-primary hover:text-white'
-                                    }`}
-                            >
-                                {isSelected ? <><CheckCircle size={20} /> In Your Plan</> : `Add to Plan →`}
-                            </button>
+                            <p className="text-2xl font-bold text-text-dark">{item.priceMin.toLocaleString()} EGP</p>
                         </div>
                     </div>
                 </div>
