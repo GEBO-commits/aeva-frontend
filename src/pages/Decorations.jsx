@@ -135,6 +135,7 @@ export default function Decorations() {
                     </div>
                 )}
                 </div>
+                </div>
             </div>
         </div>
     );
