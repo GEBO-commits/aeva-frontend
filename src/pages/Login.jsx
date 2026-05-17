@@ -53,14 +53,13 @@ export default function Login() {
             return;
         }
 
-        // Claim anonymous session if it exists and is different from authenticated user
+        // Claim anonymous session if it exists and is different from authenticated user.
+        // Non-fatal: edge function may not be deployed in all environments — log and continue.
         if (anonymousUserId && user.id !== anonymousUserId) {
             try {
                 await authService.claimAnonymousSession(anonymousUserId, user.id);
             } catch (mergeError) {
-                console.error('[Login] Session merge failed:', mergeError);
-                setAuthError('Session initialization failed. Please try again.');
-                return;
+                console.warn('[Login] Session merge skipped (edge function unavailable):', mergeError);
             }
         }
 

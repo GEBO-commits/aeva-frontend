@@ -89,7 +89,7 @@ ${vendorList}`;
 
         if (geminiKey) {
             try {
-                const url = `/api/gemini/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+                const url = `/api/gemini/models/gemini-flash-latest:generateContent?key=${geminiKey}`;
                 const body = {
                     system_instruction: { parts: [{ text: systemPrompt }] },
                     contents: [

@@ -138,9 +138,10 @@ export default function EventPlan() {
 
     useEffect(() => {
         const fetchEventData = async () => {
+            const resolvedId = eventIdFromState || localStorage.getItem('aeva_pending_event_id');
             try {
-                if (eventIdFromState) {
-                    const { event, error: eventError } = await getEvent(eventIdFromState);
+                if (resolvedId) {
+                    const { event, error: eventError } = await getEvent(resolvedId);
 
                     if (eventError) {
                         console.error('[EventPlan] Failed to fetch event:', eventError);
