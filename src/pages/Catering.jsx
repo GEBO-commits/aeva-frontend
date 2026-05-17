@@ -113,6 +113,7 @@ export default function Catering() {
                 </div>
                 </div>
             </div>
+            </div>
         </div>
     );
 }
