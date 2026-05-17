@@ -18,8 +18,8 @@ export default function CateringFilter({ filters, setFilters }) {
                             type="range"
                             name="maxPrice"
                             min="500"
-                            max="5000"
-                            step="100"
+                            max="50000"
+                            step="500"
                             value={filters.maxPrice}
                             onChange={handleChange}
                             className="w-full accent-primary h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
@@ -39,7 +39,7 @@ export default function CateringFilter({ filters, setFilters }) {
             </div>
 
             <button
-                onClick={() => setFilters({ maxPrice: '5000', rating: 'all' })}
+                onClick={() => setFilters({ maxPrice: '50000', rating: 'all' })}
                 className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-colors font-medium text-sm mt-auto"
             >
                 Reset Filters

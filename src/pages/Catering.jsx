@@ -9,7 +9,7 @@ import { CardSkeleton } from '../components/ui/Skeleton';
 export default function Catering() {
     const [isLoading, setIsLoading] = useState(true);
     const [catering, setCatering] = useState([]);
-    const [filters, setFilters] = useState({ maxPrice: '5000', rating: 'all' });
+    const [filters, setFilters] = useState({ maxPrice: '50000', rating: 'all' });
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const navigate = useNavigate();
 
@@ -103,7 +103,7 @@ export default function Catering() {
                         <h3 className="text-xl font-bold text-text-dark mb-2">No catering options found</h3>
                         <p className="text-text-muted mb-6">Try adjusting your filters to see more results.</p>
                         <button
-                            onClick={() => setFilters({ maxPrice: '5000', rating: 'all' })}
+                            onClick={() => setFilters({ maxPrice: '50000', rating: 'all' })}
                             className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-full font-medium transition-colors text-sm"
                         >
                             Clear Filters
