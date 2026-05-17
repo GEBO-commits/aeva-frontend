@@ -115,7 +115,6 @@ export default function Vendors() {
                 </div>
                 </div>
             </div>
-            </div>
         </div>
     );
 }
